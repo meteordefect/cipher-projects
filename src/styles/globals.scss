@@ -1,0 +1,20 @@
+// styles/globals.scss
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --black: #101010;
+  --white: #ffffff;
+  --goldy: #e8ded5;
+}
+
+body {
+  font-family: var(--font-neue-haas);
+  @apply text-black bg-white;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  @apply max-w-[1440px] mx-auto px-4;
+}
