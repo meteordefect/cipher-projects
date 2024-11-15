@@ -7,10 +7,10 @@ import { ArrowUpRight } from 'lucide-react'
 import { useBackground } from '@/context/BackgroundContext'
 
 const letters = [
-  '零', '壱', '弐', '参', '肆', '伍', '陸', '質', '捌', '玖',  
-  'ｱ', 'ｲ', 'ｳ', 'ｴ', 'ｵ', 'ｶ', 'ｷ', 'ｸ', 'ｹ', 'ｺ',        
-  '⟨', '⟩', '⟪', '⟫', '⌈', '⌉', '⌊', '⌋', '∮', '∯',        
-  '†', '‡', '§', '¶', '©', '®', '™', '⁂', '⁕', '⁜',         
+  '零', '壱', '弐', '参', '肆', '伍', '陸', '質', '捌', '玖',
+  'ｱ', 'ｲ', 'ｳ', 'ｴ', 'ｵ', 'ｶ', 'ｷ', 'ｸ', 'ｹ', 'ｺ',
+  '⟨', '⟩', '⟪', '⟫', '⌈', '⌉', '⌊', '⌋', '∮', '∯',
+  '†', '‡', '§', '¶', '©', '®', '™', '⁂', '⁕', '⁜',
 ]
 
 export default function ScrambleButton() {
@@ -69,7 +69,7 @@ export default function ScrambleButton() {
       }, 150)
       return () => clearTimeout(timeout)
     }
-  }, [isHovered])
+  }, [isHovered, originalText]) // Added originalText to deps
 
   return (
     <Link href="/contact">

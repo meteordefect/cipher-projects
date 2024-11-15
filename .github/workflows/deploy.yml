@@ -26,15 +26,19 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
+      - name: Disable Next.js Telemetry
+        run: npx next telemetry disable
+
       # Install dependencies once
       - name: Install Next.js Dependencies
         run: npm ci
+        npm install typescript@~5.3.3 --save-exact
 
       # Handle ESLint
       - name: Create ESLint config
         run: |
           echo '{
-            "extends": "next/core-web-plugins",
+            "extends": "next",
             "rules": {
               "react/no-unescaped-entities": "off",
               "@next/next/no-img-element": "off"
@@ -44,12 +48,6 @@ jobs:
       # Add type checking step
       - name: Type Check
         run: npx tsc --noEmit
-
-      - name: Run ESLint
-        run: |
-          npm run lint || true
-          git config --global user.name 'GitHub Actions'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
       - name: Run ESLint
         run: |
