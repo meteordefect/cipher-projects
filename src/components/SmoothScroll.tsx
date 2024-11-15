@@ -15,10 +15,8 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      // Removed direction and gestureDirection
-      smooth: true,
-      mouseMultiplier: 1,
-      smoothTouch: false,
+      smoothWheel: true,  // use this instead of 'smooth'
+      wheelMultiplier: 1, // use this instead of 'mouseMultiplier'
       touchMultiplier: 2,
       infinite: false,
     })

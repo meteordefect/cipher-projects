@@ -31,10 +31,11 @@ jobs:
       - name: Install Next.js Dependencies
         run: npm ci
 
+      # Add ESLint config here, before the build
       - name: Create ESLint config
         run: |
           echo '{
-            "extends": "next/core-web-plugins",
+            "extends": "next",
             "rules": {
               "react/no-unescaped-entities": "off",
               "@next/next/no-img-element": "off"
