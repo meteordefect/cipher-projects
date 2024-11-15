@@ -8,7 +8,9 @@ on:
     branches: [ main ]
 
 env:
-  AWS_DEFAULT_REGION: ap-southeast-2  # or your preferred region
+  AWS_DEFAULT_REGION: ap-southeast-2
+  NODE_VERSION: '18'
+  STACK_NAME: CipherProjectsStack
 
 jobs:
   build-and-deploy:
@@ -20,16 +22,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Install Dependencies (Next.js)
-        run: npm ci
-
-      - name: Build Next.js
-        run: npm run build
-
-      - name: Install Dependencies (CDK)
+      # First deploy infrastructure
+      - name: Install CDK Dependencies
         working-directory: cipher-infra
         run: |
           npm ci
@@ -42,6 +39,47 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
 
-      - name: Deploy CDK
+      - name: Deploy Infrastructure
         working-directory: cipher-infra
-        run: cdk deploy --require-approval never
+        run: |
+          cdk deploy --require-approval never
+          # Store the deployment bucket name for later use
+          BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name ${{ env.STACK_NAME }} --query 'Stacks[0].Outputs[?OutputKey==`DeploymentBucketName`].OutputValue' --output text)
+          echo "DEPLOY_BUCKET=$BUCKET_NAME" >> $GITHUB_ENV
+          # Store the EC2 instance ID
+          EC2_ID=$(aws cloudformation describe-stacks --stack-name ${{ env.STACK_NAME }} --query 'Stacks[0].Outputs[?OutputKey==`InstanceId`].OutputValue' --output text)
+          echo "EC2_INSTANCE_ID=$EC2_ID" >> $GITHUB_ENV
+
+      # Then build and deploy the application
+      - name: Install Next.js Dependencies
+        run: npm ci
+
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Package Application
+        run: |
+          zip -r deploy.zip .next package.json package-lock.json public next.config.js
+
+      - name: Deploy to EC2
+        run: |
+          # Upload to S3
+          aws s3 cp deploy.zip s3://${{ env.DEPLOY_BUCKET }}/deploy.zip
+          
+          # Deploy to EC2 using SSM
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=instanceids,Values=['${{ env.EC2_INSTANCE_ID }}']" \
+            --parameters 'commands=[
+              "cd /var/www/cipher-projects",
+              "aws s3 cp s3://${{ env.DEPLOY_BUCKET }}/deploy.zip .",
+              "unzip -o deploy.zip",
+              "npm ci --production",
+              "pm2 restart cipher-projects || pm2 start npm --name \"cipher-projects\" -- start"
+            ]' \
+            --output text
+
+      - name: Verify Deployment
+        run: |
+          echo "Deployed to EC2 instance: ${{ env.EC2_INSTANCE_ID }}"
+          echo "CloudFront domain: $(aws cloudformation describe-stacks --stack-name ${{ env.STACK_NAME }} --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontDomain`].OutputValue' --output text)"
