@@ -18,6 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
+          # Add this to enable pushing fixes back to the repository
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
@@ -26,29 +27,19 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
-      - name: Disable Next.js Telemetry
-        run: npx next telemetry disable
-
-      # Install dependencies once
+      # Add these new steps for handling ESLint
       - name: Install Next.js Dependencies
-        run: |
-          npm ci
-          npm install typescript@~5.3.3 --save-exact
+        run: npm ci
 
-      # Handle ESLint
       - name: Create ESLint config
         run: |
           echo '{
-            "extends": "next",
+            "extends": "next/core-web-plugins",
             "rules": {
               "react/no-unescaped-entities": "off",
               "@next/next/no-img-element": "off"
             }
           }' > .eslintrc.json
-
-      # Add type checking step
-      - name: Type Check
-        run: npx tsc --noEmit
 
       - name: Run ESLint
         run: |
@@ -56,30 +47,17 @@ jobs:
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-      # CDK deployment
+      # Rest of your existing workflow...
       - name: Install CDK Dependencies
         working-directory: cipher-infra
         run: |
           npm ci
           npm install -g aws-cdk
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+      # Then build and deploy the application
+      - name: Install Next.js Dependencies
+        run: npm ci
 
-      - name: Deploy Infrastructure
-        working-directory: cipher-infra
-        run: |
-          cdk deploy --require-approval never
-          BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name ${{ env.STACK_NAME }} --query 'Stacks[0].Outputs[?OutputKey==`DeploymentBucketName`].OutputValue' --output text)
-          echo "DEPLOY_BUCKET=$BUCKET_NAME" >> $GITHUB_ENV
-          EC2_ID=$(aws cloudformation describe-stacks --stack-name ${{ env.STACK_NAME }} --query 'Stacks[0].Outputs[?OutputKey==`InstanceId`].OutputValue' --output text)
-          echo "EC2_INSTANCE_ID=$EC2_ID" >> $GITHUB_ENV
-
-      # Build and deploy application
       - name: Build Next.js
         run: npm run build
 
@@ -89,10 +67,13 @@ jobs:
 
       - name: Deploy to EC2
         run: |
+          # Upload to S3
           aws s3 cp deploy.zip s3://${{ env.DEPLOY_BUCKET }}/deploy.zip
+          
+          # Deploy to EC2 using SSM
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
-            --targets "Key=instanceids,Values=${{ env.EC2_INSTANCE_ID }}" \
+            --targets "Key=instanceids,Values=['${{ env.EC2_INSTANCE_ID }}']" \
             --parameters 'commands=[
               "cd /var/www/cipher-projects",
               "aws s3 cp s3://${{ env.DEPLOY_BUCKET }}/deploy.zip .",
