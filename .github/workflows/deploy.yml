@@ -31,8 +31,9 @@ jobs:
 
       # Install dependencies once
       - name: Install Next.js Dependencies
-        run: npm ci
-        npm install typescript@~5.3.3 --save-exact
+        run: |
+          npm ci
+          npm install typescript@~5.3.3 --save-exact
 
       # Handle ESLint
       - name: Create ESLint config
@@ -91,7 +92,7 @@ jobs:
           aws s3 cp deploy.zip s3://${{ env.DEPLOY_BUCKET }}/deploy.zip
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
-            --targets "Key=instanceids,Values=['${{ env.EC2_INSTANCE_ID }}']" \
+            --targets "Key=instanceids,Values=${{ env.EC2_INSTANCE_ID }}" \
             --parameters 'commands=[
               "cd /var/www/cipher-projects",
               "aws s3 cp s3://${{ env.DEPLOY_BUCKET }}/deploy.zip .",

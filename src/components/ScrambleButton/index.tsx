@@ -17,10 +17,12 @@ export default function ScrambleButton() {
   const { isDark } = useBackground()
   const [isHovered, setIsHovered] = useState(false)
   const [displayText, setDisplayText] = useState(["LET'S", "TALK "])
-  const originalText = ["LET'S", "TALK "]
+  // Removed originalText from here
   const [isAnimating, setIsAnimating] = useState(false)
 
   useEffect(() => {
+    const originalText = ["LET'S", "TALK "] // Moved inside useEffect
+
     if (isHovered) {
       setIsAnimating(true)
       let iteration = 0
@@ -69,7 +71,7 @@ export default function ScrambleButton() {
       }, 150)
       return () => clearTimeout(timeout)
     }
-  }, [isHovered, originalText]) // Added originalText to deps
+  }, [isHovered]) // Removed originalText from dependencies
 
   return (
     <Link href="/contact">
