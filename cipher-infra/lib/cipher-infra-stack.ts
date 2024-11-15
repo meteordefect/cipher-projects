@@ -15,12 +15,6 @@ export class CipherProjectsStack extends cdk.Stack {
       autoDeleteObjects: true,
     });
 
-    // Add output
-    new cdk.CfnOutput(this, 'DeploymentBucketName', {
-      value: deploymentBucket.bucketName,
-      description: 'Name of deployment bucket',
-    });
-
     // VPC setup remains the same
     const vpc = new ec2.Vpc(this, 'CipherVPC', {
       maxAzs: 2,
