@@ -24,8 +24,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          node-version: '18'  # Specify Node.js 18 explicitly
+          cache: 'npm'        # Optional: Enable caching for faster builds
 
       # Add these new steps for handling ESLint
       - name: Install Next.js Dependencies
