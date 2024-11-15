@@ -8,13 +8,6 @@ interface SmoothScrollProps {
   children: ReactNode;
 }
 
-// Add type definition for Lenis instance
-declare global {
-  interface Window {
-    lenis: Lenis | null;
-  }
-}
-
 export default function SmoothScroll({ children }: SmoothScrollProps) {
   const pathname = usePathname()
 
@@ -22,8 +15,7 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      direction: 'vertical',
-      gestureDirection: 'vertical',
+      // Remove direction and gestureDirection as they're not in the type
       smooth: true,
       mouseMultiplier: 1,
       smoothTouch: false,
@@ -31,10 +23,7 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
       infinite: false,
     })
 
-    // Store lenis instance globally for potential external use
-    window.lenis = lenis
-
-    function raf(time: number): void {
+    function raf(time: number) {
       lenis.raf(time)
       requestAnimationFrame(raf)
     }
@@ -42,14 +31,13 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
     requestAnimationFrame(raf)
 
     // Handle route changes
-    if (typeof window !== 'undefined') {
+    if (window) {
       window.scrollTo(0, 0)
       lenis.scrollTo(0)
     }
 
     // Cleanup
     return () => {
-      window.lenis = null
       lenis.destroy()
     }
   }, [pathname])

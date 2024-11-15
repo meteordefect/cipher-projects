@@ -41,6 +41,16 @@ jobs:
             }
           }' > .eslintrc.json
 
+      # Add type checking step
+      - name: Type Check
+        run: npx tsc --noEmit
+
+      - name: Run ESLint
+        run: |
+          npm run lint || true
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
       - name: Run ESLint
         run: |
           npm run lint || true
