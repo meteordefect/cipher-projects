@@ -9,13 +9,7 @@ export class CipherProjectsStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Deployment bucket for application code
-    const deploymentBucket = new s3.Bucket(this, 'DeploymentBucket', {
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      autoDeleteObjects: true,
-    });
-
-    // VPC setup remains the same
+    // VPC setup
     const vpc = new ec2.Vpc(this, 'CipherVPC', {
       maxAzs: 2,
       natGateways: 1,
@@ -26,6 +20,12 @@ export class CipherProjectsStack extends cdk.Stack {
           subnetType: ec2.SubnetType.PUBLIC,
         }
       ]
+    });
+
+    // Deployment bucket for application code
+    const deploymentBucket = new s3.Bucket(this, 'DeploymentBucket', {
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
     });
 
     // EC2 Role with additional permissions
@@ -39,32 +39,6 @@ export class CipherProjectsStack extends cdk.Stack {
     // Add permission to access deployment bucket
     deploymentBucket.grantRead(role);
 
-    // Initial setup script
-    const userData = ec2.UserData.forLinux();
-    userData.addCommands(
-      'yum update -y',
-      'yum install -y nodejs nginx git unzip',
-      'npm install -g pm2',
-      
-      // Basic nginx setup for Node.js
-      'echo "server { \
-        listen 80; \
-        location / { \
-          proxy_pass http://localhost:3000; \
-          proxy_http_version 1.1; \
-          proxy_set_header Upgrade $http_upgrade; \
-          proxy_set_header Connection \'upgrade\'; \
-          proxy_set_header Host $host; \
-          proxy_cache_bypass $http_upgrade; \
-        } \
-      }" > /etc/nginx/conf.d/app.conf',
-      
-      'systemctl enable nginx',
-      'systemctl start nginx',
-      
-      'mkdir -p /var/www/cipher-projects',
-    );
-
     // EC2 Instance
     const instance = new ec2.Instance(this, 'WebServer', {
       vpc,
@@ -73,7 +47,6 @@ export class CipherProjectsStack extends cdk.Stack {
       machineImage: new ec2.AmazonLinuxImage({
         generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
       }),
-      userData,
       role,
     });
 
@@ -88,11 +61,11 @@ export class CipherProjectsStack extends cdk.Stack {
       },
     });
 
-    // Outputs
+    // Outputs - make sure each has a unique identifier
     new cdk.CfnOutput(this, 'InstanceId', {
       value: instance.instanceId,
     });
-    new cdk.CfnOutput(this, 'DeploymentBucketName', {
+    new cdk.CfnOutput(this, 'DeploymentBucketName', { // This was duplicated
       value: deploymentBucket.bucketName,
     });
     new cdk.CfnOutput(this, 'InstancePublicDNS', {
