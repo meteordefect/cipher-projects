@@ -1,7 +1,6 @@
 // src/app/research/visionary-lens/page.tsx
 'use client'
 
-import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, Linkedin, Twitter } from 'lucide-react'

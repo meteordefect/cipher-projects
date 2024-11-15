@@ -5,7 +5,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { motion, useMotionValue, useSpring, useTransform, useScroll } from 'framer-motion'
 import { Arrow } from '@/components/ui/Arrow'
-import { useBackground } from '@/context/BackgroundContext'
 
 interface Project {
   title: string;
@@ -251,7 +250,6 @@ function MagneticButton({ children }: { children: React.ReactNode }) {
 }
 
 export default function SelectedWork() {
-  const { isDark } = useBackground()
   const containerRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: containerRef,

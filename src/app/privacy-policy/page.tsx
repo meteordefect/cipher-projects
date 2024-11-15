@@ -1,11 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useBackground } from '@/context/BackgroundContext'
 
 export default function PrivacyPolicy() {
-  const { isDark } = useBackground()
-
   return (
     <main className="min-h-screen">
       {/* Hero Section */}

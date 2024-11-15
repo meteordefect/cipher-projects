@@ -3,14 +3,9 @@
 
 import { Suspense, lazy } from 'react' // Remove useState and useEffect
 import { motion } from 'framer-motion' // Remove AnimatePresence since PageTransition handles it
-import { useBackground } from '@/context/BackgroundContext'
+
 
 // Loading States Components
-const ComponentLoader = () => (
-  <div className="w-full min-h-[50vh] flex items-center justify-center">
-    <div className="w-8 h-8 border-2 border-current border-t-transparent rounded-full animate-spin" />
-  </div>
-)
 
 const SectionLoader = () => (
   <div className="w-full py-24">
@@ -39,8 +34,8 @@ const Section = ({ children, fullWidth = false }: { children: React.ReactNode, f
   </Suspense>
 )
 
+
 export default function Home() {
-  const { isDark } = useBackground()
 
   return (
     <motion.main

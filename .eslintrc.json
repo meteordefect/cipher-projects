@@ -1,7 +1,14 @@
 {
-  "extends": "next",
+  "extends": [
+    "next",
+    "next/core-web-vitals",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
   "rules": {
     "react/no-unescaped-entities": "off",
     "@next/next/no-img-element": "off"
-  }
+  },
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"]
 }

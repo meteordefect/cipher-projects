@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { useBackground } from '@/context/BackgroundContext'
 
 const services = [
   {
@@ -42,7 +41,6 @@ const services = [
 ];
 
 export default function ServicesPage() {
-  const { isDark } = useBackground()
 
   return (
     <main className="min-h-screen">

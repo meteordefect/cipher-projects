@@ -2,8 +2,6 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Arrow } from '@/components/ui/Arrow'
-import { motion } from 'framer-motion'
 
 export default function Footer() {
   return (

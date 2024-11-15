@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { useBackground } from '@/context/BackgroundContext'
 
 const values = [
   {
@@ -38,8 +37,6 @@ const milestones = [
 ];
 
 export default function AboutPage() {
-  const { isDark } = useBackground()
-
   return (
     <main className="min-h-screen">
       {/* Hero Section */}

@@ -5,7 +5,6 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowUpRight } from 'lucide-react'
-import { useBackground } from '@/context/BackgroundContext'
 
 const researchPosts = [
   {
@@ -61,7 +60,6 @@ const researchPosts = [
 ]
 
 export default function ResearchPage() {
-  const { isDark } = useBackground()
 
   return (
     <main className="min-h-screen pt-48 pb-32">
