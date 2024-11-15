@@ -1,14 +1,22 @@
 {
-  "extends": [
-    "next",
-    "next/core-web-vitals",
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
-  "rules": {
-    "react/no-unescaped-entities": "off",
-    "@next/next/no-img-element": "off"
-  },
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"]
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "next/core-web-vitals"
+  ],
+  "plugins": ["@typescript-eslint"],
+  "rules": {
+    // Customize your ESLint rules here
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "react/react-in-jsx-scope": "off",
+    "react/no-unescaped-entities": "warn", // Change from "error" to "warn" or "off" if needed
+    "@next/next/no-img-element": "warn" // Change from "error" to "warn" or "off" if needed
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
 }
+
