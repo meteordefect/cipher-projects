@@ -4,13 +4,13 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
-import * as acm from 'aws-cdk-lib/aws-certificatemanager'; // Add this import
+import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 
 export class CipherProjectsStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // VPC setup remains the same
+    // VPC setup
     const vpc = new ec2.Vpc(this, 'CipherVPC', {
       maxAzs: 2,
       natGateways: 1,
@@ -23,13 +23,13 @@ export class CipherProjectsStack extends cdk.Stack {
       ]
     });
 
-    // Deployment bucket remains the same
+    // Deployment bucket
     const deploymentBucket = new s3.Bucket(this, 'DeploymentBucket', {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
     });
 
-    // EC2 role remains the same
+    // EC2 role
     const role = new iam.Role(this, 'EC2Role', {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
       managedPolicies: [
@@ -39,7 +39,34 @@ export class CipherProjectsStack extends cdk.Stack {
 
     deploymentBucket.grantRead(role);
 
-    // EC2 Instance remains the same
+    // Create user data script
+    const userData = ec2.UserData.forLinux();
+    userData.addCommands(
+      'yum update -y',
+      'amazon-linux-extras install -y nginx1',
+      'systemctl start nginx',
+      'systemctl enable nginx',
+      
+      // Configure nginx for your Next.js app
+      'cat > /etc/nginx/conf.d/default.conf << \'EOL\'',
+      `server {
+          listen 80;
+          server_name _;
+
+          location / {
+              proxy_pass http://localhost:3000;
+              proxy_http_version 1.1;
+              proxy_set_header Upgrade $http_upgrade;
+              proxy_set_header Connection 'upgrade';
+              proxy_set_header Host $host;
+              proxy_cache_bypass $http_upgrade;
+          }
+      }
+      EOL`,
+      'systemctl restart nginx'
+    );
+
+    // Single EC2 Instance definition with userData
     const instance = new ec2.Instance(this, 'WebServer', {
       vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
@@ -47,6 +74,7 @@ export class CipherProjectsStack extends cdk.Stack {
       machineImage: new ec2.AmazonLinuxImage({
         generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
       }),
+      userData,
       role,
     });
 
@@ -58,21 +86,20 @@ export class CipherProjectsStack extends cdk.Stack {
 
     // Reference existing certificate
     const certificate = acm.Certificate.fromCertificateArn(this, 'SiteCertificate',
-      'arn:aws:acm:us-east-1:285572126612:certificate/a891abf9-cbc6-4c64-9861-00730703a7f1'  // Replace with your cert ARN
+      'arn:aws:acm:us-east-1:285572126612:certificate/a891abf9-cbc6-4c64-9861-00730703a7f1'
     );
 
-
-    // CloudFront distribution with matching domain
+    // CloudFront distribution
     const distribution = new cloudfront.Distribution(this, 'Distribution', {
       defaultBehavior: {
         origin: new origins.HttpOrigin(instance.instancePublicDnsName),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       },
       certificate: certificate,
-      domainNames: ['cipherprojects.com'],  // Match certificate domain
+      domainNames: ['cipherprojects.com'],
     });
 
-    // Outputs remain the same
+    // Outputs
     new cdk.CfnOutput(this, 'InstanceId', {
       value: instance.instanceId,
     });
