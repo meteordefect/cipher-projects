@@ -2,7 +2,13 @@ exec > >(tee /var/log/user-data.log|logger -t user-data) 2>&1
 set -e
 
 # Fetch bucket name from instance tags
-bucket_name=$(curl -s http://169.254.169.254/latest/meta-data/tags/instance/DeploymentBucketName)
+bucket_name=${DEPLOYMENT_BUCKET:-$(curl -s http://169.254.169.254/latest/meta-data/tags/instance/DeploymentBucketName)}
+
+if [[ -z "$bucket_name" ]]; then
+    echo "Error: Deployment bucket name not found in instance tags or environment variable."
+    exit 1
+fi
+
 echo "Bucket name fetched: $bucket_name"
 
 # Update and install dependencies

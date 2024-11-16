@@ -40,6 +40,16 @@ export class CipherProjectsStack extends cdk.Stack {
       ],
     });
 
+    // Attach custom inline policy for EC2 Describe permissions
+    role.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'ec2:DescribeInstances',
+        'ec2:DescribeTags',
+      ],
+      resources: ['*'],
+    }));
+
     // Attach S3 permissions to the EC2 role
     deploymentBucket.grantRead(role);
 
