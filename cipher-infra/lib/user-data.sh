@@ -6,8 +6,7 @@ bucket_name=$(curl -s http://169.254.169.254/latest/meta-data/tags/instance/Depl
 echo "Bucket name fetched: $bucket_name"
 
 # Update and install dependencies
-yum update -y
-curl -sL https://rpm.nodesource.com/setup_20.x | bash -
+curl -sL https://rpm.nodesource.com/setup_18.x | bash -
 yum install -y nodejs unzip
 amazon-linux-extras install -y nginx1
 systemctl start nginx
