@@ -25,6 +25,51 @@ export class CipherProjectsStack extends cdk.Stack {
       ]
     });
 
+    // Create security group first
+    const webServerSG = new ec2.SecurityGroup(this, 'WebServerSG', {
+      vpc,
+      description: 'Security group for web server',
+      allowAllOutbound: true,
+    });
+
+    // Add inbound rules
+    webServerSG.addIngressRule(
+      ec2.Peer.ipv4('130.176.0.0/16'),
+      ec2.Port.tcp(80),
+      'Allow CloudFront HTTP'
+    );
+    
+    webServerSG.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.tcp(443),
+      'Allow HTTPS for SSM'
+    );
+
+    // Add VPC Endpoints for SSM (optional since you have NAT Gateway)
+    const ssmEndpoint = new ec2.InterfaceVpcEndpoint(this, 'SSMEndpoint', {
+      vpc,
+      service: ec2.InterfaceVpcEndpointAwsService.SSM,
+      subnets: { subnetType: ec2.SubnetType.PUBLIC },
+      privateDnsEnabled: true,
+      securityGroups: [webServerSG],
+    });
+
+    const ssmMessagesEndpoint = new ec2.InterfaceVpcEndpoint(this, 'SSMMessagesEndpoint', {
+      vpc,
+      service: ec2.InterfaceVpcEndpointAwsService.SSM_MESSAGES,
+      subnets: { subnetType: ec2.SubnetType.PUBLIC },
+      privateDnsEnabled: true,
+      securityGroups: [webServerSG],
+    });
+
+    const ec2MessagesEndpoint = new ec2.InterfaceVpcEndpoint(this, 'EC2MessagesEndpoint', {
+      vpc,
+      service: ec2.InterfaceVpcEndpointAwsService.EC2_MESSAGES,
+      subnets: { subnetType: ec2.SubnetType.PUBLIC },
+      privateDnsEnabled: true,
+      securityGroups: [webServerSG],
+    });
+
     // Deployment bucket
     const deploymentBucket = new s3.Bucket(this, 'DeploymentBucket', {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -72,32 +117,17 @@ export class CipherProjectsStack extends cdk.Stack {
       roles: [role.roleName],
     });
 
-    // User data with dynamic bucket name
+    // User data with dynamic bucket name and SSM check
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
+      '# Ensure SSM agent is running',
+      'systemctl enable amazon-ssm-agent',
+      'systemctl restart amazon-ssm-agent',
+      '',
+      '# Set bucket name and continue with deployment',
       'export DEPLOYMENT_BUCKET=' + deploymentBucket.bucketName,
       fs.readFileSync(path.join(__dirname, 'user-data.sh'), 'utf8')
     );    
-
-    // Create security group for the instance
-    const webServerSG = new ec2.SecurityGroup(this, 'WebServerSG', {
-      vpc,
-      description: 'Security group for web server',
-      allowAllOutbound: true,
-    });
-
-    // Add inbound rules
-    webServerSG.addIngressRule(
-      ec2.Peer.ipv4('130.176.0.0/16'),
-      ec2.Port.tcp(80),
-      'Allow CloudFront HTTP'
-    );
-    
-    webServerSG.addIngressRule(
-      ec2.Peer.anyIpv4(),
-      ec2.Port.tcp(443),
-      'Allow HTTPS for SSM'
-    );
 
     // Single EC2 Instance definition
     const instance = new ec2.Instance(this, 'WebServer', {
