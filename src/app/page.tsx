@@ -1,12 +1,9 @@
-// src/app/page.tsx
 'use client'
-
 import { Suspense, lazy } from 'react' // Remove useState and useEffect
 import { motion } from 'framer-motion' // Remove AnimatePresence since PageTransition handles it
 
 
 // Loading States Components
-
 const SectionLoader = () => (
   <div className="w-full py-24">
     <div className="animate-pulse space-y-8">
@@ -33,7 +30,6 @@ const Section = ({ children, fullWidth = false }: { children: React.ReactNode, f
     {fullWidth ? children : <div className="container">{children}</div>}
   </Suspense>
 )
-
 
 export default function Home() {
 
