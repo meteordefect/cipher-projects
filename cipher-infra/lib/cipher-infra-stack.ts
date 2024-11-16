@@ -31,6 +31,7 @@ export class CipherProjectsStack extends cdk.Stack {
       autoDeleteObjects: true,
     });
 
+
     // EC2 role
     const role = new iam.Role(this, 'EC2Role', {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
@@ -40,20 +41,20 @@ export class CipherProjectsStack extends cdk.Stack {
     });
 
     // User data with dynamic bucket name
-    const bucketName = deploymentBucket.bucketName;
-    const userDataScript = fs.readFileSync(path.resolve(__dirname, 'user-data.sh'), 'utf8')
-                              .replace('<BUCKET_NAME>', bucketName);
     const userData = ec2.UserData.forLinux();
-    userData.addCommands(userDataScript);
+    userData.addCommands(
+      'export DEPLOYMENT_BUCKET=' + deploymentBucket.bucketName,
+      fs.readFileSync(path.join(__dirname, 'user-data.sh'), 'utf8')
+    );    
 
     // Single EC2 Instance definition with userData
     const instance = new ec2.Instance(this, 'WebServer', {
       vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.NANO),
-      machineImage: new ec2.AmazonLinuxImage({
-        generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
-      }),
+      machineImage: ec2.MachineImage.fromSsmParameter(
+        '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
+      ),
       userData,
       role,
     });

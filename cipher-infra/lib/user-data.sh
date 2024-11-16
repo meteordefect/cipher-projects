@@ -7,7 +7,7 @@ echo "Bucket name fetched: $bucket_name"
 
 # Update and install dependencies
 curl -sL https://rpm.nodesource.com/setup_18.x | bash -
-yum install -y nodejs unzip
+yum install -y nodejs
 amazon-linux-extras install -y nginx1
 systemctl start nginx
 systemctl enable nginx
@@ -16,9 +16,8 @@ systemctl enable nginx
 mkdir -p /var/www/cipher-projects
 
 # Download and unzip application package
-aws s3 cp s3://$bucket_name/deploy.zip /var/www/cipher-projects/deploy.zip
+aws s3 cp s3://${DEPLOYMENT_BUCKET}/deploy.zip /var/www/cipher-projects/deploy.zip
 unzip -o /var/www/cipher-projects/deploy.zip -d /var/www/cipher-projects
-
 cd /var/www/cipher-projects
 npm ci --production
 npm install -g pm2
