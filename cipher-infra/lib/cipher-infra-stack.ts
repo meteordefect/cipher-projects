@@ -6,6 +6,7 @@ import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as fs from 'fs';
+import * as path from 'path';
 
 export class CipherProjectsStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
@@ -37,8 +38,11 @@ export class CipherProjectsStack extends cdk.Stack {
         iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'),
       ],
     });
-  
-    const userDataScript = fs.readFileSync('./user-data.sh', 'utf8');
+
+    // User data with dynamic bucket name
+    const bucketName = deploymentBucket.bucketName;
+    const userDataScript = fs.readFileSync(path.resolve(__dirname, 'user-data.sh'), 'utf8')
+                              .replace('<BUCKET_NAME>', bucketName);
     const userData = ec2.UserData.forLinux();
     userData.addCommands(userDataScript);
 
@@ -53,7 +57,6 @@ export class CipherProjectsStack extends cdk.Stack {
       userData,
       role,
     });
-    
 
     // Security group rule
     instance.connections.allowFrom(

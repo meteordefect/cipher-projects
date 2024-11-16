@@ -61,6 +61,8 @@ jobs:
       - name: Deploy Infrastructure and Debug
         working-directory: cipher-infra
         run: |
+          echo "Checking user-data.sh existence:"
+          ls -l lib/user-data.sh
           cdk deploy --require-approval never
           echo "=== Stack Outputs ==="
           aws cloudformation describe-stacks --stack-name ${{ env.STACK_NAME }} --query 'Stacks[0].Outputs' --output json
@@ -69,6 +71,11 @@ jobs:
           echo "DEPLOY_BUCKET=$BUCKET_NAME" >> $GITHUB_ENV
           EC2_ID=$(aws cloudformation describe-stacks --stack-name ${{ env.STACK_NAME }} --query 'Stacks[0].Outputs[?OutputKey==`InstanceId`].OutputValue' --output text)
           echo "EC2_INSTANCE_ID=$EC2_ID" >> $GITHUB_ENV
+
+      - name: Validate S3 Bucket
+        run: |
+          echo "Validating S3 Bucket:"
+          aws s3 ls "s3://${{ env.DEPLOY_BUCKET }}/"
 
       - name: Build Next.js
         run: npm run build
