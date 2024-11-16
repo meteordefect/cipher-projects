@@ -31,7 +31,7 @@ export class CipherProjectsStack extends cdk.Stack {
       autoDeleteObjects: true,
     });
 
-    // EC2 role with expanded permissions
+    // EC2 role with expanded permissions (SINGLE DEFINITION)
     const role = new iam.Role(this, 'EC2Role', {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
       managedPolicies: [
@@ -47,10 +47,24 @@ export class CipherProjectsStack extends cdk.Stack {
         'ec2:DescribeTags',
         'ec2:DescribeInstanceAttribute',
         'ec2:DescribeInstanceStatus',
+      ],
+      resources: ['*'],
+    }));
+
+    // Grant S3 permissions explicitly
+    deploymentBucket.grantRead(role);
+
+    // Add specific S3 permissions for the bucket
+    role.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
         's3:GetObject',
         's3:ListBucket',
       ],
-      resources: ['*'],
+      resources: [
+        deploymentBucket.bucketArn,
+        `${deploymentBucket.bucketArn}/*`
+      ],
     }));
 
     // Create instance profile
