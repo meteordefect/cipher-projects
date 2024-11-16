@@ -1,3 +1,4 @@
+#!/bin/bash
 exec > >(tee /var/log/user-data.log|logger -t user-data) 2>&1
 set -e
 
@@ -16,31 +17,45 @@ if [[ -z "$bucket_name" ]]; then
 fi
 
 # Update and install dependencies
-curl -sL https://rpm.nodesource.com/setup_18.x | bash -
-yum install -y nodejs
-yum install -y nginx
-npm install -g next 
-systemctl start nginx
-systemctl enable nginx
+apt-get update
+apt-get install -y curl unzip nginx
+
+# Install Node.js
+curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+apt-get install -y nodejs
 
 # Prepare application directory
 mkdir -p /var/www/cipher-projects
+
+# Install AWS CLI if not present
+if ! command -v aws &> /dev/null; then
+    apt-get install -y awscli
+fi
 
 # Download and unzip application package
 aws s3 cp s3://${DEPLOYMENT_BUCKET}/deploy.zip /var/www/cipher-projects/deploy.zip
 unzip -o /var/www/cipher-projects/deploy.zip -d /var/www/cipher-projects
 cd /var/www/cipher-projects
-npm ci --production
+
+# Install dependencies and build
+export NODE_ENV=production
+npm ci
+npm run build
+
+# Install and setup PM2
 npm install -g pm2
 pm2 start npm --name "cipher-projects" -- start
-pm2 startup
+pm2 startup ubuntu
 pm2 save
 
-cat > /etc/nginx/conf.d/default.conf << 'EOL'
+# Configure nginx
+cat > /etc/nginx/sites-available/default << 'EOL'
 server {
-    listen 80;
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    
     server_name _;
-
+    
     location / {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
@@ -48,13 +63,16 @@ server {
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
         proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 EOL
-systemctl restart nginx || {
-    echo "Error: Failed to restart Nginx."
-    exit 1
-}
+
+# Start services
+systemctl enable nginx
+systemctl restart nginx
 
 # Verify application
 curl -f http://localhost:3000 || {
