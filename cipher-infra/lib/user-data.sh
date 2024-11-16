@@ -18,7 +18,7 @@ fi
 
 # Update and install dependencies
 apt-get update
-apt-get install -y curl unzip nginx
+apt-get install -y curl unzip
 
 # Install Node.js
 curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
@@ -44,9 +44,31 @@ npm run build
 
 # Install and setup PM2
 npm install -g pm2
+
+# Stop any existing PM2 processes
+pm2 kill || true
+
+# Start the Next.js application with PM2
 pm2 start npm --name "cipher-projects" -- start
 pm2 startup ubuntu
 pm2 save
+
+# Wait for the application to start
+echo "Waiting for Next.js application to start..."
+sleep 10
+
+# Verify application is running before configuring nginx
+if ! curl -f http://localhost:3000 > /dev/null 2>&1; then
+    echo "Error: Node.js application failed to start on port 3000."
+    pm2 logs cipher-projects
+    exit 1
+fi
+
+# Install and configure nginx only after application is confirmed running
+apt-get install -y nginx
+
+# Stop nginx if it's running
+systemctl stop nginx || true
 
 # Configure nginx
 cat > /etc/nginx/sites-available/default << 'EOL'
@@ -70,12 +92,15 @@ server {
 }
 EOL
 
-# Start services
+# Start nginx
 systemctl enable nginx
-systemctl restart nginx
+systemctl start nginx
 
-# Verify application
-curl -f http://localhost:3000 || {
-    echo "Error: Node.js application is not running on port 3000."
+# Final verification
+if ! curl -f http://localhost:80 > /dev/null 2>&1; then
+    echo "Error: Application is not accessible through nginx."
+    systemctl status nginx
     exit 1
-}
+fi
+
+echo "Deployment completed successfully!"
