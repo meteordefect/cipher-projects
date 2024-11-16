@@ -8,7 +8,7 @@ echo "Bucket name fetched: $bucket_name"
 # Update and install dependencies
 curl -sL https://rpm.nodesource.com/setup_18.x | bash -
 yum install -y nodejs
-amazon-linux-extras install -y nginx1
+yum install -y nginx
 systemctl start nginx
 systemctl enable nginx
 
@@ -40,4 +40,13 @@ server {
     }
 }
 EOL
-systemctl restart nginx
+systemctl restart nginx || {
+    echo "Error: Failed to restart Nginx."
+    exit 1
+}
+
+# Verify application
+curl -f http://localhost:3000 || {
+    echo "Error: Node.js application is not running on port 3000."
+    exit 1
+}

@@ -40,6 +40,9 @@ export class CipherProjectsStack extends cdk.Stack {
       ],
     });
 
+    // Attach S3 permissions to the EC2 role
+    deploymentBucket.grantRead(role);
+
     // User data with dynamic bucket name
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
