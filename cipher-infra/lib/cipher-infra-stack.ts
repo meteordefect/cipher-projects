@@ -31,7 +31,7 @@ export class CipherProjectsStack extends cdk.Stack {
       autoDeleteObjects: true,
     });
 
-    // EC2 role with expanded permissions (SINGLE DEFINITION)
+    // EC2 role with expanded permissions
     const role = new iam.Role(this, 'EC2Role', {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
       managedPolicies: [
@@ -79,6 +79,26 @@ export class CipherProjectsStack extends cdk.Stack {
       fs.readFileSync(path.join(__dirname, 'user-data.sh'), 'utf8')
     );    
 
+    // Create security group for the instance
+    const webServerSG = new ec2.SecurityGroup(this, 'WebServerSG', {
+      vpc,
+      description: 'Security group for web server',
+      allowAllOutbound: true,
+    });
+
+    // Add inbound rules
+    webServerSG.addIngressRule(
+      ec2.Peer.ipv4('130.176.0.0/16'),
+      ec2.Port.tcp(80),
+      'Allow CloudFront HTTP'
+    );
+    
+    webServerSG.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.tcp(443),
+      'Allow HTTPS for SSM'
+    );
+
     // Single EC2 Instance definition
     const instance = new ec2.Instance(this, 'WebServer', {
       vpc,
@@ -89,16 +109,13 @@ export class CipherProjectsStack extends cdk.Stack {
       ),
       userData,
       role,
+      requireImdsv2: true,
+      associatePublicIpAddress: true,
+      securityGroup: webServerSG
     });
 
     // Add tags that will be accessible via metadata
     cdk.Tags.of(instance).add('DeploymentBucketName', deploymentBucket.bucketName);
-
-    // Security group rule
-    instance.connections.allowFrom(
-      ec2.Peer.ipv4('130.176.0.0/16'),  // CloudFront IP range
-      ec2.Port.tcp(80)
-    );
 
     // Reference existing certificate
     const certificate = acm.Certificate.fromCertificateArn(this, 'SiteCertificate',
