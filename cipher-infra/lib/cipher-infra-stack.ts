@@ -31,8 +31,7 @@ export class CipherProjectsStack extends cdk.Stack {
       autoDeleteObjects: true,
     });
 
-
-    // EC2 role
+    // EC2 role with expanded permissions
     const role = new iam.Role(this, 'EC2Role', {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
       managedPolicies: [
@@ -40,18 +39,24 @@ export class CipherProjectsStack extends cdk.Stack {
       ],
     });
 
-    // Attach custom inline policy for EC2 Describe permissions
+    // Add permissions for EC2 tags and metadata
     role.addToPolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
         'ec2:DescribeInstances',
         'ec2:DescribeTags',
+        'ec2:DescribeInstanceAttribute',
+        'ec2:DescribeInstanceStatus',
+        's3:GetObject',
+        's3:ListBucket',
       ],
       resources: ['*'],
     }));
 
-    // Attach S3 permissions to the EC2 role
-    deploymentBucket.grantRead(role);
+    // Create instance profile
+    const instanceProfile = new iam.CfnInstanceProfile(this, 'EC2InstanceProfile', {
+      roles: [role.roleName],
+    });
 
     // User data with dynamic bucket name
     const userData = ec2.UserData.forLinux();
@@ -60,7 +65,7 @@ export class CipherProjectsStack extends cdk.Stack {
       fs.readFileSync(path.join(__dirname, 'user-data.sh'), 'utf8')
     );    
 
-    // Single EC2 Instance definition with userData
+    // Single EC2 Instance definition
     const instance = new ec2.Instance(this, 'WebServer', {
       vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
@@ -71,6 +76,9 @@ export class CipherProjectsStack extends cdk.Stack {
       userData,
       role,
     });
+
+    // Add tags that will be accessible via metadata
+    cdk.Tags.of(instance).add('DeploymentBucketName', deploymentBucket.bucketName);
 
     // Security group rule
     instance.connections.allowFrom(

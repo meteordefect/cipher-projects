@@ -1,15 +1,19 @@
 exec > >(tee /var/log/user-data.log|logger -t user-data) 2>&1
 set -e
 
-# Fetch bucket name from instance tags
-bucket_name=${DEPLOYMENT_BUCKET:-$(curl -s http://169.254.169.254/latest/meta-data/tags/instance/DeploymentBucketName)}
+# Fetch bucket name from instance tags or environment variable
+if [[ -n "$DEPLOYMENT_BUCKET" ]]; then
+    bucket_name=$DEPLOYMENT_BUCKET
+else
+    # Using IMDSv2 token for enhanced security
+    TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+    bucket_name=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/tags/instance/DeploymentBucketName)
+fi
 
 if [[ -z "$bucket_name" ]]; then
     echo "Error: Deployment bucket name not found in instance tags or environment variable."
     exit 1
 fi
-
-echo "Bucket name fetched: $bucket_name"
 
 # Update and install dependencies
 curl -sL https://rpm.nodesource.com/setup_18.x | bash -
