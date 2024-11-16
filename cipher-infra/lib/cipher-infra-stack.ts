@@ -45,31 +45,6 @@ export class CipherProjectsStack extends cdk.Stack {
       'Allow HTTPS for SSM'
     );
 
-    // Add VPC Endpoints for SSM (optional since you have NAT Gateway)
-    const ssmEndpoint = new ec2.InterfaceVpcEndpoint(this, 'SSMEndpoint', {
-      vpc,
-      service: ec2.InterfaceVpcEndpointAwsService.SSM,
-      subnets: { subnetType: ec2.SubnetType.PUBLIC },
-      privateDnsEnabled: true,
-      securityGroups: [webServerSG],
-    });
-
-    const ssmMessagesEndpoint = new ec2.InterfaceVpcEndpoint(this, 'SSMMessagesEndpoint', {
-      vpc,
-      service: ec2.InterfaceVpcEndpointAwsService.SSM_MESSAGES,
-      subnets: { subnetType: ec2.SubnetType.PUBLIC },
-      privateDnsEnabled: true,
-      securityGroups: [webServerSG],
-    });
-
-    const ec2MessagesEndpoint = new ec2.InterfaceVpcEndpoint(this, 'EC2MessagesEndpoint', {
-      vpc,
-      service: ec2.InterfaceVpcEndpointAwsService.EC2_MESSAGES,
-      subnets: { subnetType: ec2.SubnetType.PUBLIC },
-      privateDnsEnabled: true,
-      securityGroups: [webServerSG],
-    });
-
     // Deployment bucket
     const deploymentBucket = new s3.Bucket(this, 'DeploymentBucket', {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -117,18 +92,16 @@ export class CipherProjectsStack extends cdk.Stack {
       roles: [role.roleName],
     });
 
-    // User data with dynamic bucket name and SSM check
+    // User data with deployment configuration
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
-      '# Ensure SSM agent is running',
-      'systemctl enable amazon-ssm-agent',
-      'systemctl restart amazon-ssm-agent',
-      '',
-      '# Set bucket name and continue with deployment',
+      // Set the bucket name for the deployment script to use
       'export DEPLOYMENT_BUCKET=' + deploymentBucket.bucketName,
+      
+      // Read and include the contents of user-data.sh
       fs.readFileSync(path.join(__dirname, 'user-data.sh'), 'utf8')
-    );    
-
+    );
+    
     // Single EC2 Instance definition
     const instance = new ec2.Instance(this, 'WebServer', {
       vpc,
