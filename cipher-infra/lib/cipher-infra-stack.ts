@@ -56,11 +56,11 @@ export class CipherProjectsStack extends cdk.Stack {
       ec2.Port.tcp(80)
     );
 
-    // Certificate (make sure it's in us-east-1 for CloudFront)
-    const certificate = new acm.Certificate(this, 'SiteCertificate', {
-      domainName: 'cipherprojects.com',
-      validation: acm.CertificateValidation.fromDns(),
-    });
+    // Reference existing certificate
+    const certificate = acm.Certificate.fromCertificateArn(this, 'SiteCertificate',
+      'arn:aws:acm:us-east-1:285572126612:certificate/a891abf9-cbc6-4c64-9861-00730703a7f1'  // Replace with your cert ARN
+    );
+
 
     // CloudFront distribution with matching domain
     const distribution = new cloudfront.Distribution(this, 'Distribution', {
