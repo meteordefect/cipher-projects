@@ -39,32 +39,47 @@ export class CipherProjectsStack extends cdk.Stack {
 
     deploymentBucket.grantRead(role);
 
-    // Create user data script
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
-      'yum update -y',
-      'amazon-linux-extras install -y nginx1',
-      'systemctl start nginx',
-      'systemctl enable nginx',
-      
-      // Configure nginx for your Next.js app
-      'cat > /etc/nginx/conf.d/default.conf << \'EOL\'',
-      `server {
-          listen 80;
-          server_name _;
+    'exec > >(tee /var/log/user-data.log|logger -t user-data) 2>&1', // Log output for debugging
+    'yum update -y',
+    'curl -sL https://rpm.nodesource.com/setup_20.x | bash -',  // Install Node.js
+    'yum install -y nodejs unzip',
+    'amazon-linux-extras install -y nginx1',
+    'systemctl start nginx',
+    'systemctl enable nginx',
+    
+    // Pull application code from S3 bucket
+    'mkdir -p /var/www/cipher-projects',
+    `aws s3 cp s3://${deploymentBucket.bucketName}/deploy.zip /var/www/cipher-projects/deploy.zip`,
+    'unzip -o /var/www/cipher-projects/deploy.zip -d /var/www/cipher-projects',
+    
+    // Install dependencies and start the app
+    'cd /var/www/cipher-projects',
+    'npm ci --production',
+    'npm install -g pm2',
+    'pm2 start npm --name "cipher-projects" -- start',
+    'pm2 startup',
+    'pm2 save',
 
-          location / {
-              proxy_pass http://localhost:3000;
-              proxy_http_version 1.1;
-              proxy_set_header Upgrade $http_upgrade;
-              proxy_set_header Connection 'upgrade';
-              proxy_set_header Host $host;
-              proxy_cache_bypass $http_upgrade;
-          }
-      }
-      EOL`,
-      'systemctl restart nginx'
-    );
+    // Configure Nginx for reverse proxy
+    'cat > /etc/nginx/conf.d/default.conf << \'EOL\'',
+    `server {
+        listen 80;
+        server_name _;
+
+        location / {
+            proxy_pass http://localhost:3000;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+        }
+    }
+    EOL`,
+    'systemctl restart nginx'
+  );
 
     // Single EC2 Instance definition with userData
     const instance = new ec2.Instance(this, 'WebServer', {
@@ -77,6 +92,7 @@ export class CipherProjectsStack extends cdk.Stack {
       userData,
       role,
     });
+    
 
     // Security group rule
     instance.connections.allowFrom(
