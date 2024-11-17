@@ -16,7 +16,7 @@ fi
 
 # Basic system setup
 apt-get update
-apt-get install -y curl unzip nginx awscli
+apt-get install -y curl unzip nginx
 
 # Install Node.js
 curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
