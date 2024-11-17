@@ -12,7 +12,7 @@ export class CipherProjectsStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // VPC setup
+    // VPC with public and private subnets
     const vpc = new ec2.Vpc(this, 'CipherVPC', {
       maxAzs: 2,
       natGateways: 1,
@@ -21,18 +21,23 @@ export class CipherProjectsStack extends cdk.Stack {
           cidrMask: 24,
           name: 'Public',
           subnetType: ec2.SubnetType.PUBLIC,
+        },
+        {
+          cidrMask: 24,
+          name: 'Private',
+          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
         }
       ]
     });
 
-    // Create security group first
+    // Enhanced security group for web server
     const webServerSG = new ec2.SecurityGroup(this, 'WebServerSG', {
       vpc,
-      description: 'Security group for web server',
+      description: 'Security group for Next.js web server',
       allowAllOutbound: true,
     });
 
-    // Add inbound rules
+    // Only allow HTTP from CloudFront and SSH/HTTPS for management
     webServerSG.addIngressRule(
       ec2.Peer.ipv4('130.176.0.0/16'),
       ec2.Port.tcp(80),
@@ -42,24 +47,33 @@ export class CipherProjectsStack extends cdk.Stack {
     webServerSG.addIngressRule(
       ec2.Peer.anyIpv4(),
       ec2.Port.tcp(443),
-      'Allow HTTPS for SSM'
+      'Allow HTTPS'
     );
 
-    // Deployment bucket
+    webServerSG.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.tcp(22),
+      'Allow SSH'
+    );
+
+    // Deployment bucket with versioning
     const deploymentBucket = new s3.Bucket(this, 'DeploymentBucket', {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
+      versioned: true,
+      encryption: s3.BucketEncryption.S3_MANAGED,
     });
 
-    // EC2 role with expanded permissions
+    // Enhanced EC2 role with specific permissions
     const role = new iam.Role(this, 'EC2Role', {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
       managedPolicies: [
         iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy'),
       ],
     });
 
-    // Add permissions for EC2 tags and metadata
+    // Add specific permissions for EC2 operation
     role.addToPolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
@@ -71,10 +85,8 @@ export class CipherProjectsStack extends cdk.Stack {
       resources: ['*'],
     }));
 
-    // Grant S3 permissions explicitly
+    // Grant S3 permissions for deployment
     deploymentBucket.grantRead(role);
-
-    // Add specific S3 permissions for the bucket
     role.addToPolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
@@ -87,67 +99,74 @@ export class CipherProjectsStack extends cdk.Stack {
       ],
     }));
 
-    // Create instance profile
     const instanceProfile = new iam.CfnInstanceProfile(this, 'EC2InstanceProfile', {
       roles: [role.roleName],
     });
 
-    // User data with deployment configuration
+    // Enhanced user data script
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
-      // Set the bucket name for the deployment script to use
       'export DEPLOYMENT_BUCKET=' + deploymentBucket.bucketName,
-      
-      // Read and include the contents of user-data.sh
       fs.readFileSync(path.join(__dirname, 'user-data.sh'), 'utf8')
     );
     
-    // Single EC2 Instance definition
+    // EC2 instance with improved configuration
     const instance = new ec2.Instance(this, 'WebServer', {
       vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.SMALL),
-      machineImage: ec2.MachineImage.fromSSMParameter(
-        '/aws/service/canonical/ubuntu/server/focal/stable/current/amd64/hvm/ebs-gp2/ami-id',
-        ec2.OperatingSystemType.LINUX,
-      ),
+      machineImage: new ec2.AmazonLinuxImage({
+        generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
+        cpuType: ec2.AmazonLinuxCpuType.X86_64,
+      }),
       userData,
       role,
       requireImdsv2: true,
       associatePublicIpAddress: true,
-      securityGroup: webServerSG
+      securityGroup: webServerSG,
+      blockDevices: [{
+        deviceName: '/dev/xvda',
+        volume: ec2.BlockDeviceVolume.ebs(20, {
+          volumeType: ec2.EbsDeviceVolumeType.GP3,
+          encrypted: true,
+        }),
+      }],
     });
 
-    // Add tags that will be accessible via metadata
+    // Add tags for deployment configuration
     cdk.Tags.of(instance).add('DeploymentBucketName', deploymentBucket.bucketName);
+    cdk.Tags.of(instance).add('Environment', 'production');
 
-    // Reference existing certificate
+    // Use existing certificate
     const certificate = acm.Certificate.fromCertificateArn(this, 'SiteCertificate',
       'arn:aws:acm:us-east-1:285572126612:certificate/a891abf9-cbc6-4c64-9861-00730703a7f1'
     );
 
-    // CloudFront distribution
+    // Enhanced CloudFront distribution
     const distribution = new cloudfront.Distribution(this, 'Distribution', {
       defaultBehavior: {
-        origin: new origins.HttpOrigin(instance.instancePublicDnsName),
+        origin: new origins.HttpOrigin(instance.instancePublicDnsName, {
+          protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
+          httpPort: 80,
+          keepaliveTimeout: cdk.Duration.seconds(60),
+          readTimeout: cdk.Duration.seconds(30),
+        }),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+        cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+        originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER,
       },
       certificate: certificate,
       domainNames: ['cipherprojects.com'],
+      minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
+      enableLogging: true,
+      httpVersion: cloudfront.HttpVersion.HTTP2_AND_3,
     });
 
-    // Outputs
-    new cdk.CfnOutput(this, 'InstanceId', {
-      value: instance.instanceId,
-    });
-    new cdk.CfnOutput(this, 'DeploymentBucketName', {
-      value: deploymentBucket.bucketName,
-    });
-    new cdk.CfnOutput(this, 'InstancePublicDNS', {
-      value: instance.instancePublicDnsName,
-    });
-    new cdk.CfnOutput(this, 'CloudFrontDomain', {
-      value: distribution.distributionDomainName,
-    });
+    // Outputs for deployment reference
+    new cdk.CfnOutput(this, 'InstanceId', { value: instance.instanceId });
+    new cdk.CfnOutput(this, 'DeploymentBucketName', { value: deploymentBucket.bucketName });
+    new cdk.CfnOutput(this, 'InstancePublicDNS', { value: instance.instancePublicDnsName });
+    new cdk.CfnOutput(this, 'CloudFrontDomain', { value: distribution.distributionDomainName });
   }
 }
