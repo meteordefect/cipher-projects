@@ -1,4 +1,3 @@
-#!/bin/bash
 exec > >(tee /var/log/user-data.log|logger -t user-data) 2>&1
 set -e
 
