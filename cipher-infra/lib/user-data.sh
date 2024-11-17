@@ -23,15 +23,25 @@ if [[ -z "$bucket_name" ]]; then
     exit 1
 fi
 
-# System Updates
-dnf update -y --skip-broken
+# System Updates with best and allowerasing to handle dracut conflicts
+dnf update -y --best --allowerasing
 dnf clean all
 
-# Install required packages
-dnf install -y nginx git unzip jq nodejs npm
+# Install Node.js repo and Node.js
+dnf install -y nodejs
+
+# Install other required packages
+dnf install -y nginx git unzip jq gcc gcc-c++ make
 
 # Create application user
 useradd -m -s /bin/bash webadmin || echo "User already exists"
+
+# Set correct ownership
+chown -R webadmin:webadmin /home/webadmin
+
+# Install npm and PM2 globally
+npm install -g npm@latest
+npm install -g pm2
 
 # Create application directories with correct permissions
 mkdir -p /var/www/cipher-projects
@@ -94,11 +104,10 @@ server {
 }
 EOL
 
-# Install PM2 globally
-npm install -g pm2
-
 # Deploy application as webadmin user
 cd /var/www/cipher-projects
+
+echo "Downloading deployment package..."
 aws s3 cp s3://${bucket_name}/deploy.zip ./deploy.zip
 unzip -o deploy.zip
 rm deploy.zip
@@ -110,7 +119,12 @@ chown -R webadmin:webadmin /var/www/cipher-projects
 su - webadmin << 'EOUSER'
 cd /var/www/cipher-projects
 export NODE_ENV=production
+export PATH=$PATH:/usr/bin
+
+echo "Installing dependencies..."
 npm ci
+
+echo "Building application..."
 npm run build
 
 # Create PM2 ecosystem file
@@ -131,13 +145,13 @@ module.exports = {
 }
 EOL
 
-# Start application with PM2
+echo "Starting application with PM2..."
 pm2 start ecosystem.config.js
 pm2 save
 EOUSER
 
 # Set up PM2 startup script
-env PATH=$PATH:/usr/bin pm2 startup systemd -u webadmin --hp /home/webadmin
+env PATH=$PATH:/usr/bin /usr/local/bin/pm2 startup systemd -u webadmin --hp /home/webadmin
 systemctl enable pm2-webadmin
 
 # Configure SELinux if enabled
@@ -150,6 +164,7 @@ systemctl enable nginx
 systemctl start nginx
 
 # Verify deployment
+echo "Verifying deployment..."
 for i in {1..30}; do
     if curl -s http://localhost > /dev/null; then
         echo "Application successfully deployed"
