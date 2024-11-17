@@ -116,7 +116,7 @@ export class CipherProjectsStack extends cdk.Stack {
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.SMALL),
       machineImage: new ec2.AmazonLinuxImage({
-        generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
+        generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2023,
         cpuType: ec2.AmazonLinuxCpuType.X86_64,
       }),
       userData,
