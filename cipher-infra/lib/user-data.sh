@@ -22,6 +22,12 @@ apt-get install -y curl unzip nginx awscli
 curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
 apt-get install -y nodejs
 
+# Install AWS CLI
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+rm -rf awscliv2.zip ./aws
+
 # Create and configure application directory
 mkdir -p /var/www/cipher-projects
 chown -R ec2-user:ec2-user /var/www/cipher-projects
