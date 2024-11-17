@@ -24,8 +24,8 @@ apt-get install -y nodejs
 
 # Create and configure application directory
 mkdir -p /var/www/cipher-projects
-chown -R ssm-user:ssm-user /var/www/cipher-projects
-chmod -R 755 /var/www/cipher-projects
+chown -R ec2-user:ec2-user /var/www/cipher-projects
+sudo -u ec2-user npm install -g pm2
 
 # Deploy application
 cd /var/www/cipher-projects
