@@ -106,7 +106,7 @@ export class CipherProjectsStack extends cdk.Stack {
     const instance = new ec2.Instance(this, 'WebServer', {
       vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.NANO),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.SMALL),
       machineImage: ec2.MachineImage.fromSsmParameter(
         '/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64'
       ),

@@ -18,7 +18,7 @@ fi
 
 # Update and install dependencies
 apt-get update
-apt-get install -y curl unzip
+apt-get install -y curl unzip nginx
 
 # Install Node.js
 curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
@@ -26,6 +26,9 @@ apt-get install -y nodejs
 
 # Prepare application directory
 mkdir -p /var/www/cipher-projects
+# Set correct ownership for the application directory
+chown -R ssm-user:ssm-user /var/www/cipher-projects
+chmod -R 755 /var/www/cipher-projects
 
 # Install AWS CLI if not present
 if ! command -v aws &> /dev/null; then
@@ -44,31 +47,9 @@ npm run build
 
 # Install and setup PM2
 npm install -g pm2
-
-# Stop any existing PM2 processes
-pm2 kill || true
-
-# Start the Next.js application with PM2
 pm2 start npm --name "cipher-projects" -- start
 pm2 startup ubuntu
 pm2 save
-
-# Wait for the application to start
-echo "Waiting for Next.js application to start..."
-sleep 10
-
-# Verify application is running before configuring nginx
-if ! curl -f http://localhost:3000 > /dev/null 2>&1; then
-    echo "Error: Node.js application failed to start on port 3000."
-    pm2 logs cipher-projects
-    exit 1
-fi
-
-# Install and configure nginx only after application is confirmed running
-apt-get install -y nginx
-
-# Stop nginx if it's running
-systemctl stop nginx || true
 
 # Configure nginx
 cat > /etc/nginx/sites-available/default << 'EOL'
@@ -92,15 +73,12 @@ server {
 }
 EOL
 
-# Start nginx
+# Start services
 systemctl enable nginx
-systemctl start nginx
+systemctl restart nginx
 
-# Final verification
-if ! curl -f http://localhost:80 > /dev/null 2>&1; then
-    echo "Error: Application is not accessible through nginx."
-    systemctl status nginx
+# Verify application
+curl -f http://localhost:3000 || {
+    echo "Error: Node.js application is not running on port 3000."
     exit 1
-fi
-
-echo "Deployment completed successfully!"
+}
