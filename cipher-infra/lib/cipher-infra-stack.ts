@@ -106,7 +106,9 @@ export class CipherProjectsStack extends cdk.Stack {
     // Enhanced user data script
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
-      'export DEPLOYMENT_BUCKET=' + deploymentBucket.bucketName,
+      `#!/bin/bash
+    # Version: ${Date.now()}  # This will force replacement on each deploy
+    export DEPLOYMENT_BUCKET=${deploymentBucket.bucketName}`,
       fs.readFileSync(path.join(__dirname, 'user-data.sh'), 'utf8')
     );
     

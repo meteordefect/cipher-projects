@@ -22,7 +22,7 @@ if [[ -z "$bucket_name" ]]; then
     exit 1
 fi
 
-# System Updates with best and allowerasing to handle dracut conflicts
+# System Updates with best and allowerasing to handle dracut conflictxs
 dnf update -y --best --allowerasing
 dnf clean all
 
