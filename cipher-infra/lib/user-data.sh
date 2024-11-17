@@ -178,4 +178,3 @@ done
 echo "Error: Application failed to start within timeout"
 pm2 logs cipher-projects --lines 100
 exit 1
-
