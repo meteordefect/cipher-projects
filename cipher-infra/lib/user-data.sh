@@ -2,30 +2,42 @@
 exec > >(tee /var/log/user-data.log|logger -t user-data) 2>&1
 set -e
 
-# Fetch deployment configuration
-TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
-bucket_name=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/tags/instance/DeploymentBucketName)
+# Set up error handling
+function handle_error {
+    echo "An error occurred on line $1"
+    exit 1
+}
+
+trap 'handle_error $LINENO' ERR
+
+# Fetch bucket name from instance tags or environment variable
+if [[ -n "$DEPLOYMENT_BUCKET" ]]; then
+    bucket_name=$DEPLOYMENT_BUCKET
+else
+    TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+    bucket_name=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/tags/instance/DeploymentBucketName)
+fi
 
 if [[ -z "$bucket_name" ]]; then
     echo "Error: Deployment bucket name not found."
     exit 1
 fi
 
-# System Updates and Dependencies
-yum update -y
-yum install -y gcc-c++ make git unzip nginx jq
+# System Updates
+dnf update -y --skip-broken
+dnf clean all
 
-# Install Node.js 18
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-. ~/.nvm/nvm.sh
-nvm install 18
-nvm use 18
-nvm alias default 18
+# Install required packages
+dnf install -y nginx git unzip jq nodejs npm
 
-# Install PM2 globally
-npm install -g pm2
+# Create application user
+useradd -m -s /bin/bash webadmin || echo "User already exists"
 
-# Configure NGINX
+# Create application directories with correct permissions
+mkdir -p /var/www/cipher-projects
+chown -R webadmin:webadmin /var/www/cipher-projects
+
+# Configure nginx
 cat > /etc/nginx/conf.d/nextjs.conf << 'EOL'
 upstream nextjs_upstream {
     server 127.0.0.1:3000;
@@ -41,7 +53,6 @@ server {
     add_header X-XSS-Protection "1; mode=block";
     add_header X-Content-Type-Options "nosniff";
     add_header Referrer-Policy "strict-origin-when-cross-origin";
-    add_header Content-Security-Policy "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:;";
 
     # Compression
     gzip on;
@@ -54,8 +65,7 @@ server {
         application/x-javascript
         text/css
         text/javascript
-        text/plain
-        text/xml;
+        text/plain;
 
     # Next.js static files
     location /_next/static/ {
@@ -80,28 +90,30 @@ server {
         proxy_buffer_size 128k;
         proxy_buffers 4 256k;
         proxy_busy_buffers_size 256k;
-        
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 60s;
-        proxy_read_timeout 60s;
     }
 }
 EOL
 
-# Create application directory
-mkdir -p /var/www/cipher-projects
-cd /var/www/cipher-projects
+# Install PM2 globally
+npm install -g pm2
 
-# Deploy application
+# Deploy application as webadmin user
+cd /var/www/cipher-projects
 aws s3 cp s3://${bucket_name}/deploy.zip ./deploy.zip
 unzip -o deploy.zip
 rm deploy.zip
 
-# Install dependencies and build
-npm ci --production
+# Set ownership and permissions
+chown -R webadmin:webadmin /var/www/cipher-projects
+
+# Switch to webadmin user for npm operations
+su - webadmin << 'EOUSER'
+cd /var/www/cipher-projects
+export NODE_ENV=production
+npm ci
 npm run build
 
-# Configure PM2
+# Create PM2 ecosystem file
 cat > ecosystem.config.js << EOL
 module.exports = {
   apps: [{
@@ -113,7 +125,7 @@ module.exports = {
       PORT: 3000
     },
     exec_mode: 'cluster',
-    instances: 'max',
+    instances: '1',
     max_memory_restart: '500M'
   }]
 }
@@ -122,9 +134,18 @@ EOL
 # Start application with PM2
 pm2 start ecosystem.config.js
 pm2 save
-pm2 startup amazon -u ec2-user
+EOUSER
 
-# Configure NGINX and start services
+# Set up PM2 startup script
+env PATH=$PATH:/usr/bin pm2 startup systemd -u webadmin --hp /home/webadmin
+systemctl enable pm2-webadmin
+
+# Configure SELinux if enabled
+if command -v setsebool >/dev/null 2>&1; then
+    setsebool -P httpd_can_network_connect 1
+fi
+
+# Start and enable nginx
 systemctl enable nginx
 systemctl start nginx
 
