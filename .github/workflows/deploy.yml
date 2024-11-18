@@ -1,32 +1,14 @@
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
       # Step 1: Checkout code
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-    
-      # Step 2: Install AWS CLI
-      - name: Install AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y unzip curl
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
 
-      # get creds
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-southeast-2
-
-
-      # Step 3: Build Next.js App in Root Folder
+      # Step 2: Build Next.js App in Root Folder
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -42,7 +24,7 @@ jobs:
         run: |
           zip -r deploy.zip .next package.json package-lock.json public next.config.js app pages
 
-      # Step 4: Setup CDK in Cipher-Infra Folder
+      # Step 3: Setup CDK in Cipher-Infra Folder
       - name: Install CDK Dependencies
         working-directory: cipher-infra
         run: npm ci
@@ -55,17 +37,6 @@ jobs:
         working-directory: cipher-infra
         run: cdk deploy --require-approval never
 
-      # Step 5: Get Deployment Bucket
-      - name: Get Deployment Bucket
-        run: |
-          BUCKET_NAME=$(aws cloudformation describe-stacks \
-            --stack-name CipherProjectsStack \
-            --query 'Stacks[0].Outputs[?OutputKey==`DeploymentBucketName`].OutputValue' \
-            --output text)
-          echo "DEPLOY_BUCKET=${BUCKET_NAME}" >> $GITHUB_ENV
-
-      # Step 6: Upload to S3
+      # Step 4: Upload to S3 and Deploy to EC2
       - name: Upload to S3
-        run: |
-          echo "Uploading deploy.zip to bucket ${DEPLOY_BUCKET}..."
-          aws s3 cp deploy.zip s3://${DEPLOY_BUCKET}/deploy.zip
+        run: aws s3 cp deploy.zip s3://${{ env.DEPLOY_BUCKET }}/deploy.zip
