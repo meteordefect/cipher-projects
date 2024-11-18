@@ -132,13 +132,7 @@ export class CipherProjectsStack extends cdk.Stack {
           encrypted: true,
         }),
       }],
-      metadataOptions: {
-        httpTokens: ec2.HttpTokens.REQUIRED,
-        httpEndpoint: ec2.HttpEndpoint.ENABLED,
-        instanceMetadataTags: ec2.InstanceMetadataTags.ENABLED,
-        httpPutResponseHopLimit: 2,
-      },
-    });
+    });    
     
     // Attach updateReplacePolicy
     const cfnInstance = instance.node.defaultChild as ec2.CfnInstance;
@@ -165,7 +159,7 @@ export class CipherProjectsStack extends cdk.Stack {
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
         cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
-        originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_HEADERS,
+        originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER
       },
       certificate: certificate,
       domainNames: ['cipherprojects.com'],
