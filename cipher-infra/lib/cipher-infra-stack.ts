@@ -12,7 +12,7 @@ export class CipherProjectsStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     const stackProps = {
       ...props,
-      crossRegionReferences: true, // Enable cross-region references
+      crossRegionReferences: true,
     };
     super(scope, id, stackProps);
 
@@ -98,30 +98,35 @@ export class CipherProjectsStack extends cdk.Stack {
       ],
     });
 
-    // Consolidated S3 permissions
-    const s3PolicyStatement = new iam.PolicyStatement({
+    // S3 permissions
+    const s3Actions = [
+      's3:GetObject',
+      's3:ListBucket',
+      's3:GetBucketLocation',
+      's3:GetObjectVersion',
+      's3:HeadBucket',
+      's3:HeadObject'
+    ];
+
+    // Add S3 permissions to EC2 role
+    role.addToPolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
-      actions: [
-        's3:GetObject',
-        's3:ListBucket',
-        's3:GetBucketLocation',
-        's3:GetObjectVersion',
-        's3:HeadBucket',
-        's3:HeadObject'
-      ],
+      actions: s3Actions,
       resources: [
         deploymentBucket.bucketArn,
         `${deploymentBucket.bucketArn}/*`
       ],
-    });
-
-    // Add S3 permissions to role
-    role.addToPolicy(s3PolicyStatement);
+    }));
 
     // Add S3 permissions to bucket policy
     deploymentBucket.addToResourcePolicy(new iam.PolicyStatement({
-      ...s3PolicyStatement,
-      principals: [new iam.ArnPrincipal(role.roleArn)]
+      effect: iam.Effect.ALLOW,
+      principals: [new iam.ArnPrincipal(role.roleArn)],
+      actions: s3Actions,
+      resources: [
+        deploymentBucket.bucketArn,
+        `${deploymentBucket.bucketArn}/*`
+      ],
     }));
 
     // Add EC2 permissions
