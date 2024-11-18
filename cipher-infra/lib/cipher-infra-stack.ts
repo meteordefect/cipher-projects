@@ -122,7 +122,6 @@ export class CipherProjectsStack extends cdk.Stack {
       }),
       userData,
       role,
-      requireImdsv2: true,
       associatePublicIpAddress: true,
       securityGroup: webServerSG,
       blockDevices: [{
@@ -133,11 +132,12 @@ export class CipherProjectsStack extends cdk.Stack {
         }),
       }],
     });    
-    
+
     // Attach updateReplacePolicy
     const cfnInstance = instance.node.defaultChild as ec2.CfnInstance;
     cfnInstance.cfnOptions.updateReplacePolicy = cdk.CfnDeletionPolicy.DELETE;
 
+    
     // Add tags for deployment configuration
     cdk.Tags.of(instance).add('DeploymentBucketName', deploymentBucket.bucketName);
     cdk.Tags.of(instance).add('Environment', 'production');
