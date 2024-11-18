@@ -63,7 +63,62 @@ mkdir -p /var/www/cipher-projects
 chown -R webadmin:webadmin /var/www/cipher-projects
 
 # Configure nginx
-[... rest of nginx config ...]
+echo "Configuring nginx..."
+cat > /etc/nginx/conf.d/nextjs.conf << 'EOL'
+upstream nextjs_upstream {
+    server 127.0.0.1:3000;
+    keepalive 64;
+}
+
+server {
+    listen 80;
+    server_name _;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-XSS-Protection "1; mode=block";
+    add_header X-Content-Type-Options "nosniff";
+    add_header Referrer-Policy "strict-origin-when-cross-origin";
+
+    # Compression
+    gzip on;
+    gzip_comp_level 6;
+    gzip_min_length 256;
+    gzip_proxied any;
+    gzip_types
+        application/javascript
+        application/json
+        application/x-javascript
+        text/css
+        text/javascript
+        text/plain;
+
+    # Next.js static files
+    location /_next/static/ {
+        alias /var/www/cipher-projects/.next/static/;
+        expires 365d;
+        access_log off;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    # Next.js application
+    location / {
+        proxy_pass http://nextjs_upstream;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        proxy_buffer_size 128k;
+        proxy_buffers 4 256k;
+        proxy_busy_buffers_size 256k;
+    }
+}
+EOL
 
 echo "Deploying application..."
 cd /var/www/cipher-projects
