@@ -122,6 +122,12 @@ server {
 }
 EOL
 
+# Change to the application directory
+echo "Setting working directory to /var/www/cipher-projects"
+cd /var/www/cipher-projects || { echo "Failed to change directory to /var/www/cipher-projects"; exit 1; }
+
+# Check if we already have a deployment
+
 # Check if we already have a deployment
 if [ -d ".next" ] && [ -f "package.json" ]; then
     echo "Found existing deployment, skipping download..."

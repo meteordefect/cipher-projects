@@ -133,8 +133,14 @@ export class CipherProjectsStack extends cdk.Stack {
           encrypted: true,
         }),
       }],
+      metadataOptions: {
+        httpTokens: ec2.HttpTokens.REQUIRED,
+        httpEndpoint: ec2.HttpEndpoint.ENABLED,
+        instanceMetadataTags: ec2.InstanceMetadataTags.ENABLED, // Enable metadata tags
+        httpPutResponseHopLimit: 2,
+      },
     });
-
+    
     // And add this after your instance definition
     const cfnInstance = instance.node.defaultChild as ec2.CfnInstance;
     cfnInstance.cfnOptions.updateReplacePolicy = cdk.CfnDeletionPolicy.DELETE;
