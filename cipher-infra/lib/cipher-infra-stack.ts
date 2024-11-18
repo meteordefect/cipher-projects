@@ -64,6 +64,12 @@ export class CipherProjectsStack extends cdk.Stack {
       encryption: s3.BucketEncryption.S3_MANAGED,
     });
 
+    // Create CloudFront log bucket
+    const logBucket = new s3.Bucket(this, 'CloudFrontLogBucket', {
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
+      encryption: s3.BucketEncryption.S3_MANAGED,
+    });
+
     // Enhanced EC2 role with specific permissions
     const role = new iam.Role(this, 'EC2Role', {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
@@ -99,6 +105,7 @@ export class CipherProjectsStack extends cdk.Stack {
       ],
     }));
 
+    // Create instance profile
     const instanceProfile = new iam.CfnInstanceProfile(this, 'EC2InstanceProfile', {
       roles: [role.roleName],
     });
@@ -111,36 +118,59 @@ export class CipherProjectsStack extends cdk.Stack {
       fs.readFileSync(path.join(__dirname, 'user-data.sh'), 'utf8')
     );
 
-    // EC2
-    const instance = new ec2.Instance(this, 'WebServer', {
-      vpc,
-      vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.SMALL),
-      machineImage: new ec2.AmazonLinuxImage({
-        generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2023,
-        cpuType: ec2.AmazonLinuxCpuType.X86_64,
-      }),
-      userData,
-      role,
-      associatePublicIpAddress: true,
-      securityGroup: webServerSG,
-      blockDevices: [{
-        deviceName: '/dev/xvda',
-        volume: ec2.BlockDeviceVolume.ebs(20, {
-          volumeType: ec2.EbsDeviceVolumeType.GP3,
-          encrypted: true,
-        }),
-      }],
-    });    
+    // Create the Launch Template
+    const launchTemplate = new ec2.CfnLaunchTemplate(this, 'LaunchTemplate', {
+      launchTemplateData: {
+        instanceType: 't3.small',
+        imageId: new ec2.AmazonLinuxImage({
+          generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2023,
+          cpuType: ec2.AmazonLinuxCpuType.X86_64,
+        }).getImage(this).imageId,
+        securityGroupIds: [webServerSG.securityGroupId],
+        iamInstanceProfile: {
+          arn: instanceProfile.attrArn,
+        },
+        blockDeviceMappings: [
+          {
+            deviceName: '/dev/xvda',
+            ebs: {
+              volumeSize: 20,
+              volumeType: 'gp3',
+              encrypted: true,
+            },
+          },
+        ],
+        metadataOptions: {
+          httpEndpoint: 'enabled',
+          httpTokens: 'required',
+          httpPutResponseHopLimit: 2,
+          instanceMetadataTags: 'enabled',
+        },
+        userData: cdk.Fn.base64(userData.render()),
+      },
+    });
 
-    // Attach updateReplacePolicy
-    const cfnInstance = instance.node.defaultChild as ec2.CfnInstance;
-    cfnInstance.cfnOptions.updateReplacePolicy = cdk.CfnDeletionPolicy.DELETE;
+    // Create the EC2 Instance using the Launch Template
+    const instance = new ec2.CfnInstance(this, 'WebServerInstance', {
+      launchTemplate: {
+        launchTemplateId: launchTemplate.ref,
+        version: launchTemplate.attrLatestVersionNumber,
+      },
+      subnetId: vpc.publicSubnets[0].subnetId,
+      tags: [
+        {
+          key: 'DeploymentBucketName',
+          value: deploymentBucket.bucketName,
+        },
+        {
+          key: 'Environment',
+          value: 'production',
+        },
+      ],
+    });
 
-    
-    // Add tags for deployment configuration
-    cdk.Tags.of(instance).add('DeploymentBucketName', deploymentBucket.bucketName);
-    cdk.Tags.of(instance).add('Environment', 'production');
+    // Set update replace policy
+    instance.cfnOptions.updateReplacePolicy = cdk.CfnDeletionPolicy.DELETE;
 
     // Use existing certificate
     const certificate = acm.Certificate.fromCertificateArn(this, 'SiteCertificate',
@@ -150,7 +180,7 @@ export class CipherProjectsStack extends cdk.Stack {
     // Enhanced CloudFront distribution
     const distribution = new cloudfront.Distribution(this, 'Distribution', {
       defaultBehavior: {
-        origin: new origins.HttpOrigin(instance.instancePublicDnsName, {
+        origin: new origins.HttpOrigin(instance.attrPublicDnsName, {
           protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
           httpPort: 80,
           keepaliveTimeout: cdk.Duration.seconds(60),
@@ -159,19 +189,21 @@ export class CipherProjectsStack extends cdk.Stack {
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
         cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
-        originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER
+        originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
       },
       certificate: certificate,
       domainNames: ['cipherprojects.com'],
       minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
       enableLogging: true,
+      logBucket: logBucket,
+      logFilePrefix: 'cloudfront-logs/',
       httpVersion: cloudfront.HttpVersion.HTTP2_AND_3,
     });
 
     // Outputs for deployment reference
-    new cdk.CfnOutput(this, 'InstanceId', { value: instance.instanceId });
+    new cdk.CfnOutput(this, 'InstanceId', { value: instance.ref });
     new cdk.CfnOutput(this, 'DeploymentBucketName', { value: deploymentBucket.bucketName });
-    new cdk.CfnOutput(this, 'InstancePublicDNS', { value: instance.instancePublicDnsName });
+    new cdk.CfnOutput(this, 'InstancePublicDNS', { value: instance.attrPublicDnsName });
     new cdk.CfnOutput(this, 'CloudFrontDomain', { value: distribution.distributionDomainName });
   }
 }
