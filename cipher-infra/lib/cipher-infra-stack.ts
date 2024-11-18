@@ -72,7 +72,7 @@ export class CipherProjectsStack extends cdk.Stack {
     const logBucket = new s3.Bucket(this, 'CloudFrontLogBucket', {
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       encryption: s3.BucketEncryption.S3_MANAGED,
-      objectOwnership: s3.ObjectOwnership.OBJECT_WRITER, // Add this
+      objectOwnership: s3.ObjectOwnership.OBJECT_WRITER,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
     });
 
@@ -124,7 +124,7 @@ export class CipherProjectsStack extends cdk.Stack {
       resources: [
         deploymentBucket.bucketArn,
         `${deploymentBucket.bucketArn}/*`,
-        'arn:aws:s3:::*'  // Required for ListAllMyBuckets
+        'arn:aws:s3:::*'
       ],
     }));
 
@@ -150,15 +150,6 @@ export class CipherProjectsStack extends cdk.Stack {
       ],
       resources: [`arn:aws:ec2:${this.region}:${this.account}:instance/*`],
     }));
-
-    // Create wait condition for deployment bucket
-    const deploymentBucketReadyHandle = new cdk.CfnWaitConditionHandle(this, 'DeploymentBucketReadyHandle');
-    
-    const deploymentBucketReady = new cdk.CfnWaitCondition(this, 'DeploymentBucketReady', {
-      count: 1,
-      handle: deploymentBucketReadyHandle.ref,
-      timeout: '600'
-    });
 
     // Create instance profile
     const instanceProfile = new iam.CfnInstanceProfile(this, 'EC2InstanceProfile', {
@@ -224,8 +215,7 @@ export class CipherProjectsStack extends cdk.Stack {
       tags: commonTags,
     });
 
-    // Add dependency on bucket ready condition
-    instance.node.addDependency(deploymentBucketReady);
+    // Add dependency on bucket
     instance.node.addDependency(deploymentBucket);
 
     // Set update replace policy
@@ -268,6 +258,5 @@ export class CipherProjectsStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'DeploymentBucketName', { value: deploymentBucket.bucketName });
     new cdk.CfnOutput(this, 'InstancePublicDNS', { value: instance.attrPublicDnsName });
     new cdk.CfnOutput(this, 'CloudFrontDomain', { value: distribution.distributionDomainName });
-    new cdk.CfnOutput(this, 'DeploymentBucketReadyHandle', { value: deploymentBucketReadyHandle.ref });
   }
 }

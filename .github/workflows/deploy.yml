@@ -45,6 +45,15 @@ jobs:
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Package Application
+        run: |
+          zip -r deploy.zip .next package.json package-lock.json public next.config.js app pages
+          echo "Created deploy.zip with contents:"
+          unzip -l deploy.zip
+
       - name: Install CDK Dependencies
         working-directory: cipher-infra
         run: |
@@ -58,30 +67,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
 
-      - name: Build Next.js
-        run: npm run build
-
-      - name: Package Application
-        run: |
-          zip -r deploy.zip .next package.json package-lock.json public next.config.js app pages
-          echo "Created deploy.zip with contents:"
-          unzip -l deploy.zip
-
       - name: Deploy Infrastructure
         working-directory: cipher-infra
         run: |
           echo "Checking user-data.sh existence:"
           ls -l lib/user-data.sh
-          cdk deploy --require-approval never || {
-            echo "CDK deployment failed. Checking CloudFormation events..."
-            aws cloudformation describe-stack-events --stack-name ${{ env.STACK_NAME }} --query 'StackEvents[?ResourceStatus==`CREATE_FAILED`].[LogicalResourceId,ResourceStatusReason]' --output text
-            exit 1
-          }
+          cdk deploy --require-approval never
 
-      - name: Get Stack Outputs
-        id: stack-outputs
+      - name: Wait and Get Stack Outputs
         run: |
-          echo "=== Stack Outputs ==="
+          echo "Waiting for stack to stabilize..."
+          aws cloudformation wait stack-create-complete --stack-name ${{ env.STACK_NAME }} || true
+          aws cloudformation wait stack-update-complete --stack-name ${{ env.STACK_NAME }} || true
+          
+          echo "Getting stack outputs..."
           STACK_OUTPUT=$(aws cloudformation describe-stacks --stack-name ${{ env.STACK_NAME }} --query 'Stacks[0].Outputs' --output json)
           echo "$STACK_OUTPUT"
           
@@ -90,39 +89,28 @@ jobs:
           
           echo "DEPLOY_BUCKET=$BUCKET_NAME" >> $GITHUB_ENV
           echo "EC2_INSTANCE_ID=$EC2_ID" >> $GITHUB_ENV
-          
-          echo "Found bucket name: $BUCKET_NAME"
-          echo "Found EC2 instance ID: $EC2_ID"
 
-      - name: Wait for Bucket
+      - name: Upload to S3 and Wait
         run: |
           echo "Waiting for bucket ${{ env.DEPLOY_BUCKET }} to be accessible..."
           for i in {1..30}; do
             if aws s3api head-bucket --bucket ${{ env.DEPLOY_BUCKET }} 2>/dev/null; then
-              echo "Bucket is accessible"
+              echo "Bucket is accessible, uploading deploy.zip..."
+              aws s3 cp deploy.zip "s3://${{ env.DEPLOY_BUCKET }}/deploy.zip"
               break
             fi
-            echo "Attempt $i: Bucket not ready, waiting..."
+            echo "Attempt $i: Waiting for bucket..."
             sleep 10
           done
 
-      - name: Upload to S3
-        run: |
-          echo "Uploading deploy.zip to s3://${{ env.DEPLOY_BUCKET }}/"
-          aws s3 cp deploy.zip "s3://${{ env.DEPLOY_BUCKET }}/deploy.zip" || {
-            echo "Upload failed. Checking bucket permissions..."
-            aws s3api get-bucket-policy --bucket ${{ env.DEPLOY_BUCKET }}
-            exit 1
-          }
-
-      - name: Wait for Instance
+      - name: Wait for EC2 Instance
         run: |
           echo "Waiting for EC2 instance ${{ env.EC2_INSTANCE_ID }} to be ready..."
+          aws ec2 wait instance-running --instance-ids ${{ env.EC2_INSTANCE_ID }}
           aws ec2 wait instance-status-ok --instance-ids ${{ env.EC2_INSTANCE_ID }}
 
       - name: Deploy to EC2
         run: |
-          echo "Deploying to EC2 instance ${{ env.EC2_INSTANCE_ID }}..."
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceids,Values=['${{ env.EC2_INSTANCE_ID }}']" \
@@ -140,13 +128,3 @@ jobs:
         run: |
           echo "Deployed to EC2 instance: ${{ env.EC2_INSTANCE_ID }}"
           echo "CloudFront domain: $(aws cloudformation describe-stacks --stack-name ${{ env.STACK_NAME }} --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontDomain`].OutputValue' --output text)"
-          
-          # Wait for application to be accessible
-          for i in {1..30}; do
-            if curl -sf http://$(aws ec2 describe-instances --instance-ids ${{ env.EC2_INSTANCE_ID }} --query 'Reservations[0].Instances[0].PublicDnsName' --output text) > /dev/null; then
-              echo "Application is responding"
-              break
-            fi
-            echo "Waiting for application to start... (attempt $i/30)"
-            sleep 10
-          done
