@@ -17,6 +17,15 @@ jobs:
           unzip awscliv2.zip
           sudo ./aws/install
 
+      # get creds
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-southeast-2
+
+
       # Step 3: Build Next.js App in Root Folder
       - name: Setup Node.js
         uses: actions/setup-node@v3
