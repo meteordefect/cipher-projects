@@ -135,7 +135,7 @@ export class CipherProjectsStack extends cdk.Stack {
       }],
     });
 
-    // And add this after your instance definition:
+    // And add this after your instance definition
     const cfnInstance = instance.node.defaultChild as ec2.CfnInstance;
     cfnInstance.cfnOptions.updateReplacePolicy = cdk.CfnDeletionPolicy.DELETE;
 
