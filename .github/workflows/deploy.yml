@@ -1,49 +1,30 @@
-name: Build and Deploy
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-env:
-  AWS_DEFAULT_REGION: "ap-southeast-2"
-  NODE_VERSION: "20"
-  STACK_NAME: "CipherProjectsStack"
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
+      # Step 1: Checkout code
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+    
+      # Step 2: Install AWS CLI
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip curl
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
 
+      # Step 3: Build Next.js App in Root Folder
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
 
       - name: Install Next.js Dependencies
-        run: |
-          npm ci
-          echo "Excluding cipher-infra from Next.js build..."
-          echo '{
-            "extends": "next",
-            "exclude": ["cipher-infra/**/*"],
-            "rules": {
-              "react/no-unescaped-entities": "off",
-              "@next/next/no-img-element": "off"
-            }
-          }' > .eslintrc.json
-
-      - name: Run ESLint
-        run: |
-          npm run lint || true
-          git config --global user.name 'GitHub Actions'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        run: npm ci
 
       - name: Build Next.js
         run: npm run build
@@ -51,82 +32,31 @@ jobs:
       - name: Package Application
         run: |
           zip -r deploy.zip .next package.json package-lock.json public next.config.js app pages
-          echo "Created deploy.zip with contents:"
-          unzip -l deploy.zip
 
+      # Step 4: Setup CDK in Cipher-Infra Folder
       - name: Install CDK Dependencies
         working-directory: cipher-infra
-        run: |
-          rm -f package-lock.json
-          npm install
-          npm install -g aws-cdk typescript ts-node
-          npm install aws-cdk-lib constructs
+        run: npm ci
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+      - name: Build CDK
+        working-directory: cipher-infra
+        run: npm run build
 
       - name: Deploy Infrastructure
         working-directory: cipher-infra
-        run: |
-          echo "Checking user-data.sh existence:"
-          ls -l lib/user-data.sh
-          cdk deploy --require-approval never
+        run: cdk deploy --require-approval never
 
-      - name: Wait and Get Stack Outputs
+      # Step 5: Get Deployment Bucket
+      - name: Get Deployment Bucket
         run: |
-          echo "Waiting for stack to stabilize..."
-          aws cloudformation wait stack-create-complete --stack-name ${{ env.STACK_NAME }} || true
-          aws cloudformation wait stack-update-complete --stack-name ${{ env.STACK_NAME }} || true
-          
-          echo "Getting stack outputs..."
-          STACK_OUTPUT=$(aws cloudformation describe-stacks --stack-name ${{ env.STACK_NAME }} --query 'Stacks[0].Outputs' --output json)
-          echo "$STACK_OUTPUT"
-          
-          BUCKET_NAME=$(echo "$STACK_OUTPUT" | jq -r '.[] | select(.OutputKey=="DeploymentBucketName") | .OutputValue')
-          EC2_ID=$(echo "$STACK_OUTPUT" | jq -r '.[] | select(.OutputKey=="InstanceId") | .OutputValue')
-          
-          echo "DEPLOY_BUCKET=$BUCKET_NAME" >> $GITHUB_ENV
-          echo "EC2_INSTANCE_ID=$EC2_ID" >> $GITHUB_ENV
+          BUCKET_NAME=$(aws cloudformation describe-stacks \
+            --stack-name CipherProjectsStack \
+            --query 'Stacks[0].Outputs[?OutputKey==`DeploymentBucketName`].OutputValue' \
+            --output text)
+          echo "DEPLOY_BUCKET=${BUCKET_NAME}" >> $GITHUB_ENV
 
-      - name: Upload to S3 and Wait
+      # Step 6: Upload to S3
+      - name: Upload to S3
         run: |
-          echo "Waiting for bucket ${{ env.DEPLOY_BUCKET }} to be accessible..."
-          for i in {1..30}; do
-            if aws s3api head-bucket --bucket ${{ env.DEPLOY_BUCKET }} 2>/dev/null; then
-              echo "Bucket is accessible, uploading deploy.zip..."
-              aws s3 cp deploy.zip "s3://${{ env.DEPLOY_BUCKET }}/deploy.zip"
-              break
-            fi
-            echo "Attempt $i: Waiting for bucket..."
-            sleep 10
-          done
-
-      - name: Wait for EC2 Instance
-        run: |
-          echo "Waiting for EC2 instance ${{ env.EC2_INSTANCE_ID }} to be ready..."
-          aws ec2 wait instance-running --instance-ids ${{ env.EC2_INSTANCE_ID }}
-          aws ec2 wait instance-status-ok --instance-ids ${{ env.EC2_INSTANCE_ID }}
-
-      - name: Deploy to EC2
-        run: |
-          aws ssm send-command \
-            --document-name "AWS-RunShellScript" \
-            --targets "Key=instanceids,Values=['${{ env.EC2_INSTANCE_ID }}']" \
-            --parameters 'commands=[
-              "cd /var/www/cipher-projects",
-              "aws s3 cp s3://${{ env.DEPLOY_BUCKET }}/deploy.zip .",
-              "unzip -o deploy.zip",
-              "chown -R webadmin:webadmin .",
-              "su - webadmin -c \"cd /var/www/cipher-projects && npm ci --production\"",
-              "su - webadmin -c \"cd /var/www/cipher-projects && pm2 restart cipher-projects || pm2 start npm --name \"cipher-projects\" -- start\""
-            ]' \
-            --output text
-
-      - name: Verify Deployment
-        run: |
-          echo "Deployed to EC2 instance: ${{ env.EC2_INSTANCE_ID }}"
-          echo "CloudFront domain: $(aws cloudformation describe-stacks --stack-name ${{ env.STACK_NAME }} --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontDomain`].OutputValue' --output text)"
+          echo "Uploading deploy.zip to bucket ${DEPLOY_BUCKET}..."
+          aws s3 cp deploy.zip s3://${DEPLOY_BUCKET}/deploy.zip
