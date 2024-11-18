@@ -120,13 +120,36 @@ server {
 }
 EOL
 
-echo "Deploying application..."
-cd /var/www/cipher-projects
+# Check if we already have a deployment
+if [ -d ".next" ] && [ -f "package.json" ]; then
+    echo "Found existing deployment, skipping download..."
+else
+    echo "No existing deployment found, trying S3..."
+    
+    # Test S3 bucket access first
+    if ! aws s3 ls s3://${bucket_name} &>/dev/null; then
+        echo "Error: Cannot access bucket ${bucket_name}"
+        aws s3 ls s3://${bucket_name}  # Run again to see error message
+        exit 1
+    fi
 
-echo "Downloading deployment package..."
-aws s3 cp s3://${bucket_name}/deploy.zip ./deploy.zip
-unzip -o deploy.zip
-rm deploy.zip
+    if ! aws s3 ls s3://${bucket_name}/deploy.zip &>/dev/null; then
+        echo "Error: deploy.zip not found in bucket ${bucket_name}"
+        echo "Available files in bucket:"
+        aws s3 ls s3://${bucket_name}
+        exit 1
+    fi
+
+    echo "Downloading from S3: ${bucket_name}/deploy.zip"
+    if ! aws s3 cp s3://${bucket_name}/deploy.zip ./deploy.zip; then
+        echo "Error downloading deploy.zip"
+        exit 1
+    fi
+
+    echo "Extracting deployment package..."
+    unzip -o deploy.zip
+    rm deploy.zip
+fi
 
 # Set ownership and permissions
 chown -R webadmin:webadmin /var/www/cipher-projects
