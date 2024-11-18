@@ -27,28 +27,12 @@ jobs:
           cache: 'npm'
 
       - name: Install Next.js Dependencies
-        run: npm ci
-
-      - name: Build Next.js
-        run: npm run build
-
-      - name: Install CDK Dependencies
-        working-directory: cipher-infra
         run: |
-          rm -f package-lock.json
-          npm install
-          npm install -g aws-cdk
-          npm run build
-
-      - name: Build CDK
-        working-directory: cipher-infra
-        run: |
-          tsc
-
-      - name: Create ESLint config
-        run: |
+          npm ci
+          echo "Excluding cipher-infra from Next.js build..."
           echo '{
             "extends": "next",
+            "exclude": ["cipher-infra/**/*"],
             "rules": {
               "react/no-unescaped-entities": "off",
               "@next/next/no-img-element": "off"
@@ -73,8 +57,10 @@ jobs:
       - name: Install CDK Dependencies
         working-directory: cipher-infra
         run: |
-          npm ci
-          npm install -g aws-cdk
+          rm -f package-lock.json
+          npm install
+          npm install -g aws-cdk typescript ts-node
+          npm install aws-cdk-lib constructs
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
