@@ -10,7 +10,11 @@ import * as path from 'path';
 
 export class CipherProjectsStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
-    super(scope, id, props);
+    const stackProps = {
+      ...props,
+      crossRegionReferences: true, // Enable cross-region references
+    };
+    super(scope, id, stackProps);
 
     // VPC with public and private subnets
     const vpc = new ec2.Vpc(this, 'CipherVPC', {
@@ -70,6 +74,21 @@ export class CipherProjectsStack extends cdk.Stack {
       encryption: s3.BucketEncryption.S3_MANAGED,
     });
 
+    // Add CloudFront logging permissions to log bucket
+    logBucket.addToResourcePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      principals: [new iam.ServicePrincipal('cloudfront.amazonaws.com')],
+      actions: ['s3:PutObject'],
+      resources: [
+        `${logBucket.bucketArn}/*`
+      ],
+      conditions: {
+        StringEquals: {
+          'AWS:SourceArn': `arn:aws:cloudfront::${this.account}:distribution/*`
+        }
+      }
+    }));
+
     // Enhanced EC2 role with specific permissions
     const role = new iam.Role(this, 'EC2Role', {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
@@ -79,7 +98,33 @@ export class CipherProjectsStack extends cdk.Stack {
       ],
     });
 
-    // Add specific permissions for EC2 operation
+    // Consolidated S3 permissions
+    const s3PolicyStatement = new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        's3:GetObject',
+        's3:ListBucket',
+        's3:GetBucketLocation',
+        's3:GetObjectVersion',
+        's3:HeadBucket',
+        's3:HeadObject'
+      ],
+      resources: [
+        deploymentBucket.bucketArn,
+        `${deploymentBucket.bucketArn}/*`
+      ],
+    });
+
+    // Add S3 permissions to role
+    role.addToPolicy(s3PolicyStatement);
+
+    // Add S3 permissions to bucket policy
+    deploymentBucket.addToResourcePolicy(new iam.PolicyStatement({
+      ...s3PolicyStatement,
+      principals: [new iam.ArnPrincipal(role.roleArn)]
+    }));
+
+    // Add EC2 permissions
     role.addToPolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
@@ -89,23 +134,6 @@ export class CipherProjectsStack extends cdk.Stack {
         'ec2:DescribeInstanceStatus',
       ],
       resources: [`arn:aws:ec2:${this.region}:${this.account}:instance/*`],
-    }));
-
-    // Grant S3 permissions for deployment
-    deploymentBucket.addToResourcePolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      principals: [new iam.ArnPrincipal(role.roleArn)],  // Add EC2 role
-      actions: [
-        's3:GetObject',
-        's3:ListBucket',
-        's3:GetObjectVersion',
-        's3:HeadBucket',
-        's3:HeadObject'
-      ],
-      resources: [
-        deploymentBucket.bucketArn,
-        `${deploymentBucket.bucketArn}/*`
-      ],
     }));
 
     // Create instance profile
@@ -120,6 +148,15 @@ export class CipherProjectsStack extends cdk.Stack {
     export DEPLOYMENT_BUCKET=${deploymentBucket.bucketName}`,
       fs.readFileSync(path.join(__dirname, 'user-data.sh'), 'utf8')
     );
+
+    // Common tags for resources
+    const commonTags = [
+      { key: 'DeploymentBucketName', value: deploymentBucket.bucketName },
+      { key: 'Environment', value: 'production' },
+      { key: 'Name', value: 'CipherProjects-WebServer' },
+      { key: 'Application', value: 'CipherProjects' },
+      { key: 'Managed-By', value: 'CDK' }
+    ];
 
     // Create the Launch Template
     const launchTemplate = new ec2.CfnLaunchTemplate(this, 'LaunchTemplate', {
@@ -160,16 +197,7 @@ export class CipherProjectsStack extends cdk.Stack {
         version: launchTemplate.attrLatestVersionNumber,
       },
       subnetId: vpc.publicSubnets[0].subnetId,
-      tags: [
-        {
-          key: 'DeploymentBucketName',
-          value: deploymentBucket.bucketName,
-        },
-        {
-          key: 'Environment',
-          value: 'production',
-        },
-      ],
+      tags: commonTags,
     });
 
     // Set update replace policy
@@ -202,6 +230,10 @@ export class CipherProjectsStack extends cdk.Stack {
       logFilePrefix: 'cloudfront-logs/',
       httpVersion: cloudfront.HttpVersion.HTTP2_AND_3,
     });
+
+    // Add explicit dependencies
+    distribution.node.addDependency(instance);
+    distribution.node.addDependency(logBucket);
 
     // Outputs for deployment reference
     new cdk.CfnOutput(this, 'InstanceId', { value: instance.ref });
