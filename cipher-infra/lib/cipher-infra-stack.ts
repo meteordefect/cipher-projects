@@ -136,7 +136,7 @@ export class CipherProjectsStack extends cdk.Stack {
       metadataOptions: {
         httpTokens: ec2.HttpTokens.REQUIRED,
         httpEndpoint: ec2.HttpEndpoint.ENABLED,
-        instanceMetadataTags: ec2.InstanceMetadataTags.ENABLED, // Enable metadata tags
+        instanceMetadataTags: ec2.InstanceMetadataTags.ENABLED,
         httpPutResponseHopLimit: 2,
       },
     });
