@@ -72,6 +72,8 @@ export class CipherProjectsStack extends cdk.Stack {
     const logBucket = new s3.Bucket(this, 'CloudFrontLogBucket', {
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       encryption: s3.BucketEncryption.S3_MANAGED,
+      objectOwnership: s3.ObjectOwnership.OBJECT_WRITER, // Add this
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
     });
 
     // Add CloudFront logging permissions to log bucket
@@ -98,27 +100,35 @@ export class CipherProjectsStack extends cdk.Stack {
       ],
     });
 
-    // S3 permissions
+    // Comprehensive S3 permissions
     const s3Actions = [
       's3:GetObject',
       's3:ListBucket',
       's3:GetBucketLocation',
       's3:GetObjectVersion',
       's3:HeadBucket',
-      's3:HeadObject'
+      's3:HeadObject',
+      's3:ListBucketVersions',
+      's3:GetBucketPolicy',
+      's3:PutObject',
+      's3:ListAllMyBuckets'
     ];
 
-    // Add S3 permissions to EC2 role
+    // Grant bucket permissions directly
+    deploymentBucket.grantReadWrite(role);
+
+    // Add explicit role policy
     role.addToPolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: s3Actions,
       resources: [
         deploymentBucket.bucketArn,
-        `${deploymentBucket.bucketArn}/*`
+        `${deploymentBucket.bucketArn}/*`,
+        'arn:aws:s3:::*'  // Required for ListAllMyBuckets
       ],
     }));
 
-    // Add S3 permissions to bucket policy
+    // Add explicit bucket policy
     deploymentBucket.addToResourcePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       principals: [new iam.ArnPrincipal(role.roleArn)],
@@ -140,6 +150,15 @@ export class CipherProjectsStack extends cdk.Stack {
       ],
       resources: [`arn:aws:ec2:${this.region}:${this.account}:instance/*`],
     }));
+
+    // Create wait condition for deployment bucket
+    const deploymentBucketReadyHandle = new cdk.CfnWaitConditionHandle(this, 'DeploymentBucketReadyHandle');
+    
+    const deploymentBucketReady = new cdk.CfnWaitCondition(this, 'DeploymentBucketReady', {
+      count: 1,
+      handle: deploymentBucketReadyHandle.ref,
+      timeout: '600'
+    });
 
     // Create instance profile
     const instanceProfile = new iam.CfnInstanceProfile(this, 'EC2InstanceProfile', {
@@ -205,6 +224,10 @@ export class CipherProjectsStack extends cdk.Stack {
       tags: commonTags,
     });
 
+    // Add dependency on bucket ready condition
+    instance.node.addDependency(deploymentBucketReady);
+    instance.node.addDependency(deploymentBucket);
+
     // Set update replace policy
     instance.cfnOptions.updateReplacePolicy = cdk.CfnDeletionPolicy.DELETE;
 
@@ -245,5 +268,6 @@ export class CipherProjectsStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'DeploymentBucketName', { value: deploymentBucket.bucketName });
     new cdk.CfnOutput(this, 'InstancePublicDNS', { value: instance.attrPublicDnsName });
     new cdk.CfnOutput(this, 'CloudFrontDomain', { value: distribution.distributionDomainName });
+    new cdk.CfnOutput(this, 'DeploymentBucketReadyHandle', { value: deploymentBucketReadyHandle.ref });
   }
 }
