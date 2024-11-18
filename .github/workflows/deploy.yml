@@ -1,42 +1,68 @@
+name: Deploy Infrastructure and Application
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     
     steps:
-      # Step 1: Checkout code
       - uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      # Step 2: Build Next.js App in Root Folder
+      
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+          cache: 'npm'
 
-      - name: Install Next.js Dependencies
+      # Build Next.js
+      - name: Install Root Dependencies
         run: npm ci
-
+      
       - name: Build Next.js
         run: npm run build
-
+      
       - name: Package Application
         run: |
-          zip -r deploy.zip .next package.json package-lock.json public next.config.js app pages
+          zip -r deploy.zip .next package.json package-lock.json public app pages next.config.js
 
-      # Step 3: Setup CDK in Cipher-Infra Folder
-      - name: Install CDK Dependencies
+      # AWS Setup
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-southeast-2
+      
+      # CDK Deploy
+      - name: CDK Setup
         working-directory: cipher-infra
-        run: npm ci
-
-      - name: Build CDK
+        run: |
+          npm ci
+          npm install -g aws-cdk
+          
+      - name: CDK Bootstrap
         working-directory: cipher-infra
-        run: npm run build
-
+        run: cdk bootstrap
+        
       - name: Deploy Infrastructure
         working-directory: cipher-infra
-        run: cdk deploy --require-approval never
-
-      # Step 4: Upload to S3 and Deploy to EC2
+        run: |
+          cdk deploy --require-approval never --outputs-file outputs.json
+          
       - name: Upload to S3
-        run: aws s3 cp deploy.zip s3://${{ env.DEPLOY_BUCKET }}/deploy.zip
+        run: |
+          BUCKET_NAME=$(jq -r '.CipherInfraStack.DeploymentBucketName' cipher-infra/outputs.json)
+          aws s3 cp deploy.zip "s3://${BUCKET_NAME}/deploy.zip"
