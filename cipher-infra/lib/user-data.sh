@@ -1,3 +1,4 @@
+#!/bin/bash
 exec > >(tee /var/log/user-data.log|logger -t user-data) 2>&1
 set -e
 
@@ -5,6 +6,9 @@ set -e
 function handle_error {
     echo "Error occurred in script at line: $1"
     echo "Last command: $2"
+    echo "Current directory: $(pwd)"
+    echo "Directory contents:"
+    ls -la
     journalctl -xe --no-pager | tail -n 50
     exit 1
 }
@@ -13,18 +17,34 @@ trap 'handle_error ${LINENO} "${BASH_COMMAND}"' ERR
 
 echo "Starting deployment at $(date)"
 
-# Fetch bucket name from instance tags or environmen variable
+# Get IMDSv2 token with error handling
+echo "Getting IMDSv2 token..."
+TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600" 2>/dev/null) || {
+    echo "Failed to get IMDSv2 token"
+    exit 1
+}
+
+echo "Getting AWS Region..."
+AWS_REGION=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/placement/region) || {
+    echo "Failed to get AWS region"
+    exit 1
+}
+echo "AWS Region: ${AWS_REGION}"
+
+# Get the bucket name with error handling
 if [[ -n "$DEPLOYMENT_BUCKET" ]]; then
     bucket_name=$DEPLOYMENT_BUCKET
 else
-    TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+    echo "Getting bucket name from instance tag..."
     bucket_name=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/tags/instance/DeploymentBucketName)
 fi
 
 if [[ -z "$bucket_name" ]]; then
-    echo "Error: Deployment bucket name not found."
+    echo "Error: Could not determine bucket name"
     exit 1
 fi
+
+echo "Using deployment bucket: ${bucket_name}"
 
 # Optimize package installation
 echo "Optimizing dnf..."
@@ -32,15 +52,35 @@ echo 'max_parallel_downloads=20' >> /etc/dnf/dnf.conf
 echo 'fastestmirror=true' >> /etc/dnf/dnf.conf
 
 echo "Updating system packages..."
-dnf update -y --best --allowerasing
+dnf update -y --best --allowerasing || {
+    echo "Failed to update system packages"
+    exit 1
+}
 dnf clean all
 
 # Install Node.js repository properly first
 echo "Setting up Node.js repository..."
-curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
+curl -fsSL https://rpm.nodesource.com/setup_18.x | bash - || {
+    echo "Failed to set up Node.js repository"
+    exit 1
+}
 
 echo "Installing Node.js and dependencies..."
-dnf install -y nodejs nginx git unzip jq gcc gcc-c++ make
+dnf install -y nodejs nginx git unzip jq gcc gcc-c++ make || {
+    echo "Failed to install required packages"
+    exit 1
+}
+
+# Verify Node.js installation
+echo "Verifying Node.js installation..."
+command -v node >/dev/null 2>&1 || { 
+    echo "Error: Node.js installation failed" 
+    exit 1
+}
+node -v || { 
+    echo "Error: Node.js is not working properly"
+    exit 1
+}
 
 # Configure npm for faster installs
 echo "Configuring npm for performance..."
@@ -50,9 +90,14 @@ npm config set audit=false
 npm config set update-notifier=false
 
 echo "Installing global packages..."
-# Install latest npm with specific version to avoid issues
-npm install -g npm@10.2.4
-npm install -g pm2@latest
+npm install -g npm@10.2.4 || {
+    echo "Failed to install npm"
+    exit 1
+}
+npm install -g pm2@latest || {
+    echo "Failed to install pm2"
+    exit 1
+}
 node -v
 npm -v
 
@@ -122,41 +167,80 @@ server {
 }
 EOL
 
+# Verify nginx configuration
+echo "Verifying nginx configuration..."
+nginx -t || {
+    echo "Error: Invalid nginx configuration"
+    exit 1
+}
+
 # Change to the application directory
 echo "Setting working directory to /var/www/cipher-projects"
-cd /var/www/cipher-projects || { echo "Failed to change directory to /var/www/cipher-projects"; exit 1; }
+cd /var/www/cipher-projects || { 
+    echo "Failed to change directory to /var/www/cipher-projects"
+    exit 1
+}
 
-# Check if we already have a deployment
+# Check existing deployment and clean if necessary
+if [ -d ".next" ] || [ -f "package.json" ]; then
+    echo "Found existing deployment, checking structure..."
+    echo "Current directory contents before cleanup:"
+    ls -la
+    echo "Cleaning up existing deployment..."
+    cd /var/www/cipher-projects
+    pwd
+    find . -mindepth 1 -delete
+    echo "Directory contents after cleanup:"
+    ls -la
+fi
 
-# Check if we already have a deployment
-if [ -d ".next" ] && [ -f "package.json" ]; then
-    echo "Found existing deployment, skipping download..."
+# Check for and download deploy.zip
+echo "Checking for deploy.zip in ${bucket_name}..."
+if aws s3 ls "s3://${bucket_name}/deploy.zip" --region="${AWS_REGION}" 2>/dev/null; then
+    echo "deploy.zip found, downloading..."
+    if aws s3 cp "s3://${bucket_name}/deploy.zip" ./deploy.zip --region="${AWS_REGION}"; then
+        echo "Successfully downloaded deploy.zip"
+        echo "Extracting deploy.zip..."
+        if unzip -o deploy.zip; then
+            echo "Successfully extracted deploy.zip"
+            echo "Contents of extracted files:"
+            ls -la
+            pwd
+
+            echo "Checking Next.js project structure..."
+            if [ ! -f "package.json" ]; then
+                echo "Error: Missing package.json"
+                exit 1
+            fi
+
+            if [ ! -d "pages" ] && [ ! -d "app" ]; then
+                echo "Error: Missing required Next.js directory structure (need either 'pages' or 'app' directory)"
+                echo "Current directory structure:"
+                find . -type d
+                exit 1
+            fi
+
+            echo "Checking package.json for Next.js..."
+            if ! grep -q '"next":' package.json; then
+                echo "Error: Not a Next.js project (next.js not found in package.json)"
+                cat package.json
+                exit 1
+            fi
+
+            rm deploy.zip
+        else
+            echo "Error: Failed to extract deploy.zip"
+            exit 1
+        fi
+    else
+        echo "Error: Failed to download deploy.zip"
+        exit 1
+    fi
 else
-    echo "No existing deployment found, trying S3..."
-    
-    # Test S3 bucket access first
-    if ! aws s3 ls s3://${bucket_name} &>/dev/null; then
-        echo "Error: Cannot access bucket ${bucket_name}"
-        aws s3 ls s3://${bucket_name}  # Run again to see error message
-        exit 1
-    fi
-
-    if ! aws s3 ls s3://${bucket_name}/deploy.zip &>/dev/null; then
-        echo "Error: deploy.zip not found in bucket ${bucket_name}"
-        echo "Available files in bucket:"
-        aws s3 ls s3://${bucket_name}
-        exit 1
-    fi
-
-    echo "Downloading from S3: ${bucket_name}/deploy.zip"
-    if ! aws s3 cp s3://${bucket_name}/deploy.zip ./deploy.zip; then
-        echo "Error downloading deploy.zip"
-        exit 1
-    fi
-
-    echo "Extracting deployment package..."
-    unzip -o deploy.zip
-    rm deploy.zip
+    echo "Error: deploy.zip not found in bucket ${bucket_name}"
+    echo "Available files in bucket:"
+    aws s3 ls "s3://${bucket_name}" --region="${AWS_REGION}" || echo "Could not list bucket contents"
+    exit 1
 fi
 
 # Set ownership and permissions
@@ -165,7 +249,7 @@ chown -R webadmin:webadmin /var/www/cipher-projects
 # Switch to webadmin user for npm operations with optimizations
 echo "Installing npm dependencies as webadmin..."
 su - webadmin << 'EOUSER'
-cd /var/www/cipher-projects
+cd /var/www/cipher-projects || exit 1
 export NODE_ENV=production
 export PATH=$PATH:/usr/bin
 
@@ -176,11 +260,32 @@ npm config set audit=false
 npm config set update-notifier=false
 
 echo "Running npm ci with increased network timeout..."
-# Use npm ci with optimizations
-npm ci --prefer-offline --no-audit --no-fund --network-timeout=100000
+echo "Current directory: $(pwd)"
+echo "Directory contents before npm ci:"
+ls -la
+
+npm ci --prefer-offline --no-audit --no-fund --network-timeout=100000 || {
+    echo "npm ci failed"
+    echo "package.json contents:"
+    cat package.json
+    echo "Directory contents:"
+    ls -la
+    exit 1
+}
 
 echo "Building application..."
-npm run build
+echo "Current directory: $(pwd)"
+echo "Directory contents before build:"
+ls -la
+
+npm run build || {
+    echo "Build failed"
+    echo "package.json contents:"
+    cat package.json
+    echo "Directory contents:"
+    ls -la
+    exit 1
+}
 
 # Create PM2 ecosystem file
 cat > ecosystem.config.js << EOL
@@ -201,22 +306,37 @@ module.exports = {
 EOL
 
 echo "Starting application with PM2..."
-pm2 start ecosystem.config.js
-pm2 save
+pm2 start ecosystem.config.js || exit 1
+pm2 save || exit 1
 EOUSER
 
-# Set up PM2 startup script
-env PATH=$PATH:/usr/bin /usr/local/bin/pm2 startup systemd -u webadmin --hp /home/webadmin
-systemctl enable pm2-webadmin
+# Set up PM2 startup script with full path
+echo "Setting up PM2 startup..."
+export PM2_HOME="/home/webadmin/.pm2"
+sudo -u webadmin env PATH=$PATH:/usr/bin:/usr/local/bin /usr/local/bin/pm2 startup systemd -u webadmin --hp /home/webadmin || {
+    echo "Failed to set up PM2 startup"
+    exit 1
+}
+systemctl enable pm2-webadmin || echo "Warning: Failed to enable pm2-webadmin service"
 
 # Configure SELinux if enabled
 if command -v setsebool >/dev/null 2>&1; then
-    setsebool -P httpd_can_network_connect 1
+    setsebool -P httpd_can_network_connect 1 || {
+        echo "Warning: Failed to set SELinux boolean"
+    }
 fi
 
 # Start and enable nginx
 systemctl enable nginx
 systemctl start nginx
+
+# Verify nginx status
+echo "Verifying nginx status..."
+systemctl is-active nginx || {
+    echo "Error: nginx is not running"
+    systemctl status nginx
+    exit 1
+}
 
 # Verify deployment
 echo "Verifying deployment..."

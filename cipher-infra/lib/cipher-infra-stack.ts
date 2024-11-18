@@ -92,12 +92,15 @@ export class CipherProjectsStack extends cdk.Stack {
     }));
 
     // Grant S3 permissions for deployment
-    deploymentBucket.grantRead(role);
-    role.addToPolicy(new iam.PolicyStatement({
+    deploymentBucket.addToResourcePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
+      principals: [new iam.ArnPrincipal(role.roleArn)],  // Add EC2 role
       actions: [
         's3:GetObject',
         's3:ListBucket',
+        's3:GetObjectVersion',
+        's3:HeadBucket',
+        's3:HeadObject'
       ],
       resources: [
         deploymentBucket.bucketArn,
