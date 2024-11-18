@@ -53,6 +53,8 @@ echo "Installing global packages..."
 # Install latest npm with specific version to avoid issues
 npm install -g npm@10.2.4
 npm install -g pm2@latest
+node -v
+npm -v
 
 echo "Setting up application user..."
 useradd -m -s /bin/bash webadmin || echo "User already exists"
