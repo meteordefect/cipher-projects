@@ -10,6 +10,7 @@
     "typescript": "^5.x"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "cdk": "cdk"
   }
 }
