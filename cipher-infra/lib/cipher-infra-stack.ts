@@ -30,37 +30,35 @@ export class CipherProjectsStack extends cdk.Stack {
           cidrMask: 24,
           name: 'Private',
           subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
-        }
-      ]
+        },
+      ],
     });
 
-    // Enhanced security group for web server
+    // Security group for web server
     const webServerSG = new ec2.SecurityGroup(this, 'WebServerSG', {
       vpc,
       description: 'Security group for Next.js web server',
       allowAllOutbound: true,
     });
 
-    // Only allow HTTP from CloudFront and SSH/HTTPS for management
+    // Allow HTTP, HTTPS, and SSH traffic
     webServerSG.addIngressRule(
-      ec2.Peer.ipv4('130.176.0.0/16'),
+      ec2.Peer.anyIpv4(),
       ec2.Port.tcp(80),
-      'Allow CloudFront HTTP'
+      'Allow HTTP'
     );
-    
     webServerSG.addIngressRule(
       ec2.Peer.anyIpv4(),
       ec2.Port.tcp(443),
       'Allow HTTPS'
     );
-
     webServerSG.addIngressRule(
       ec2.Peer.anyIpv4(),
       ec2.Port.tcp(22),
       'Allow SSH'
     );
 
-    // Deployment bucket with versioning
+    // S3 bucket for deployment artifacts
     const deploymentBucket = new s3.Bucket(this, 'DeploymentBucket', {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
@@ -68,195 +66,78 @@ export class CipherProjectsStack extends cdk.Stack {
       encryption: s3.BucketEncryption.S3_MANAGED,
     });
 
-    // Create CloudFront log bucket
-    const logBucket = new s3.Bucket(this, 'CloudFrontLogBucket', {
-      removalPolicy: cdk.RemovalPolicy.RETAIN,
-      encryption: s3.BucketEncryption.S3_MANAGED,
-      objectOwnership: s3.ObjectOwnership.OBJECT_WRITER,
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-    });
-
-    // Add CloudFront logging permissions to log bucket
-    logBucket.addToResourcePolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      principals: [new iam.ServicePrincipal('cloudfront.amazonaws.com')],
-      actions: ['s3:PutObject'],
-      resources: [
-        `${logBucket.bucketArn}/*`
-      ],
-      conditions: {
-        StringEquals: {
-          'AWS:SourceArn': `arn:aws:cloudfront::${this.account}:distribution/*`
-        }
-      }
-    }));
-
-    // Enhanced EC2 role with specific permissions
+    // EC2 IAM role
     const role = new iam.Role(this, 'EC2Role', {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
       managedPolicies: [
         iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'),
-        iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy'),
       ],
     });
 
-    // Comprehensive S3 permissions
-    const s3Actions = [
-      's3:GetObject',
-      's3:ListBucket',
-      's3:GetBucketLocation',
-      's3:GetObjectVersion',
-      's3:HeadBucket',
-      's3:HeadObject',
-      's3:ListBucketVersions',
-      's3:GetBucketPolicy',
-      's3:PutObject',
-      's3:ListAllMyBuckets'
-    ];
-
-    // Grant bucket permissions directly
+    // Grant read/write access to deployment bucket
     deploymentBucket.grantReadWrite(role);
 
-    // Add explicit role policy
-    role.addToPolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: s3Actions,
-      resources: [
-        deploymentBucket.bucketArn,
-        `${deploymentBucket.bucketArn}/*`,
-        'arn:aws:s3:::*'
-      ],
-    }));
-
-    // Add explicit bucket policy
-    deploymentBucket.addToResourcePolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      principals: [new iam.ArnPrincipal(role.roleArn)],
-      actions: s3Actions,
-      resources: [
-        deploymentBucket.bucketArn,
-        `${deploymentBucket.bucketArn}/*`
-      ],
-    }));
-
-    // Add EC2 permissions
-    role.addToPolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: [
-        'ec2:DescribeInstances',
-        'ec2:DescribeTags',
-        'ec2:DescribeInstanceAttribute',
-        'ec2:DescribeInstanceStatus',
-      ],
-      resources: [`arn:aws:ec2:${this.region}:${this.account}:instance/*`],
-    }));
-
-    // Create instance profile
+    // EC2 instance profile
     const instanceProfile = new iam.CfnInstanceProfile(this, 'EC2InstanceProfile', {
       roles: [role.roleName],
     });
 
-    // Enhanced user data script
+    // User data for EC2 instance
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
-      `# Version: ${Date.now()}  # This forces replacement on each deploy
-    export DEPLOYMENT_BUCKET=${deploymentBucket.bucketName}`,
+      `export DEPLOYMENT_BUCKET=${deploymentBucket.bucketName}`,
       fs.readFileSync(path.join(__dirname, 'user-data.sh'), 'utf8')
     );
 
-    // Common tags for resources
-    const commonTags = [
-      { key: 'DeploymentBucketName', value: deploymentBucket.bucketName },
-      { key: 'Environment', value: 'production' },
-      { key: 'Name', value: 'CipherProjects-WebServer' },
-      { key: 'Application', value: 'CipherProjects' },
-      { key: 'Managed-By', value: 'CDK' }
-    ];
-
-    // Create the Launch Template
+    // Launch template for EC2 instance
     const launchTemplate = new ec2.CfnLaunchTemplate(this, 'LaunchTemplate', {
       launchTemplateData: {
-        instanceType: 't3.small',
+        instanceType: 't3.micro',
         imageId: new ec2.AmazonLinuxImage({
-          generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2023,
-          cpuType: ec2.AmazonLinuxCpuType.X86_64,
+          generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
         }).getImage(this).imageId,
         securityGroupIds: [webServerSG.securityGroupId],
         iamInstanceProfile: {
           arn: instanceProfile.attrArn,
         },
-        blockDeviceMappings: [
-          {
-            deviceName: '/dev/xvda',
-            ebs: {
-              volumeSize: 20,
-              volumeType: 'gp3',
-              encrypted: true,
-            },
-          },
-        ],
-        metadataOptions: {
-          httpEndpoint: 'enabled',
-          httpTokens: 'required',
-          httpPutResponseHopLimit: 2,
-          instanceMetadataTags: 'enabled',
-        },
         userData: cdk.Fn.base64(userData.render()),
       },
     });
 
-    // Create the EC2 Instance using the Launch Template
+    // EC2 instance
     const instance = new ec2.CfnInstance(this, 'WebServerInstance', {
       launchTemplate: {
         launchTemplateId: launchTemplate.ref,
         version: launchTemplate.attrLatestVersionNumber,
       },
       subnetId: vpc.publicSubnets[0].subnetId,
-      tags: commonTags,
     });
 
-    // Add dependency on bucket
-    instance.node.addDependency(deploymentBucket);
-
-    // Set update replace policy
-    instance.cfnOptions.updateReplacePolicy = cdk.CfnDeletionPolicy.DELETE;
-
-    // Use existing certificate
-    const certificate = acm.Certificate.fromCertificateArn(this, 'SiteCertificate',
-      'arn:aws:acm:us-east-1:285572126612:certificate/a891abf9-cbc6-4c64-9861-00730703a7f1'
-    );
-
-    // Enhanced CloudFront distribution
+    // CloudFront distribution
+    const certificate = acm.Certificate.fromCertificateArn(this, 'Certificate', 'arn:aws:acm:us-east-1:123456789012:certificate/your-certificate-id');
     const distribution = new cloudfront.Distribution(this, 'Distribution', {
       defaultBehavior: {
         origin: new origins.HttpOrigin(instance.attrPublicDnsName, {
           protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
-          httpPort: 80,
-          keepaliveTimeout: cdk.Duration.seconds(60),
-          readTimeout: cdk.Duration.seconds(30),
         }),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-        allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
-        cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
-        originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
       },
-      certificate: certificate,
-      domainNames: ['cipherprojects.com'],
-      minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
-      enableLogging: true,
-      logBucket: logBucket,
-      logFilePrefix: 'cloudfront-logs/',
-      httpVersion: cloudfront.HttpVersion.HTTP2_AND_3,
+      certificate,
+      domainNames: ['yourdomain.com'],
     });
 
-    // Add explicit dependencies
-    distribution.node.addDependency(instance);
-    distribution.node.addDependency(logBucket);
-
-    // Outputs for deployment reference
-    new cdk.CfnOutput(this, 'InstanceId', { value: instance.ref });
-    new cdk.CfnOutput(this, 'DeploymentBucketName', { value: deploymentBucket.bucketName });
-    new cdk.CfnOutput(this, 'InstancePublicDNS', { value: instance.attrPublicDnsName });
-    new cdk.CfnOutput(this, 'CloudFrontDomain', { value: distribution.distributionDomainName });
+    // Outputs
+    new cdk.CfnOutput(this, 'DeploymentBucketName', {
+      value: deploymentBucket.bucketName,
+    });
+    new cdk.CfnOutput(this, 'InstanceId', {
+      value: instance.ref,
+    });
+    new cdk.CfnOutput(this, 'InstancePublicDnsName', {
+      value: instance.attrPublicDnsName,
+    });
+    new cdk.CfnOutput(this, 'CloudFrontDomainName', {
+      value: distribution.distributionDomainName,
+    });
   }
 }

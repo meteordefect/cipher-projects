@@ -1,26 +1,14 @@
-# Cipher Projects Infrastructure
+# Welcome to your CDK TypeScript project
 
-This repository contains the AWS infrastructure as code (IaC) for the Cipher Projects deployment, built using AWS CDK (Cloud Development Kit). It automates the setup of the necessary cloud infrastructure and deployment process for the `cipherprojects.com` application.
+This is a blank project for CDK development with TypeScript.
 
----
+The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
-## Features
+## Useful commands
 
-- **VPC Setup**: Configures a Virtual Private Cloud (VPC) with public subnets.
-- **EC2 Deployment**: Deploys an Amazon EC2 instance to host the application.
-- **CloudFront Distribution**: Configures AWS CloudFront for secure and performant content delivery.
-- **S3 Deployment Bucket**: Sets up an S3 bucket to store deployment artifacts.
-- **ACM SSL Certificates**: Ensures secure HTTPS connections using Amazon Certificate Manager (ACM).
-- **User Data Script**: Configures the EC2 instance with Node.js, PM2, NGINX, and the application code.
-- **Automated Deployment**: GitHub Actions for CI/CD pipeline, automating infrastructure deployment and application updates.
-
----
-
-## Prerequisites
-
-1. **AWS Account**: Ensure you have an AWS account with appropriate permissions.
-2. **AWS CLI**: Install and configure the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html).
-3. **Node.js**: Install [Node.js](https://nodejs.org/) version 18 or above.
-4. **AWS CDK**: Install the AWS CDK globally:
-   ```bash
-   npm install -g aws-cdk
+* `npm run build`   compile typescript to js
+* `npm run watch`   watch for changes and compile
+* `npm run test`    perform the jest unit tests
+* `npx cdk deploy`  deploy this stack to your default AWS account/region
+* `npx cdk diff`    compare deployed stack with current state
+* `npx cdk synth`   emits the synthesized CloudFormation template
