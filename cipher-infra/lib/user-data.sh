@@ -13,7 +13,7 @@ trap 'handle_error ${LINENO} "${BASH_COMMAND}"' ERR
 
 echo "Starting deployment at $(date)"
 
-# Fetch bucket name from instance tags or environment variable
+# Fetch bucket name from instance tags or environment  variable
 if [[ -n "$DEPLOYMENT_BUCKET" ]]; then
     bucket_name=$DEPLOYMENT_BUCKET
 else
