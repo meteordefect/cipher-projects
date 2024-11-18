@@ -35,13 +35,15 @@ jobs:
       - name: Install CDK Dependencies
         working-directory: cipher-infra
         run: |
-          npm ci
-          npm install aws-cdk-lib constructs
+          rm -f package-lock.json
+          npm install
           npm install -g aws-cdk
+          npm run build
 
       - name: Build CDK
         working-directory: cipher-infra
-        run: npm run build || true
+        run: |
+          tsc
 
       - name: Create ESLint config
         run: |
