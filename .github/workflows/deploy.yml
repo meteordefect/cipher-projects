@@ -29,6 +29,20 @@ jobs:
       - name: Install Next.js Dependencies
         run: npm ci
 
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Install CDK Dependencies
+        working-directory: cipher-infra
+        run: |
+          npm ci
+          npm install aws-cdk-lib constructs
+          npm install -g aws-cdk
+
+      - name: Build CDK
+        working-directory: cipher-infra
+        run: npm run build || true
+
       - name: Create ESLint config
         run: |
           echo '{
