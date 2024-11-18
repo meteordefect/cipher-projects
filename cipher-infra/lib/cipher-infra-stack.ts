@@ -82,7 +82,7 @@ export class CipherProjectsStack extends cdk.Stack {
         'ec2:DescribeInstanceAttribute',
         'ec2:DescribeInstanceStatus',
       ],
-      resources: ['*'],
+      resources: [`arn:aws:ec2:${this.region}:${this.account}:instance/*`],
     }));
 
     // Grant S3 permissions for deployment
@@ -111,8 +111,7 @@ export class CipherProjectsStack extends cdk.Stack {
       fs.readFileSync(path.join(__dirname, 'user-data.sh'), 'utf8')
     );
 
-    
-    // EC2 instance with improved configuration
+    // EC2
     const instance = new ec2.Instance(this, 'WebServer', {
       vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
@@ -141,7 +140,7 @@ export class CipherProjectsStack extends cdk.Stack {
       },
     });
     
-    // And add this after your instance definition
+    // Attach updateReplacePolicy
     const cfnInstance = instance.node.defaultChild as ec2.CfnInstance;
     cfnInstance.cfnOptions.updateReplacePolicy = cdk.CfnDeletionPolicy.DELETE;
 
@@ -166,7 +165,7 @@ export class CipherProjectsStack extends cdk.Stack {
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
         cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
-        originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER,
+        originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_HEADERS,
       },
       certificate: certificate,
       domainNames: ['cipherprojects.com'],
