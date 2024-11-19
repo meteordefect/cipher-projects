@@ -12,17 +12,21 @@ jobs:
       id-token: write
     
     steps:
-      # 1. Checkout Code
+      #  Checkout Code
       - uses: actions/checkout@v3
       
-      # 2. Setup Node.js
+      #  Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
-          
-      # 3. Build Next.js
+      
+      # Install AWS CDK CLI
+      - name: Install AWS CDK
+        run: npm install -g aws-cdk
+
+      #  Build Next.js
       - name: Install Next.js Dependencies
         run: npm ci
       
@@ -31,14 +35,14 @@ jobs:
         env:
           SKIP_TYPE_CHECK: true
         
-      # 4. Package Application
+      #  Package Application
       - name: Package Application
         run: |
           echo "Creating deployment package..."
           zip -r deploy.zip .next package.json package-lock.json public node_modules
           echo "Package created successfully"
 
-      # 5. Configure AWS Credentials
+      #  Configure AWS Credentials
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -46,26 +50,26 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-southeast-2
       
-      # 6. Deploy S3 Bucket First
+      #  Deploy S3 Bucket First
       - name: Deploy Bucket
         working-directory: cipher-infra
         run: |
           cdk deploy "*Bucket*" --require-approval never --outputs-file bucket-outputs.json
       
-      # 7. Upload Deployment Package to S3
+      # Upload Deployment Package to S3
       - name: Upload Deployment Package
         run: |
           BUCKET_NAME=$(jq -r '.CipherStack.DeploymentBucketName' cipher-infra/bucket-outputs.json)
           echo "Uploading deployment package to bucket: ${BUCKET_NAME}"
           aws s3 cp deploy.zip "s3://${BUCKET_NAME}/deploy.zip"
       
-      # 8. Verify Data Upload
+      #  Verify Data Upload
       - name: Verify Deployment Package
         run: |
           BUCKET_NAME=$(jq -r '.CipherStack.DeploymentBucketName' cipher-infra/bucket-outputs.json)
           aws s3 ls "s3://${BUCKET_NAME}/deploy.zip" || exit 1
 
-      # 9. Deploy EC2 and Other Infrastructure
+      #  Deploy EC2 and Other Infrastructure
       - name: Deploy EC2 Stack
         working-directory: cipher-infra
         run: |
