@@ -10,17 +10,10 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    
+
     steps:
       # 1. Checkout Code
       - uses: actions/checkout@v3
-      
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-southeast-2
 
       # 2. Setup Node.js
       - name: Setup Node.js
@@ -28,42 +21,65 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-      
-      # 3. Install Project Dependencies
-      - name: Install Dependencies
-        working-directory: cipher-infra
+
+      # 3. Install Dependencies for Next.js
+      - name: Install Dependencies for Next.js
+        working-directory: cipher-reup
+        run: npm ci
+
+      # 4. Build Next.js Application
+      - name: Build Next.js Application
+        working-directory: cipher-reup
+        run: npm run build
+
+      # 5. Package Deployment Files
+      - name: Package Deployment Files
+        working-directory: cipher-reup
         run: |
-          npm ci
-          npm install --save aws-cdk-lib
-          npm install --save-dev @types/node ts-node
-          npm install -g aws-cdk
+          echo "Creating deployment package..."
+          zip -r deploy.zip .next package.json package-lock.json public node_modules
+          echo "Package created successfully"
 
-      # 4. Verify CDK Installation
-      - name: Verify CDK Installation
-        run: cdk --version
+      # 6. Verify Deployment Package
+      - name: Verify Deployment Package
+        working-directory: cipher-reup
+        run: |
+          if [ ! -f deploy.zip ]; then
+            echo "Error: deploy.zip not found"
+            exit 1
+          fi
 
-      # Deploy S3 Stack
+      # 7. Configure AWS Credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-southeast-2
+
+      # 8. Deploy S3 Stack
       - name: Deploy S3 Stack
-        working-directory: cipher-infra
+        working-directory: cipher-reup/cipher-infra
         run: |
           cdk deploy S3Stack --require-approval never --outputs-file s3-outputs.json
 
-
-      # 6. Upload Deployment Package to S3
+      # 9. Upload Deployment Package to S3
       - name: Upload Deployment Package
+        working-directory: cipher-reup
         run: |
           BUCKET_NAME=$(jq -r '.S3Stack.DeploymentBucketName' cipher-infra/s3-outputs.json)
           echo "Uploading deployment package to bucket: ${BUCKET_NAME}"
           aws s3 cp deploy.zip "s3://${BUCKET_NAME}/deploy.zip"
-      
-      # 7. Verify Data Upload
-      - name: Verify Deployment Package
+
+      # 10. Verify Deployment Package on S3
+      - name: Verify Deployment Package on S3
+        working-directory: cipher-reup
         run: |
           BUCKET_NAME=$(jq -r '.S3Stack.DeploymentBucketName' cipher-infra/s3-outputs.json)
           aws s3 ls "s3://${BUCKET_NAME}/deploy.zip" || exit 1
 
-      # 8. Deploy EC2 Stack
+      # 11. Deploy EC2 Stack
       - name: Deploy EC2 Stack
-        working-directory: cipher-infra
+        working-directory: cipher-reup/cipher-infra
         run: |
           cdk deploy EC2Stack --require-approval never --outputs-file ec2-outputs.json
