@@ -1,4 +1,3 @@
-#!/bin/bash
 # Enable error handling and enhanced logging
 set -ex
 exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
@@ -36,7 +35,16 @@ fi
 # Update system and install dependencies
 echo "Updating system and installing dependencies..."
 yum update -y
-yum install -y nodejs nginx unzip
+amazon-linux-extras enable nginx1
+yum clean metadata
+yum install -y nginx unzip
+
+while pgrep -f yum > /dev/null; do
+    echo "Waiting for other yum processes to finish..."
+    sleep 5
+done
+
+mkdir -p /etc/nginx/conf.d
 
 # Configure nginx
 echo "Configuring nginx..."
