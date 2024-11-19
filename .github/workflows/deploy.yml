@@ -42,13 +42,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-southeast-2
       
-      # CDK Deploy
+      # CDK Setup
       - name: CDK Setup
         working-directory: cipher-infra
         run: |
-          echo "Setting up CDK environment..."
+          echo "Installing dependencies..."
           npm ci
           npm install -g aws-cdk
+          echo "CDK setup complete"
           
       - name: CDK Bootstrap
         working-directory: cipher-infra
