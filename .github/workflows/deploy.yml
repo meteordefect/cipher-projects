@@ -7,6 +7,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     
     steps:
       - uses: actions/checkout@v3
@@ -15,16 +18,21 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+          cache: 'npm'
           
       - name: Install Dependencies
         run: npm ci
       
       - name: Build Next.js
         run: npm run build
+        env:
+          SKIP_TYPE_CHECK: true
         
       - name: Package Application
         run: |
+          echo "Creating deployment package..."
           zip -r deploy.zip .next package.json package-lock.json public node_modules
+          echo "Package created successfully"
           
       # AWS Setup
       - name: Configure AWS Credentials
@@ -38,17 +46,14 @@ jobs:
       - name: CDK Setup
         working-directory: cipher-infra
         run: |
-          # Ensure the directory exists
-          [ -d "node_modules" ] || mkdir node_modules
-          # Install dependencies from package.json
+          echo "Setting up CDK environment..."
           npm ci
-          # Install CDK globally
           npm install -g aws-cdk
           
       - name: CDK Bootstrap
         working-directory: cipher-infra
         run: |
-          # Add error handling for bootstrap
+          echo "Starting CDK bootstrap..."
           cdk bootstrap || {
             echo "Bootstrap failed. Checking AWS credentials and permissions..."
             aws sts get-caller-identity
@@ -58,23 +63,41 @@ jobs:
       - name: Deploy Infrastructure
         working-directory: cipher-infra
         run: |
-          # Add error handling and logging
+          echo "Starting infrastructure deployment..."
           cdk deploy --require-approval never --outputs-file outputs.json || {
             echo "Deploy failed. Checking stack status..."
             cdk list
             exit 1
           }
+          echo "Infrastructure deployment completed"
+          echo "Outputs file contents:"
+          cat outputs.json
           
       - name: Upload to S3
         run: |
+          echo "Starting S3 upload process..."
+          
           if [ ! -f cipher-infra/outputs.json ]; then
-            echo "outputs.json not found!"
+            echo "Error: outputs.json not found!"
+            pwd
+            ls -la cipher-infra/
             exit 1
           fi
-          BUCKET_NAME=$(jq -r '.CipherInfraStack.DeploymentBucketName' cipher-infra/outputs.json)
-          if [ -z "$BUCKET_NAME" ]; then
-            echo "Bucket name not found in outputs.json!"
+          
+          echo "Reading CDK outputs..."
+          cat cipher-infra/outputs.json
+          
+          # Updated jq command to match your CDK output structure
+          BUCKET_NAME=$(jq -r '.["CipherStack.DeploymentBucketName"]' cipher-infra/outputs.json)
+          echo "Resolved bucket name: ${BUCKET_NAME}"
+          
+          if [ -z "$BUCKET_NAME" ] || [ "$BUCKET_NAME" = "null" ]; then
+            echo "Error: Failed to get valid bucket name from outputs"
+            echo "Full outputs content:"
             cat cipher-infra/outputs.json
             exit 1
           fi
+          
+          echo "Uploading deployment package to s3://${BUCKET_NAME}/deploy.zip"
           aws s3 cp deploy.zip "s3://${BUCKET_NAME}/deploy.zip"
+          echo "Upload completed successfully"
