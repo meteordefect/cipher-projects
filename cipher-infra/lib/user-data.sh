@@ -73,7 +73,60 @@ echo "Installing nginx..."
 apt-get install -y nginx
 
 # Configure nginx
+
+# Configure nginx
 echo "Configuring nginx..."
+
+# Stop nginx first
+systemctl stop nginx
+
+# Remove ALL default configurations
+rm -f /etc/nginx/sites-enabled/default
+rm -f /etc/nginx/sites-available/default  # Found this one!
+rm -f /etc/nginx/conf.d/default.conf
+rm -f /etc/nginx/conf.d/*.conf
+
+# Ensure directory structure
+mkdir -p /etc/nginx/conf.d
+mkdir -p /etc/nginx/sites-available
+mkdir -p /etc/nginx/sites-enabled
+
+# Create clean nginx.conf
+cat > /etc/nginx/nginx.conf << 'EOL'
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+include /etc/nginx/modules-enabled/*.conf;
+
+events {
+    worker_connections 768;
+}
+
+http {
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript;
+
+    # Only include conf.d - we'll put everything there
+    include /etc/nginx/conf.d/*.conf;
+}
+EOL
+
+
 cat > /etc/nginx/conf.d/nextjs.conf << 'EOL'
 server {
     listen 80 default_server;
