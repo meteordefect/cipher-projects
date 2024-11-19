@@ -65,9 +65,10 @@ export class EC2Stack extends cdk.Stack {
       userData,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PUBLIC
-      },
-      keyName: 'cipher-key', // Make sure you have this key pair created in AWS
+      }
     });
+
+
 
     // Outputs
     new cdk.CfnOutput(this, 'WebServerPublicDNS', {
