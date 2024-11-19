@@ -3,6 +3,15 @@ set -ex
 exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
 echo "=== Starting deployment at $(date) ==="
+
+# Verify DEPLOYMENT_BUCKET is set
+if [ -z "${DEPLOYMENT_BUCKET}" ]; then
+    echo "ERROR: DEPLOYMENT_BUCKET environment variable is not set!"
+    echo "Current environment variables:"
+    printenv
+    exit 1
+fi
+
 echo "Deployment bucket: ${DEPLOYMENT_BUCKET}"
 
 # Enhanced S3 checking function
@@ -12,25 +21,26 @@ check_s3_access() {
     aws --version
     
     echo "2. Testing bucket existence..."
-    if aws s3api head-bucket --bucket "${DEPLOYMENT_BUCKET}" 2>/dev/null; then
-        echo "Bucket exists and is accessible"
-    else
-        echo "Failed to access bucket!"
+    if ! aws s3api head-bucket --bucket "${DEPLOYMENT_BUCKET}" 2>/dev/null; then
+        echo "Failed to access bucket! Details:"
+        echo "Bucket name: ${DEPLOYMENT_BUCKET}"
+        echo "AWS Identity:"
+        aws sts get-caller-identity
+        echo "List of accessible buckets:"
+        aws s3 ls
         return 1
     fi
+    echo "Bucket exists and is accessible"
     
     echo "3. Testing bucket listing..."
-    aws s3 ls "s3://${DEPLOYMENT_BUCKET}"
+    if ! aws s3 ls "s3://${DEPLOYMENT_BUCKET}"; then
+        echo "Failed to list bucket contents!"
+        return 1
+    fi
     
     echo "S3 Access Tests Complete"
     return 0
 }
-
-# Run S3 access check
-if ! check_s3_access; then
-    echo "Failed S3 access checks!"
-    exit 1
-fi
 
 # Update system and install dependencies
 echo "Updating system and installing dependencies..."
