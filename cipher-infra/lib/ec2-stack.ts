@@ -67,9 +67,7 @@ export class EC2Stack extends cdk.Stack {
         subnetType: ec2.SubnetType.PUBLIC
       }
     });
-
-
-
+    
     // Outputs
     new cdk.CfnOutput(this, 'WebServerPublicDNS', {
       value: instance.instancePublicDnsName,

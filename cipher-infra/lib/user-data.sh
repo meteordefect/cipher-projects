@@ -77,22 +77,45 @@ echo "Configuring nginx..."
 cat > /etc/nginx/conf.d/nextjs.conf << 'EOL'
 server {
     listen 80 default_server;
+    listen [::]:80 default_server;
     server_name _;
+
+    # Access and error logs
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+
+    # Root directory for Next.js app
     root /var/www/nextjs;
 
-    location /_next/static {
-        alias /var/www/nextjs/.next/static;
-        expires 365d;
+    # Static files
+    location /_next/static/ {
+        # Adjust this path to match your Next.js static files location
+        alias /var/www/nextjs/.next/static/;
+        expires 1y;
         access_log off;
+        add_header Cache-Control "public, max-age=31536000, immutable";
     }
 
+    # Next.js application
     location / {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
+        
+        # Headers
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # Important for WebSockets
         proxy_cache_bypass $http_upgrade;
+        
+        # Timeouts
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
     }
 }
 EOL
