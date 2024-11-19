@@ -24,17 +24,17 @@ jobs:
 
       # 3. Install Dependencies for Next.js
       - name: Install Dependencies for Next.js
-        working-directory: cipher-reup
+        working-directory: cipher-projects
         run: npm ci
 
       # 4. Build Next.js Application
       - name: Build Next.js Application
-        working-directory: cipher-reup
+        working-directory: cipher-projects
         run: npm run build
 
       # 5. Package Deployment Files
       - name: Package Deployment Files
-        working-directory: cipher-reup
+        working-directory: cipher-projects
         run: |
           echo "Creating deployment package..."
           zip -r deploy.zip .next package.json package-lock.json public node_modules
@@ -42,7 +42,7 @@ jobs:
 
       # 6. Verify Deployment Package
       - name: Verify Deployment Package
-        working-directory: cipher-reup
+        working-directory: cipher-projects
         run: |
           if [ ! -f deploy.zip ]; then
             echo "Error: deploy.zip not found"
@@ -59,27 +59,20 @@ jobs:
 
       # 8. Deploy S3 Stack
       - name: Deploy S3 Stack
-        working-directory: cipher-reup/cipher-infra
+        working-directory: cipher-projects/cipher-infra
         run: |
           cdk deploy S3Stack --require-approval never --outputs-file s3-outputs.json
 
       # 9. Upload Deployment Package to S3
       - name: Upload Deployment Package
-        working-directory: cipher-reup
+        working-directory: cipher-projects
         run: |
           BUCKET_NAME=$(jq -r '.S3Stack.DeploymentBucketName' cipher-infra/s3-outputs.json)
           echo "Uploading deployment package to bucket: ${BUCKET_NAME}"
           aws s3 cp deploy.zip "s3://${BUCKET_NAME}/deploy.zip"
 
-      # 10. Verify Deployment Package on S3
-      - name: Verify Deployment Package on S3
-        working-directory: cipher-reup
-        run: |
-          BUCKET_NAME=$(jq -r '.S3Stack.DeploymentBucketName' cipher-infra/s3-outputs.json)
-          aws s3 ls "s3://${BUCKET_NAME}/deploy.zip" || exit 1
-
-      # 11. Deploy EC2 Stack
+      # 10. Deploy EC2 Stack
       - name: Deploy EC2 Stack
-        working-directory: cipher-reup/cipher-infra
+        working-directory: cipher-projects/cipher-infra
         run: |
           cdk deploy EC2Stack --require-approval never --outputs-file ec2-outputs.json
