@@ -55,7 +55,7 @@ export class EC2Stack extends cdk.Stack {
     const instance = new ec2.Instance(this, 'WebServer', {
       vpc,
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.SMALL),
-      machineImage: new ec2.AmazonLinuxImage(),
+      machineImage: new ec2.AmazonLinux2023Image(),
       securityGroup: webServerSG,
       role,
       userData,
