@@ -72,8 +72,11 @@ export class CipherStack extends cdk.Stack {
     // User Data
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
-      `# Version: ${Date.now()}`,  // Forces update
-      `export DEPLOYMENT_BUCKET=${deploymentBucket.bucketName}`,
+      `# Version: ${Date.now()}`,
+      // Add explicit logging of the bucket name
+      `echo "Setting up deployment bucket name..."`,
+      `export DEPLOYMENT_BUCKET="${deploymentBucket.bucketName}"`,
+      `echo "Deployment bucket set to: $DEPLOYMENT_BUCKET"`,
       fs.readFileSync(path.join(__dirname, 'user-data.sh'), 'utf8')
     );
 
