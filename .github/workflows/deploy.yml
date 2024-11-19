@@ -1,4 +1,4 @@
-name: Deploy Next.js App
+name: Deploy Next.js App and CDK Infrastructure
 
 on:
   push:
@@ -12,16 +12,17 @@ jobs:
       id-token: write
     
     steps:
+      # 1. Checkout Code
       - uses: actions/checkout@v3
       
-      # 1. Setup Node.js
+      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: 'npm'
           
-      # 2. Build Next.js first
+      # 3. Build Next.js
       - name: Install Next.js Dependencies
         run: npm ci
       
@@ -30,13 +31,14 @@ jobs:
         env:
           SKIP_TYPE_CHECK: true
         
+      # 4. Package Application
       - name: Package Application
         run: |
           echo "Creating deployment package..."
           zip -r deploy.zip .next package.json package-lock.json public node_modules
           echo "Package created successfully"
 
-      # 3. Deploy CDK stack
+      # 5. Configure AWS Credentials
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -44,28 +46,27 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-southeast-2
       
-      # 4. Upload to S3 BEFORE deploying EC2
-      - name: Setup CDK
+      # 6. Deploy S3 Bucket First
+      - name: Deploy Bucket
         working-directory: cipher-infra
         run: |
-          npm ci
-          npm install -g aws-cdk
-      
-      - name: Deploy S3 Bucket First
-        working-directory: cipher-infra
-        run: |
-          # Deploy only the S3 bucket stack first
           cdk deploy "*Bucket*" --require-approval never --outputs-file bucket-outputs.json
-          
-      - name: Upload to S3
+      
+      # 7. Upload Deployment Package to S3
+      - name: Upload Deployment Package
+        run: |
+          BUCKET_NAME=$(jq -r '.CipherStack.DeploymentBucketName' cipher-infra/bucket-outputs.json)
+          echo "Uploading deployment package to bucket: ${BUCKET_NAME}"
+          aws s3 cp deploy.zip "s3://${BUCKET_NAME}/deploy.zip"
+      
+      # 8. Verify Data Upload
+      - name: Verify Deployment Package
+        run: |
+          BUCKET_NAME=$(jq -r '.CipherStack.DeploymentBucketName' cipher-infra/bucket-outputs.json)
+          aws s3 ls "s3://${BUCKET_NAME}/deploy.zip" || exit 1
+
+      # 9. Deploy EC2 and Other Infrastructure
+      - name: Deploy EC2 Stack
         working-directory: cipher-infra
         run: |
-          BUCKET_NAME=$(jq -r '.CipherStack.DeploymentBucketName' bucket-outputs.json)
-          echo "Uploading to bucket: ${BUCKET_NAME}"
-          aws s3 cp ../deploy.zip "s3://${BUCKET_NAME}/deploy.zip"
-          
-      # 5. Now deploy the rest of the infrastructure
-      - name: Deploy Main Infrastructure
-        working-directory: cipher-infra
-        run: |
-          cdk deploy --require-approval never --outputs-file outputs.json
+          cdk deploy "*EC2*" --require-approval never --outputs-file ec2-outputs.json
