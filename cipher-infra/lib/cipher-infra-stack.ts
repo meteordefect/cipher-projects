@@ -70,10 +70,9 @@ export class CipherStack extends cdk.Stack {
     // User Data
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
-      'yum update -y',
-      'yum install -y nginx',
-      'systemctl start nginx',
-      'systemctl enable nginx'
+      `# Version: ${Date.now()}`,  // Forces update
+      `export DEPLOYMENT_BUCKET=${deploymentBucket.bucketName}`,
+      fs.readFileSync(path.join(__dirname, 'user-data.sh'), 'utf8')
     );
 
     // EC2 Instance
