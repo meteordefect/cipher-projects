@@ -47,7 +47,11 @@ echo "Updating system and installing dependencies..."
 yum update -y
 amazon-linux-extras enable nginx1
 yum clean metadata
-yum install -y nginx unzip
+sudo curl -sL https://rpm.nodesource.com/setup_20.x | sudo bash -
+yum install -y nginx unzip nodejs
+node --version
+npm --version
+
 
 while pgrep -f yum > /dev/null; do
     echo "Waiting for other yum processes to finish..."
