@@ -34,6 +34,7 @@ export class EC2Stack extends cdk.Stack {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
       managedPolicies: [
         iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3ReadOnlyAccess'),
       ],
     });
 
@@ -42,20 +43,14 @@ export class EC2Stack extends cdk.Stack {
     // User Data
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
-    `#!/bin/bash`,
-    `BUCKET_NAME=${deploymentBucket.bucketName}`,
-    `echo "Fetching deployment package from S3..."`,
-    `aws s3 cp s3://${deploymentBucket.bucketName}/deploy.zip /home/ec2-user/deploy.zip`,
-    `echo "Extracting deployment package..."`,
-    `unzip -o /home/ec2-user/deploy.zip -d /var/www/html`,
-    `echo "Deployment complete"`
+      // User data script from above
     );
 
     // EC2 Instance
     const instance = new ec2.Instance(this, 'WebServer', {
       vpc,
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.SMALL),
-      machineImage: new ec2.AmazonLinux2023Image(),
+      machineImage: new ec2.AmazonLinuxImage(),
       securityGroup: webServerSG,
       role,
       userData,
