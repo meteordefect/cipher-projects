@@ -49,42 +49,29 @@ export class EC2Stack extends cdk.Stack {
     // Create User Data
     const userData = ec2.UserData.forLinux();
     
-    // First commands should set the environment variable
-    userData.addCommands(
-      'set -ex',
-      `export DEPLOYMENT_BUCKET=${deploymentBucket.bucketName}`,
-      'echo "Using deployment bucket: $DEPLOYMENT_BUCKET"',
-      'printenv | grep DEPLOYMENT_BUCKET'  // Debug line to verify the variable is set
-    );
-    
-    // Then add the rest of the user data script
+    // Add environment variable
+    userData.addCommands(`export DEPLOYMENT_BUCKET=${deploymentBucket.bucketName}`);
     userData.addCommands(userDataScript);
 
-    // EC2 Instance
+    // EC2 Instance using Ubuntu 22.04
     const instance = new ec2.Instance(this, 'WebServer', {
       vpc,
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.SMALL),
-      machineImage: new ec2.AmazonLinuxImage({
-        generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2
+      machineImage: new ec2.GenericLinuxImage({
+        'ap-southeast-2': 'ami-0310483fb2b488153', // Ubuntu 22.04 LTS in ap-southeast-2
       }),
       securityGroup: webServerSG,
       role,
       userData,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PUBLIC
-      }
+      },
+      keyName: 'cipher-key', // Make sure you have this key pair created in AWS
     });
-
-    // Add S3 bucket name as a tag to the instance for easier debugging
-    cdk.Tags.of(instance).add('DeploymentBucket', deploymentBucket.bucketName);
 
     // Outputs
     new cdk.CfnOutput(this, 'WebServerPublicDNS', {
       value: instance.instancePublicDnsName,
-    });
-    
-    new cdk.CfnOutput(this, 'DeploymentBucketForInstance', {
-      value: deploymentBucket.bucketName,
     });
   }
 }

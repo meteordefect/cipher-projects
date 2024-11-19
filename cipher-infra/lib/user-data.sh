@@ -1,10 +1,8 @@
-# Enable error handling and enhanced logging
 set -ex
 exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
 echo "=== Starting deployment at $(date) ==="
 
-# Verify DEPLOYMENT_BUCKET is set
 if [ -z "${DEPLOYMENT_BUCKET}" ]; then
     echo "ERROR: DEPLOYMENT_BUCKET environment variable is not set!"
     echo "Current environment variables:"
@@ -22,43 +20,57 @@ check_s3_access() {
     
     echo "2. Testing bucket existence..."
     if ! aws s3api head-bucket --bucket "${DEPLOYMENT_BUCKET}" 2>/dev/null; then
-        echo "Failed to access bucket! Details:"
-        echo "Bucket name: ${DEPLOYMENT_BUCKET}"
-        echo "AWS Identity:"
-        aws sts get-caller-identity
-        echo "List of accessible buckets:"
-        aws s3 ls
+        echo "Failed to access bucket!"
         return 1
     fi
     echo "Bucket exists and is accessible"
     
     echo "3. Testing bucket listing..."
-    if ! aws s3 ls "s3://${DEPLOYMENT_BUCKET}"; then
-        echo "Failed to list bucket contents!"
-        return 1
-    fi
+    aws s3 ls "s3://${DEPLOYMENT_BUCKET}"
     
     echo "S3 Access Tests Complete"
     return 0
 }
 
-# Update system and install dependencies
-echo "Updating system and installing dependencies..."
-yum update -y
-amazon-linux-extras enable nginx1
-yum clean metadata
-sudo curl -sL https://rpm.nodesource.com/setup_20.x | sudo bash -
-yum install -y nginx unzip nodejs
-node --version
-npm --version
+# Install AWS CLI if not present
+if ! command -v aws &> /dev/null; then
+    echo "Installing AWS CLI..."
+    apt-get update
+    apt-get install -y unzip
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    unzip awscliv2.zip
+    ./aws/install
+fi
 
+# Run S3 access check
+if ! check_s3_access; then
+    echo "Failed S3 access checks!"
+    exit 1
+fi
 
-while pgrep -f yum > /dev/null; do
-    echo "Waiting for other yum processes to finish..."
+# Wait for apt locks
+while fuser /var/lib/apt/lists/lock >/dev/null 2>&1 || fuser /var/lib/dpkg/lock >/dev/null 2>&1 || fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
+    echo "Waiting for apt locks to be released..."
     sleep 5
 done
 
-mkdir -p /etc/nginx/conf.d
+# Update system and install dependencies
+echo "Updating system and installing dependencies..."
+apt-get update
+apt-get upgrade -y
+
+# Install Node.js 20.x
+echo "Installing Node.js 20.x..."
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt-get install -y nodejs
+
+# Verify Node.js installation
+node --version
+npm --version
+
+# Install nginx
+echo "Installing nginx..."
+apt-get install -y nginx
 
 # Configure nginx
 echo "Configuring nginx..."
@@ -85,6 +97,9 @@ server {
 }
 EOL
 
+# Remove default nginx site
+rm -f /etc/nginx/sites-enabled/default
+
 # Create systemd service
 cat > /etc/systemd/system/nextjs.service << 'EOL'
 [Unit]
@@ -93,7 +108,7 @@ After=network.target
 
 [Service]
 Type=simple
-User=ec2-user
+User=ubuntu
 Environment=NODE_ENV=production
 WorkingDirectory=/var/www/nextjs
 ExecStart=/usr/bin/npm start
@@ -120,11 +135,11 @@ unzip -o deploy.zip || {
 }
 
 # Fix permissions
-chown -R ec2-user:ec2-user /var/www/nextjs
+chown -R ubuntu:ubuntu /var/www/nextjs
 
-# Install dependencies and build
+# Install dependencies
 echo "Installing dependencies..."
-sudo -u ec2-user bash -c 'cd /var/www/nextjs && npm ci'
+sudo -u ubuntu bash -c 'cd /var/www/nextjs && npm ci'
 
 # Start services
 systemctl daemon-reload
@@ -133,4 +148,9 @@ systemctl enable nextjs
 systemctl start nginx
 systemctl start nextjs
 
+# Output important information
+echo "=== Installation Complete ==="
+echo "Node.js version: $(node --version)"
+echo "NPM version: $(npm --version)"
+echo "Nginx version: $(nginx -v 2>&1)"
 echo "Deployment completed at $(date)"
