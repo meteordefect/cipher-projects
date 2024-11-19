@@ -1,37 +1,46 @@
-# Enable error handling and logging
+# Enable error handling and enhanced logging
 set -ex
-exec > >(tee /var/log/user-data.log) 2>&1
+exec > >(tee /var/log/user-data.log /var/log/user-data-debug.log) 2>&1
 
-echo "Starting deployment at $(date)"
+echo "=== Starting deployment at $(date) ==="
+echo "Deployment bucket: ${DEPLOYMENT_BUCKET}"
 
-# Function to wait for S3 object with timeout
-wait_for_s3_object() {
-    local bucket=$1
-    local key=$2
-    local max_attempts=30  # 5 minutes total (10 second intervals)
-    local attempt=1
-
-    echo "Waiting for s3://${bucket}/${key} to become available..."
+# Enhanced S3 checking function
+check_s3_access() {
+    echo "=== Testing S3 Access ==="
+    echo "1. Testing AWS CLI..."
+    aws --version
     
-    while [ $attempt -le $max_attempts ]; do
-        if aws s3api head-object --bucket "${bucket}" --key "${key}" 2>/dev/null; then
-            echo "Object found after ${attempt} attempts!"
-            return 0
-        fi
-        echo "Attempt ${attempt}/${max_attempts}: Object not found, waiting 10 seconds..."
-        sleep 10
-        attempt=$((attempt + 1))
-    done
-
-    echo "Timeout waiting for object after ${max_attempts} attempts"
-    return 1
+    echo "2. Testing bucket existence..."
+    if aws s3api head-bucket --bucket "${DEPLOYMENT_BUCKET}" 2>/dev/null; then
+        echo "Bucket exists and is accessible"
+    else
+        echo "Failed to access bucket!"
+        return 1
+    fi
+    
+    echo "3. Testing bucket listing..."
+    aws s3 ls "s3://${DEPLOYMENT_BUCKET}"
+    
+    echo "4. Testing bucket write..."
+    echo "test" > /tmp/test.txt
+    if aws s3 cp /tmp/test.txt "s3://${DEPLOYMENT_BUCKET}/debug/test.txt"; then
+        echo "Successfully wrote to bucket"
+    else
+        echo "Failed to write to bucket!"
+        return 1
+    fi
+    
+    echo "=== S3 Access Tests Complete ==="
+    return 0
 }
 
-# Verify deployment bucket is set
-if [ -z "${DEPLOYMENT_BUCKET}" ]; then
-    echo "Error: DEPLOYMENT_BUCKET environment variable is not set!"
+# Run S3 access check
+if ! check_s3_access; then
+    echo "Failed S3 access checks!"
     exit 1
 fi
+
 echo "Using deployment bucket: ${DEPLOYMENT_BUCKET}"
 
 # Update system and install dependencies

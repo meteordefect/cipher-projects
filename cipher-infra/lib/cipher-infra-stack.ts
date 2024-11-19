@@ -4,18 +4,19 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
-import * as fs from 'fs';
-import * as path from 'path';
+import { Construct } from 'constructs';
 
-export class CipherStack extends cdk.Stack {
-  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
-    super(scope, id, {
-      ...props,
-      crossRegionReferences: true,
-    });
+// Split into two nested stacks
+class InfrastructureStack extends cdk.NestedStack {
+  public readonly vpc: ec2.Vpc;
+  public readonly deploymentBucket: s3.Bucket;
+  public readonly webServerSG: ec2.SecurityGroup;
+  
+  constructor(scope: Construct, id: string, props?: cdk.NestedStackProps) {
+    super(scope, id, props);
 
     // VPC
-    const vpc = new ec2.Vpc(this, 'CipherVPC', {
+    this.vpc = new ec2.Vpc(this, 'CipherVPC', {
       maxAzs: 2,
       natGateways: 1,
       subnetConfiguration: [
@@ -33,32 +34,38 @@ export class CipherStack extends cdk.Stack {
     });
 
     // Security Group
-    const webServerSG = new ec2.SecurityGroup(this, 'WebServerSG', {
-      vpc,
+    this.webServerSG = new ec2.SecurityGroup(this, 'WebServerSG', {
+      vpc: this.vpc,
       description: 'Security group for Next.js web server',
       allowAllOutbound: true,
     });
 
-    webServerSG.addIngressRule(
+    this.webServerSG.addIngressRule(
       ec2.Peer.anyIpv4(),
       ec2.Port.tcp(80),
       'Allow HTTP'
     );
 
-    webServerSG.addIngressRule(
+    this.webServerSG.addIngressRule(
       ec2.Peer.anyIpv4(),
       ec2.Port.tcp(443),
       'Allow HTTPS'
     );
 
-    // Deployment bucket with versioning and proper region
-    const deploymentBucket = new s3.Bucket(this, 'DeploymentBucket', {
+    // Deployment bucket
+    this.deploymentBucket = new s3.Bucket(this, 'DeploymentBucket', {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
       versioned: true,
       encryption: s3.BucketEncryption.S3_MANAGED,
-      bucketName: `cipher-deployment-${this.region}-${this.account}`, // Optional: add region to name
+      bucketName: `cipher-deployment-${cdk.Stack.of(this).region}-${cdk.Stack.of(this).account}`,
     });
+  }
+}
+
+class WebServerStack extends cdk.NestedStack {
+  constructor(scope: Construct, id: string, infrastructure: InfrastructureStack, props?: cdk.NestedStackProps) {
+    super(scope, id, props);
 
     // EC2 Role
     const role = new iam.Role(this, 'EC2Role', {
@@ -68,29 +75,26 @@ export class CipherStack extends cdk.Stack {
       ],
     });
 
-    deploymentBucket.grantRead(role);
+    infrastructure.deploymentBucket.grantRead(role);
 
     // User Data
     const userData = ec2.UserData.forLinux();
     userData.addCommands(
       `# Version: ${Date.now()}`,
-      // Add explicit logging of the bucket name
-      `echo "Setting up deployment bucket name..."`,
-      `export DEPLOYMENT_BUCKET="${deploymentBucket.bucketName}"`,
-      `echo "Deployment bucket set to: $DEPLOYMENT_BUCKET"`,
+      `export DEPLOYMENT_BUCKET="${infrastructure.deploymentBucket.bucketName}"`,
       fs.readFileSync(path.join(__dirname, 'user-data.sh'), 'utf8')
     );
 
     // EC2 Instance
     const instance = new ec2.Instance(this, 'WebServer', {
-      vpc,
+      vpc: infrastructure.vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.SMALL),
       machineImage: new ec2.AmazonLinuxImage({
         generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2023,
       }),
       userData,
-      securityGroup: webServerSG,
+      securityGroup: infrastructure.webServerSG,
       role,
     });
 
@@ -107,8 +111,24 @@ export class CipherStack extends cdk.Stack {
 
     // Outputs
     new cdk.CfnOutput(this, 'InstanceId', { value: instance.instanceId });
-    new cdk.CfnOutput(this, 'DeploymentBucketName', { value: deploymentBucket.bucketName });
     new cdk.CfnOutput(this, 'InstancePublicDNS', { value: instance.instancePublicDnsName });
     new cdk.CfnOutput(this, 'DistributionDomainName', { value: distribution.distributionDomainName });
+  }
+}
+
+export class CipherStack extends cdk.Stack {
+  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+    super(scope, id, props);
+
+    // Create infrastructure first
+    const infrastructure = new InfrastructureStack(this, 'Infrastructure');
+    
+    // Create web server stack that depends on infrastructure
+    const webServer = new WebServerStack(this, 'WebServer', infrastructure);
+
+    // Output the bucket name for GitHub Actions
+    new cdk.CfnOutput(this, 'DeploymentBucketName', { 
+      value: infrastructure.deploymentBucket.bucketName 
+    });
   }
 }
