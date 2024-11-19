@@ -1,10 +1,31 @@
-#!/bin/bash
-
 # Enable error handling and logging
 set -ex
 exec > >(tee /var/log/user-data.log) 2>&1
 
 echo "Starting deployment at $(date)"
+
+# Function to wait for S3 object with timeout
+wait_for_s3_object() {
+    local bucket=$1
+    local key=$2
+    local max_attempts=30  # 5 minutes total (10 second intervals)
+    local attempt=1
+
+    echo "Waiting for s3://${bucket}/${key} to become available..."
+    
+    while [ $attempt -le $max_attempts ]; do
+        if aws s3api head-object --bucket "${bucket}" --key "${key}" 2>/dev/null; then
+            echo "Object found after ${attempt} attempts!"
+            return 0
+        fi
+        echo "Attempt ${attempt}/${max_attempts}: Object not found, waiting 10 seconds..."
+        sleep 10
+        attempt=$((attempt + 1))
+    done
+
+    echo "Timeout waiting for object after ${max_attempts} attempts"
+    return 1
+}
 
 # Verify deployment bucket is set
 if [ -z "${DEPLOYMENT_BUCKET}" ]; then
@@ -76,6 +97,13 @@ EOL
 echo "Setting up application directory..."
 mkdir -p /var/www/nextjs
 cd /var/www/nextjs
+
+# Wait for deployment package to be available
+echo "Checking for deployment package..."
+if ! wait_for_s3_object "${DEPLOYMENT_BUCKET}" "deploy.zip"; then
+    echo "Deployment package never became available!"
+    exit 1
+fi
 
 # Get deployment package from S3
 echo "Downloading deployment package from s3://${DEPLOYMENT_BUCKET}/deploy.zip"

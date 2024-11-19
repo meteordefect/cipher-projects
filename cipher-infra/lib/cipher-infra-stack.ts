@@ -51,12 +51,13 @@ export class CipherStack extends cdk.Stack {
       'Allow HTTPS'
     );
 
-    // S3 Bucket
+    // Deployment bucket with versioning and proper region
     const deploymentBucket = new s3.Bucket(this, 'DeploymentBucket', {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
       versioned: true,
       encryption: s3.BucketEncryption.S3_MANAGED,
+      bucketName: `cipher-deployment-${this.region}-${this.account}`, // Optional: add region to name
     });
 
     // EC2 Role
