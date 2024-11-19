@@ -60,7 +60,15 @@ jobs:
       - name: Deploy S3 Stack
         working-directory: cipher-infra
         run: |
+          echo "Installing dependencies for CDK..."
+          npm ci
+          npm install --save-dev @types/node ts-node
+          npm install aws-cdk-lib
+          echo "Verifying CDK installation..."
+          cdk --version
+          echo "Deploying S3 Stack..."
           cdk deploy S3Stack --require-approval never --outputs-file s3-outputs.json
+
 
       # 9. Upload Deployment Package to S3
       - name: Upload Deployment Package
