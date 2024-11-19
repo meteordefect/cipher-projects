@@ -87,8 +87,8 @@ jobs:
           echo "Reading CDK outputs..."
           cat cipher-infra/outputs.json
           
-          # Updated jq command to match your CDK output structure
-          BUCKET_NAME=$(jq -r '.["CipherStack.DeploymentBucketName"]' cipher-infra/outputs.json)
+          # Update this line to correctly parse the nested JSON structure
+          BUCKET_NAME=$(jq -r '.CipherStack.DeploymentBucketName' cipher-infra/outputs.json)
           echo "Resolved bucket name: ${BUCKET_NAME}"
           
           if [ -z "$BUCKET_NAME" ] || [ "$BUCKET_NAME" = "null" ]; then
