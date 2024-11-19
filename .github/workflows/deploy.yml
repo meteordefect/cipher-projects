@@ -27,12 +27,14 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      # Build Next.js
+      # Next.js Build
       - name: Install Root Dependencies
         run: npm ci
       
       - name: Build Next.js
         run: npm run build
+        env:
+          SKIP_ENV_VALIDATION: true  # Add if you use t3-env or similar
       
       - name: Package Application
         run: |
@@ -50,19 +52,43 @@ jobs:
       - name: CDK Setup
         working-directory: cipher-infra
         run: |
+          # Ensure the directory exists
+          [ -d "node_modules" ] || mkdir node_modules
+          # Install dependencies from package.json
           npm ci
+          # Install CDK globally
           npm install -g aws-cdk
           
       - name: CDK Bootstrap
         working-directory: cipher-infra
-        run: cdk bootstrap
+        run: |
+          # Add error handling for bootstrap
+          cdk bootstrap || {
+            echo "Bootstrap failed. Checking AWS credentials and permissions..."
+            aws sts get-caller-identity
+            exit 1
+          }
         
       - name: Deploy Infrastructure
         working-directory: cipher-infra
         run: |
-          cdk deploy --require-approval never --outputs-file outputs.json
+          # Add error handling and logging
+          cdk deploy --require-approval never --outputs-file outputs.json || {
+            echo "Deploy failed. Checking stack status..."
+            cdk list
+            exit 1
+          }
           
       - name: Upload to S3
         run: |
+          if [ ! -f cipher-infra/outputs.json ]; then
+            echo "outputs.json not found!"
+            exit 1
+          fi
           BUCKET_NAME=$(jq -r '.CipherInfraStack.DeploymentBucketName' cipher-infra/outputs.json)
+          if [ -z "$BUCKET_NAME" ]; then
+            echo "Bucket name not found in outputs.json!"
+            cat cipher-infra/outputs.json
+            exit 1
+          fi
           aws s3 cp deploy.zip "s3://${BUCKET_NAME}/deploy.zip"
