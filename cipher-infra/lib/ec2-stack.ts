@@ -2,6 +2,8 @@ import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as fs from 'fs'; // Added import
+import * as path from 'path'; // Added import
 
 interface EC2StackProps extends cdk.StackProps {
   deploymentBucket: s3.IBucket;
@@ -40,11 +42,19 @@ export class EC2Stack extends cdk.Stack {
 
     deploymentBucket.grantRead(role);
 
-    // User Data
-    const userData = ec2.UserData.forLinux();
-    userData.addCommands(
-      // User data script from above
+    // Read user-data.sh and inject bucket name
+    const userDataScriptPath = path.join(__dirname, '../scripts/user-data.sh');
+    let userDataScript = fs.readFileSync(userDataScriptPath, 'utf8');
+
+    // Inject the bucket name into the user-data script
+    userDataScript = userDataScript.replace(
+      '__BUCKET_NAME__',
+      deploymentBucket.bucketName
     );
+
+    // Create User Data
+    const userData = ec2.UserData.forLinux();
+    userData.addCommands(userDataScript);
 
     // EC2 Instance
     const instance = new ec2.Instance(this, 'WebServer', {
@@ -57,7 +67,7 @@ export class EC2Stack extends cdk.Stack {
     });
 
     // Outputs
-    new cdk.CfnOutput(this, 'InstancePublicDNS', {
+    new cdk.CfnOutput(this, 'WebServerPublicDNS', { // More descriptive output name
       value: instance.instancePublicDnsName,
     });
   }
