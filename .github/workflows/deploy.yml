@@ -34,28 +34,29 @@ jobs:
       # 4. Verify CDK Installation
       - name: Verify CDK Installation
         run: cdk --version
-      
-      # 5. Deploy S3 Bucket
-      - name: Deploy Bucket
+
+      # Deploy S3 Stack
+      - name: Deploy S3 Stack
         working-directory: cipher-infra
         run: |
-          cdk deploy "*Bucket*" --require-approval never --outputs-file bucket-outputs.json
-      
-      # Upload Deployment Package to S3
+          cdk deploy S3Stack --require-approval never --outputs-file s3-outputs.json
+
+
+      # 6. Upload Deployment Package to S3
       - name: Upload Deployment Package
         run: |
-          BUCKET_NAME=$(jq -r '.CipherStack.DeploymentBucketName' cipher-infra/bucket-outputs.json)
+          BUCKET_NAME=$(jq -r '.S3Stack.DeploymentBucketName' cipher-infra/s3-outputs.json)
           echo "Uploading deployment package to bucket: ${BUCKET_NAME}"
           aws s3 cp deploy.zip "s3://${BUCKET_NAME}/deploy.zip"
       
-      #  Verify Data Upload
+      # 7. Verify Data Upload
       - name: Verify Deployment Package
         run: |
-          BUCKET_NAME=$(jq -r '.CipherStack.DeploymentBucketName' cipher-infra/bucket-outputs.json)
+          BUCKET_NAME=$(jq -r '.S3Stack.DeploymentBucketName' cipher-infra/s3-outputs.json)
           aws s3 ls "s3://${BUCKET_NAME}/deploy.zip" || exit 1
 
-      #  Deploy EC2 and Other Infrastructure
+      # 8. Deploy EC2 Stack
       - name: Deploy EC2 Stack
         working-directory: cipher-infra
         run: |
-          cdk deploy "*EC2*" --require-approval never --outputs-file ec2-outputs.json
+          cdk deploy EC2Stack --require-approval never --outputs-file ec2-outputs.json
