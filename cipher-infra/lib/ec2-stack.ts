@@ -6,6 +6,7 @@ import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as fs from 'fs'; 
 import * as path from 'path'; 
+import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 
 interface EC2StackProps extends cdk.StackProps {
   deploymentBucket: s3.IBucket;
@@ -122,6 +123,15 @@ export class EC2Stack extends cdk.Stack {
             originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER,
           },
         },
+        domainNames: [
+            'cipherprojects.com',
+            'www.cipherprojects.com',
+            'cipherweekly.com',
+            'www.cipherweekly.com',
+          ],
+        certificate: acm.Certificate.fromCertificateArn(this, 'CloudFrontCert', 
+            'arn:aws:acm:us-east-1:285572126612:certificate/a891abf9-cbc6-4c64-9861-00730703a7f1'
+        ),
       });
 
     // Output both the CloudFront URL and EC2 DNS
