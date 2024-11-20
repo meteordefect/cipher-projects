@@ -38,8 +38,8 @@ export default function Hero() {
   const [shouldAnimate, setShouldAnimate] = useState(false)
   
   const heroText = [
-    "We architect and deliver",
-    "enterprise-grade solutions",
+    "Elite development teams",
+    "for transformative projects",
     "from cloud to core systems."
   ]
 

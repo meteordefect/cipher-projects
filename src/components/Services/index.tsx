@@ -34,12 +34,13 @@ const ServiceItem: React.FC<ServiceItemProps> = ({ text, index }) => {
     once: false
   })
 
+  // Reduce the offset amount on mobile
   const xOffset = index % 2 === 0 ? -20 : 20
 
   return (
     <motion.div
       ref={ref}
-      className="py-12"
+      className="py-8 md:py-12 pr-4 md:pr-0" // Added right padding only for mobile
       initial={{ x: xOffset, opacity: 0 }}
       animate={{
         x: isInView ? 0 : xOffset,
@@ -57,10 +58,10 @@ const ServiceItem: React.FC<ServiceItemProps> = ({ text, index }) => {
         transition: { duration: 0.2 }
       }}
     >
-      <h3 className="text-5xl md:text-6xl font-normal relative">
+      <h3 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-normal relative">
         {text}
         <motion.span
-          className="absolute -left-8 text-base opacity-40"
+          className="absolute -left-8 text-base opacity-40 hidden md:inline"
           initial={{ opacity: 0 }}
           animate={{ opacity: isInView ? 0.4 : 0 }}
         >
@@ -104,7 +105,7 @@ const Services: React.FC = () => {
         {/* Right Column - Scrolling Text */}
         <div 
           ref={containerRef} 
-          className="col-span-12 md:col-span-8"
+          className="col-span-12 md:col-span-8 overflow-x-hidden"
         >
           <div className="space-y-4">
             {services.map((service, index) => (
