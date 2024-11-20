@@ -31,7 +31,7 @@ export class EC2Stack extends cdk.Stack {
     });
 
     webServerSG.addIngressRule(
-        ec2.Peer.ipv4('130.176.0.0/16'),  // CloudFront IP range for ap-southeast-2
+        ec2.Peer.ipv4('0.0.0.0/0'),  // CloudFront IP range for ap-southeast-2
         ec2.Port.tcp(80),
         'Allow HTTP from CloudFront'
       );
@@ -82,29 +82,47 @@ export class EC2Stack extends cdk.Stack {
 
     // Create CloudFront distribution
     const distribution = new cloudfront.Distribution(this, 'Distribution', {
-      defaultBehavior: {
-        origin: new origins.HttpOrigin(instance.instancePublicDnsName, {
-          protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
-          // Keep connection alive with origin
-          connectionAttempts: 3,
-          connectionTimeout: cdk.Duration.seconds(10),
-        }),
-        allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
-        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-        originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER,
-        cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
-      },
-      // Add specific behavior for Next.js static files
-      additionalBehaviors: {
-        '/_next/static/*': {
+        defaultBehavior: {
           origin: new origins.HttpOrigin(instance.instancePublicDnsName, {
             protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
+            connectionAttempts: 3,
+            connectionTimeout: cdk.Duration.seconds(10),
           }),
+          allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
           viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-          cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+          // Use custom cache policy for default behavior
+          cachePolicy: new cloudfront.CachePolicy(this, 'DefaultCachePolicy', {
+            queryStringBehavior: cloudfront.CacheQueryStringBehavior.all(),
+            headerBehavior: cloudfront.CacheHeaderBehavior.allowList('Accept'),
+            cookieBehavior: cloudfront.CacheCookieBehavior.none(),
+            defaultTtl: cdk.Duration.days(1),
+          }),
+          originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER,
         },
-      },
-    });
+        additionalBehaviors: {
+          '/_next/static/*': {
+            origin: new origins.HttpOrigin(instance.instancePublicDnsName, {
+              protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
+            }),
+            viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+          },
+          '/_next/image*': {
+            origin: new origins.HttpOrigin(instance.instancePublicDnsName, {
+              protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
+            }),
+            viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            // Custom cache policy for Next.js image optimization
+            cachePolicy: new cloudfront.CachePolicy(this, 'ImageCachePolicy', {
+              queryStringBehavior: cloudfront.CacheQueryStringBehavior.all(),
+              headerBehavior: cloudfront.CacheHeaderBehavior.allowList('Accept'),
+              cookieBehavior: cloudfront.CacheCookieBehavior.none(),
+              defaultTtl: cdk.Duration.days(1),
+            }),
+            originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER,
+          },
+        },
+      });
 
     // Output both the CloudFront URL and EC2 DNS
     new cdk.CfnOutput(this, 'CloudFrontURL', {
