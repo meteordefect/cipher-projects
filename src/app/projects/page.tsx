@@ -112,6 +112,54 @@ function Project({ project }: { project: DetailedProject }) {
 
 const projects: DetailedProject[] = [
   {
+    title: "Blockchain",
+    subtitle: "Industry grade infrastructure for proof-of-stake",
+    image: "/work/pos.jpg",
+    category: "Blockchain Infrastructure",
+    accentColor: "#2F4F2F",
+    description: "Designed and implemented a secure, scalable proof-of-stake blockchain infrastructure for enterprise deployment.",
+    challenge: "The client needed a robust, secure infrastructure for their proof-of-stake blockchain network that could handle high transaction volumes while maintaining security and compliance standards.",
+    solution: "Implemented a comprehensive AWS infrastructure using advanced networking features and security groups, with automated scaling and monitoring systems.",
+    results: [
+      "Achieved 99.99% uptime for validator nodes",
+      "Implemented real-time security monitoring and automated responses",
+      "Reduced infrastructure costs by 40% through optimized resource allocation",
+      "Successfully processed over 1M daily transactions"
+    ],
+    technologies: [
+      {
+        category: "AWS Infrastructure",
+        items: [
+          "AWS Network Firewall",
+          "EC2 Auto Scaling",
+          "VPC Security Groups",
+          "AWS CloudWatch",
+          "AWS Systems Manager"
+        ]
+      },
+      {
+        category: "DevOps & Automation",
+        items: [
+          "Terraform",
+          "Docker",
+          "Kubernetes",
+          "Jenkins"
+        ]
+      },
+      {
+        category: "Security",
+        items: [
+          "AWS KMS",
+          "AWS Secrets Manager",
+          "AWS WAF",
+          "AWS Shield"
+        ]
+      }
+    ],
+    year: "2023",
+    client: "DeFi Solutions Ltd"
+  },
+  {
     title: "Cloud Migration",
     subtitle: "Enhancing security and reducing costs",
     image: "/work/cloud-migrate.jpg",
@@ -119,7 +167,7 @@ const projects: DetailedProject[] = [
     accentColor: "#1E3A8A",
     description: "Executed a comprehensive cloud migration strategy focusing on security enhancement and cost optimization.",
     challenge: "The client's legacy infrastructure was becoming increasingly costly to maintain and posed security risks. They needed a seamless migration to AWS while ensuring zero downtime and maintaining strict security standards.",
-    solution: "We developed a phased migration approach using AWS Migration Hub, implementing infrastructure as code with Terraform, and containerizing applications for better scalability. Enhanced security measures were implemented through AWS WAF and comprehensive monitoring.",
+    solution: "Developed a phased migration approach using AWS Migration Hub, implementing infrastructure as code with Terraform, and containerizing applications for better scalability. Enhanced security measures were implemented through AWS WAF and comprehensive monitoring.",
     results: [
       "Completed migration with zero downtime",
       "Reduced monthly infrastructure costs by 35%",
@@ -160,8 +208,105 @@ const projects: DetailedProject[] = [
     year: "2023",
     client: "Enterprise Solutions Corp"
   },
-  // ... other projects
-]
+  {
+    title: "AWS Infrastructure",
+    subtitle: "Private AI chat management with Open-WebUI",
+    image: "/work/ollama.jpg",
+    category: "Infrastructure & AI",
+    accentColor: "#3B2F4F",
+    description: "Built a secure, scalable infrastructure for hosting private AI models with Open-WebUI and Ollama integration.",
+    challenge: "The client required a private, secure environment for AI model deployment and management, with strict data privacy requirements and the need for scalable infrastructure.",
+    solution: "Implemented a containerized architecture using AWS CDK and ECS Fargate, integrating Open-WebUI with Ollama for model management. Used Lambda for serverless processing and implemented comprehensive security measures.",
+    results: [
+      "Achieved sub-second response times for AI queries",
+      "Maintained 100% data privacy compliance",
+      "Reduced operational costs by 45%",
+      "Supported concurrent usage by 500+ users",
+      "Automated deployment and scaling processes"
+    ],
+    technologies: [
+      {
+        category: "AWS Infrastructure",
+        items: [
+          "AWS CDK",
+          "ECS Fargate",
+          "Lambda",
+          "API Gateway",
+          "VPC"
+        ]
+      },
+      {
+        category: "AI & Container Technologies",
+        items: [
+          "Open-WebUI",
+          "Ollama",
+          "Docker",
+          "ECR"
+        ]
+      },
+      {
+        category: "Security & Monitoring",
+        items: [
+          "AWS CloudWatch",
+          "AWS X-Ray",
+          "IAM",
+          "AWS Secrets Manager"
+        ]
+      }
+    ],
+    year: "2024",
+    client: "AI Innovation Labs"
+  },
+  {
+    title: "AWS Partnership",
+    subtitle: "Software verification to become an AWS Partner",
+    image: "/work/ftr.jpg",
+    category: "AWS Consulting",
+    accentColor: "#2F4F4F",
+    description: "Guided client through AWS Partner verification process, implementing best practices and achieving compliance standards.",
+    challenge: "The client needed to meet AWS Partner Network requirements while maintaining operational efficiency and implementing comprehensive security measures across their infrastructure.",
+    solution: "Implemented AWS Well-Architected framework principles, established Control Tower for multi-account management, and configured comprehensive logging and monitoring solutions.",
+    results: [
+      "Achieved AWS Partner status within 3 months",
+      "Implemented 100% of required security controls",
+      "Reduced incident response time by 70%",
+      "Automated 85% of compliance reporting",
+      "Enhanced overall security posture"
+    ],
+    technologies: [
+      {
+        category: "AWS Governance",
+        items: [
+          "AWS Control Tower",
+          "AWS Organizations",
+          "AWS Config",
+          "AWS SSO"
+        ]
+      },
+      {
+        category: "Security & Compliance",
+        items: [
+          "AWS GuardDuty",
+          "AWS Security Hub",
+          "AWS CloudTrail",
+          "AWS IAM"
+        ]
+      },
+      {
+        category: "Monitoring & Logging",
+        items: [
+          "AWS CloudWatch",
+          "AWS X-Ray",
+          "Amazon OpenSearch",
+          "AWS Systems Manager"
+        ]
+      }
+    ],
+    year: "2023",
+    client: "Tech Solutions Group"
+  }
+];
+
 
 export default function ProjectsPage() {
   return (
