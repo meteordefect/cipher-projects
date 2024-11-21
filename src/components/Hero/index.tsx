@@ -44,7 +44,7 @@ export default function Hero() {
   ]
 
   useEffect(() => {
-    // If we're not in initial loading, or if we're navigating back to the page
+    // If we're not in initial loading, or if we're navigating back to the page   
     if (!isInitialLoading || pathname !== '/') {
       setShouldAnimate(true)
     }
