@@ -41,18 +41,17 @@ const services = [
 ];
 
 export default function ServicesPage() {
-
   return (
     <main className="min-h-screen">
-      {/* Hero Section - Increased padding and adjusted layout */}
-      <section className="pt-48 pb-32"> {/* Increased padding */}
+      {/* Hero Section */}
+      <section className="pt-48 pb-32">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-5xl md:text-[4vw] leading-[1.2] font-normal" // Larger, more impactful text
+              className="text-5xl md:text-[4vw] leading-[1.2] font-normal"
             >
               Engineering 
               <br />
@@ -63,18 +62,17 @@ export default function ServicesPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-3xl md:text-4xl font-normal leading-tight opacity-80 mt-8 lg:mt-16" // Added margin top for better spacing
+              className="text-3xl md:text-4xl font-normal leading-tight opacity-80 mt-8 lg:mt-16"
             >
               We transform complex business challenges into elegant digital solutions, partnering with you to create software that drives real growth and lasting success.
             </motion.p>
           </div>
 
-          {/* Hero Image */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="mt-32 relative aspect-[21/9] w-full overflow-hidden rounded-lg" // Adjusted aspect ratio
+            className="mt-32 relative aspect-[21/9] w-full overflow-hidden rounded-lg"
           >
             <Image
               src="/services-hero.jpg"
@@ -86,111 +84,57 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* Services Detail Section - Reimagined layout */}
-      <section className="py-32"> {/* Increased vertical spacing */}
+      {/* Services List Section */}
+      <section className="py-32">
         <div className="container">
-          <div className="h-[2px] bg-current mb-32" /> {/* Increased margin */}
-          
           {services.map((service, index) => (
-            <motion.div 
-              key={service.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.2 }}
-              className={`${index !== services.length - 1 ? 'mb-40' : ''}`} // Increased spacing between services
-            >
-              <div className="grid grid-cols-1 gap-8">
-                {/* Service Title */}
-                <h2 className="text-6xl md:text-7xl font-normal mb-16">{service.title}</h2>
-                
-                {/* Service Content Grid */}
-                <div className="grid grid-cols-12 gap-8">
-                  {/* Service Items List */}
-                  <div className="col-span-12 md:col-span-6 lg:col-span-4">
-                    <ul className="space-y-6">
+            <div key={service.title}>
+              {/* Divider line */}
+              <div className="h-[1px] bg-current opacity-20" />
+              
+              <div className="py-24 md:py-32">
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="grid grid-cols-12 gap-8 items-start"
+                >
+                  {/* Title */}
+                  <div className="col-span-12 md:col-span-3">
+                    <h2 className="text-5xl md:text-6xl font-normal">{service.title}</h2>
+                  </div>
+
+                  {/* Items List */}
+                  <div className="col-span-12 md:col-span-4">
+                    <ul className="space-y-4 text-xl md:text-2xl">
                       {service.items.map((item, itemIndex) => (
                         <motion.li
                           key={itemIndex}
                           initial={{ opacity: 0, x: -20 }}
                           whileInView={{ opacity: 1, x: 0 }}
-                          transition={{ 
-                            duration: 0.4,
-                            delay: itemIndex * 0.1
-                          }}
-                          className="flex items-start gap-4 text-xl"
+                          transition={{ duration: 0.4, delay: itemIndex * 0.1 }}
                         >
-                          <span className="text-sm opacity-40 font-medium pt-1">0{itemIndex + 1}</span>
-                          <span>{item}</span>
+                          {item}
                         </motion.li>
                       ))}
                     </ul>
                   </div>
-                  
-                  {/* Service Description */}
-                  <div className="col-span-12 md:col-span-6 lg:col-span-6 lg:col-start-7">
-                    <p className="text-2xl leading-relaxed opacity-60">
+
+                  {/* Description */}
+                  <div className="col-span-12 md:col-span-5">
+                    <p className="text-xl md:text-2xl opacity-60 leading-relaxed">
                       {service.description}
                     </p>
                   </div>
-                </div>
+                </motion.div>
               </div>
-            </motion.div>
+            </div>
           ))}
-        </div>
-      </section>
-
-      {/* What to Expect Section */}
-      <section className="py-24">
-        <div className="container">
-          <div className="h-[1px] bg-current mb-24" />
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-24">
-            <motion.h2 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-6xl md:text-7xl font-normal"
-            >
-              Our Process
-            </motion.h2>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-3xl md:text-4xl font-normal leading-tight opacity-80"
-            >
-              Drive innovation with expert technical leadership, from strategic CTO guidance to optimized full-stack solutions and cloud architecture.
-            </motion.p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-            {[
-              {
-                title: "User Experience From All Angles",
-                description: "Product strategy, design, motion and front-end all have to work together to give the best experience to the users. Every detail counts."
-              },
-              {
-                title: "Decisions Based on Goals",
-                description: "Everything we do, we do it to achieve goals. Beauty and tech are just means to an end. Startups are all about hitting milestones."
-              },
-              {
-                title: "Small Teams, Big Impact",
-                description: "A multidisciplinary team of designers, developers, and product managers with experience crafting and deploying products."
-              },
-              {
-                title: "Zero Big Reveal",
-                description: "Be informed every step of the way with weekly meetings and deliverables, frequent testing and validation, and incremental progress."
-              }
-            ].map((item, index) => (
-              <div key={index} className="space-y-4">
-                <h3 className="text-2xl font-normal">{item.title}</h3>
-                <p className="text-lg opacity-60">{item.description}</p>
-              </div>
-            ))}
-          </div>
+          {/* Final divider line */}
+          <div className="h-[1px] bg-current opacity-20" />
         </div>
       </section>
     </main>
   )
 }
+
