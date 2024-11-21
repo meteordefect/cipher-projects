@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import { S3Stack } from '../lib/s3-stack';
 import { EC2Stack } from '../lib/ec2-stack';
+import { ContactFormStack } from '../lib/contact-form-stack';
 
 const app = new cdk.App();
 
@@ -19,4 +20,12 @@ new EC2Stack(app, 'EC2Stack', {
     region: process.env.CDK_DEFAULT_REGION || 'ap-southeast-2',
   },
   deploymentBucket: s3Stack.deploymentBucket, // Pass the S3 bucket reference
+});
+
+// Add the new Contact Form Stack
+new ContactFormStack(app, 'ContactFormStack', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION || 'ap-southeast-2',
+  },
 });

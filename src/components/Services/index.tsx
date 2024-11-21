@@ -34,13 +34,12 @@ const ServiceItem: React.FC<ServiceItemProps> = ({ text, index }) => {
     once: false
   })
 
-  // Reduce the offset amount on mobile
   const xOffset = index % 2 === 0 ? -20 : 20
 
   return (
     <motion.div
       ref={ref}
-      className="py-8 md:py-12 pr-4 md:pr-0" // Added right padding only for mobile
+      className="py-8 md:py-12 px-4 md:px-0 flex items-start gap-8"
       initial={{ x: xOffset, opacity: 0 }}
       animate={{
         x: isInView ? 0 : xOffset,
@@ -58,15 +57,15 @@ const ServiceItem: React.FC<ServiceItemProps> = ({ text, index }) => {
         transition: { duration: 0.2 }
       }}
     >
-      <h3 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-normal relative">
+      <motion.div
+        className="text-base opacity-40 min-w-[32px]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isInView ? 0.4 : 0 }}
+      >
+        {String(index + 1).padStart(2, '0')}
+      </motion.div>
+      <h3 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-normal">
         {text}
-        <motion.span
-          className="absolute -left-8 text-base opacity-40 hidden md:inline"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isInView ? 0.4 : 0 }}
-        >
-          {String(index + 1).padStart(2, '0')}
-        </motion.span>
       </h3>
     </motion.div>
   )
@@ -86,10 +85,10 @@ const Services: React.FC = () => {
       {/* Top Divider */}
       <div className="h-[1px] bg-black" />
       
-      <div className="grid grid-cols-12 gap-8 pt-24">
+      <div className="grid grid-cols-12 gap-8 pt-24 px-4 md:px-0"> {/* Added padding for mobile */}
         {/* Left Column - Sticky Title */}
         <motion.div 
-          className="col-span-12 md:col-span-4 md:sticky md:top-32 h-fit"
+          className="col-span-12 md:col-span-4 md:sticky md:top-32 h-fit mb-8 md:mb-0"
           style={{ y: titleY }}
         >
           <motion.h2 
