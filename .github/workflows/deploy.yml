@@ -82,3 +82,13 @@ jobs:
         working-directory: cipher-infra
         run: |
           cdk deploy EC2Stack --require-approval never --outputs-file ec2-outputs.json
+
+
+      # 11. Deploy ContactFormStack
+      - name: Deploy ContactFormStack
+        working-directory: cipher-infra
+        run: |
+          echo "Installing dependencies for ContactFormStack..."
+          npm ci
+          echo "Deploying ContactFormStack..."
+          cdk deploy ContactFormStack --require-approval never
