@@ -8,16 +8,6 @@ import { ArrowUpRight } from 'lucide-react'
 
 const researchPosts = [
   {
-    id: 'visionary-lens',
-    title: "The Visionary's Lens: Turning Everyday Frustrations into Software Gold",
-    subtitle: "Seeing opportunity where others see obstacles",
-    date: "November 9, 2024",
-    author: "Keith Vaughan",
-    category: "Innovation",
-    image: "/research/visionary.jpg",
-    excerpt: "What's the difference between a tourist and a visionary? About $100 million in potential value. A perspective on transforming daily frustrations into software opportunities."
-  },
-  {
     id: 'repo-swatting',
     title: "Repo Swatting: How False Reports Can Take Down Developer Accounts",
     subtitle: "A new threat to source code platforms",
@@ -26,6 +16,16 @@ const researchPosts = [
     category: "Security",
     image: "/research/repo-swatting.jpg",
     excerpt: "A concerning new attack method threatens developers' accounts on major platforms like GitHub and GitLab, exploiting trust and safety mechanisms through malicious file uploads."
+  },
+  {
+    id: 'visionary-lens',
+    title: "The Visionary's Lens: Turning Everyday Frustrations into Software Gold",
+    subtitle: "Seeing opportunity where others see obstacles",
+    date: "November 9, 2024",
+    author: "Keith Vaughan",
+    category: "Innovation",
+    image: "/research/visionary.jpg",
+    excerpt: "What's the difference between a tourist and a visionary? About $100 million in potential value. A perspective on transforming daily frustrations into software opportunities."
   },
   {
     id: 'kitchen-nightmares-software',

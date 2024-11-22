@@ -3,6 +3,13 @@
 import Link from 'next/link'
 import Image from 'next/image'
 
+// First, create a social media links configuration
+const socialLinks = {
+  LinkedIn: 'https://www.linkedin.com/company/cipherprojects',
+  Twitter: 'https://twitter.com/cipherprojects',
+  Facebook: 'https://www.facebook.com/profile.php?id=61560910197514'
+};
+
 export default function Footer() {
   return (
     <footer className="w-screen relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] bg-black text-white">
@@ -81,13 +88,16 @@ export default function Footer() {
           <div className="col-span-6 md:col-span-3">
             <h3 className="text-sm uppercase tracking-wider mb-4 opacity-60">Social</h3>
             <nav className="flex flex-col gap-2">
-              {['LinkedIn', 'Twitter', 'Instagram', 'Facebook'].map((item) => (
+              {Object.entries(socialLinks).map(([platform, url]) => (
                 <Link 
-                  key={item} 
-                  href={`/${item.toLowerCase()}`}
-                  className="hover:opacity-60 transition-opacity"
+                  key={platform} 
+                  href={url}
+                  target="_blank"  // Opens in new tab
+                  rel="noopener noreferrer"  // Security best practice
+                  className="hover:opacity-60 transition-opacity group flex items-center gap-2"
                 >
-                  {item}
+                  {platform}
+                  <span className="opacity-0 group-hover:opacity-60 transition-opacity">↗</span>
                 </Link>
               ))}
             </nav>
