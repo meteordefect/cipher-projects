@@ -32,20 +32,7 @@ export class ContactFormStack extends cdk.Stack {
       resources: ['*'], // You might want to restrict this to specific SES ARNs
     }));
 
-
-    // Add this first - create the logging role
-    const loggingRole = new iam.Role(this, 'ApiGatewayLoggingRole', {
-      assumedBy: new iam.ServicePrincipal('apigateway.amazonaws.com'),
-      managedPolicies: [
-        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AmazonAPIGatewayPushToCloudWatchLogs')
-      ]
-    });
-
-    const logGroup = new logs.LogGroup(this, 'ApiGatewayLogs', {
-      retention: logs.RetentionDays.ONE_WEEK,
-    });
-
-    // Then your API Gateway with the role
+   // Create API Gateway with simplified logging setup
     const api = new apigateway.RestApi(this, 'ContactFormApi', {
       restApiName: 'Contact Form Service',
       defaultCorsPreflightOptions: {
@@ -54,11 +41,10 @@ export class ContactFormStack extends cdk.Stack {
         allowHeaders: ['Content-Type'],
         maxAge: cdk.Duration.days(1),
       },
-      deployOptions: {
+      cloudWatchRole: true,  // Move this up to the main config
+      deployOptions: {   
         loggingLevel: apigateway.MethodLoggingLevel.INFO,
-        dataTraceEnabled: true,
-        accessLogDestination: new apigateway.LogGroupLogDestination(logGroup),
-        accessLogFormat: apigateway.AccessLogFormat.jsonWithStandardFields(),
+        dataTraceEnabled: true
       }
     });
 
