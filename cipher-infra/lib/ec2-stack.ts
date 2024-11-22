@@ -62,8 +62,11 @@ export class EC2Stack extends cdk.Stack {
     // Create User Data
     const userData = ec2.UserData.forLinux();
     
-    // Add environment variable
-    userData.addCommands(`export DEPLOYMENT_BUCKET=${deploymentBucket.bucketName}`);
+    // Add environment variables with timestamp
+    userData.addCommands(
+      `export DEPLOYMENT_BUCKET=${deploymentBucket.bucketName}`,
+      `export DEPLOYMENT_TIME="${new Date().toISOString()}"`, // Add timestamp
+      `echo "Starting deployment at ${new Date().toISOString()}"`); // Log timestamp
     userData.addCommands(userDataScript);
 
     // EC2 Instance using Ubuntu 22.04

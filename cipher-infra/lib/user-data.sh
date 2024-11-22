@@ -217,6 +217,18 @@ chown -R ubuntu:ubuntu /var/www/nextjs
 echo "Installing dependencies..."
 sudo -u ubuntu bash -c 'cd /var/www/nextjs && npm ci'
 
+# Clear caches before starting services
+echo "=== Clearing caches ==="
+# Clear Node.js cache
+echo "Clearing Node.js module cache..."
+npm cache clean --force
+
+# Clear nginx cache if it exists
+echo "Clearing nginx cache..."
+if [ -d "/var/cache/nginx" ]; then
+    rm -rf /var/cache/nginx/*
+fi
+
 # Start services
 systemctl daemon-reload
 systemctl enable nginx

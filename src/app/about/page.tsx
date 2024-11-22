@@ -20,19 +20,19 @@ const values = [
 
 const milestones = [
   {
-    year: "2023",
+    year: "2024",
     title: "AWS Partnership",
-    description: "Achieved AWS Partner status, expanding our cloud capabilities."
+    description: "Expanded our technical team to deliver enterprise-grade cloud solutions and custom software development."
   },
   {
-    year: "2022",
-    title: "Enterprise Solutions",
-    description: "Launched dedicated enterprise cloud migration services."
+    year: "2023",
+    title: "Growth & Innovation",
+    description: "Successfully delivered multiple cloud migration projects and established our cloud-native development framework for startups and enterprises."
   },
   {
-    year: "2021",
+    year: "2023",
     title: "Foundation",
-    description: "Started with a vision to deliver excellence in cloud and development."
+    description: "Launched Cipher Projects with a focus on cloud excellence and modern software development, bringing together experienced AWS architects and developers."
   }
 ];
 

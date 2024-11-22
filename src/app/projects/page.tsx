@@ -112,54 +112,6 @@ function Project({ project }: { project: DetailedProject }) {
 
 const projects: DetailedProject[] = [
   {
-    title: "Blockchain",
-    subtitle: "Industry grade infrastructure for proof-of-stake",
-    image: "/work/pos.jpg",
-    category: "Blockchain Infrastructure",
-    accentColor: "#2F4F2F",
-    description: "Designed and implemented a secure, scalable proof-of-stake blockchain infrastructure for enterprise deployment.",
-    challenge: "The client needed a robust, secure infrastructure for their proof-of-stake blockchain network that could handle high transaction volumes while maintaining security and compliance standards.",
-    solution: "Implemented a comprehensive AWS infrastructure using advanced networking features and security groups, with automated scaling and monitoring systems.",
-    results: [
-      "Achieved 99.99% uptime for validator nodes",
-      "Implemented real-time security monitoring and automated responses",
-      "Reduced infrastructure costs by 40% through optimized resource allocation",
-      "Successfully processed over 1M daily transactions"
-    ],
-    technologies: [
-      {
-        category: "AWS Infrastructure",
-        items: [
-          "AWS Network Firewall",
-          "EC2 Auto Scaling",
-          "VPC Security Groups",
-          "AWS CloudWatch",
-          "AWS Systems Manager"
-        ]
-      },
-      {
-        category: "DevOps & Automation",
-        items: [
-          "Terraform",
-          "Docker",
-          "Kubernetes",
-          "Jenkins"
-        ]
-      },
-      {
-        category: "Security",
-        items: [
-          "AWS KMS",
-          "AWS Secrets Manager",
-          "AWS WAF",
-          "AWS Shield"
-        ]
-      }
-    ],
-    year: "2023",
-    client: "DeFi Solutions Ltd"
-  },
-  {
     title: "Cloud Migration",
     subtitle: "Enhancing security and reducing costs",
     image: "/work/cloud-migrate.jpg",
@@ -304,6 +256,54 @@ const projects: DetailedProject[] = [
     ],
     year: "2023",
     client: "Tech Solutions Group"
+  },
+  {
+    title: "Blockchain",
+    subtitle: "Industry grade infrastructure for proof-of-stake",
+    image: "/work/pos.jpg",
+    category: "Blockchain Infrastructure",
+    accentColor: "#2F4F2F",
+    description: "Designed and implemented a secure, scalable proof-of-stake blockchain infrastructure for enterprise deployment.",
+    challenge: "The client needed a robust, secure infrastructure for their proof-of-stake blockchain network that could handle high transaction volumes while maintaining security and compliance standards.",
+    solution: "Implemented a comprehensive AWS infrastructure using advanced networking features and security groups, with automated scaling and monitoring systems.",
+    results: [
+      "Achieved 99.99% uptime for validator nodes",
+      "Implemented real-time security monitoring and automated responses",
+      "Reduced infrastructure costs by 40% through optimized resource allocation",
+      "Successfully processed over 1M daily transactions"
+    ],
+    technologies: [
+      {
+        category: "AWS Infrastructure",
+        items: [
+          "AWS Network Firewall",
+          "EC2 Auto Scaling",
+          "VPC Security Groups",
+          "AWS CloudWatch",
+          "AWS Systems Manager"
+        ]
+      },
+      {
+        category: "DevOps & Automation",
+        items: [
+          "Terraform",
+          "Docker",
+          "Kubernetes",
+          "Jenkins"
+        ]
+      },
+      {
+        category: "Security",
+        items: [
+          "AWS KMS",
+          "AWS Secrets Manager",
+          "AWS WAF",
+          "AWS Shield"
+        ]
+      }
+    ],
+    year: "2023",
+    client: "DeFi Solutions Ltd"
   }
 ];
 
