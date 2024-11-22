@@ -81,7 +81,8 @@ export class EC2Stack extends cdk.Stack {
       userData,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PUBLIC
-      }
+      },
+      instanceName: `WebServer-${Date.now()}` 
     });
 
     // Create CloudFront distribution

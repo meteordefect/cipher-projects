@@ -41,6 +41,10 @@ export class ContactFormStack extends cdk.Stack {
         allowHeaders: ['Content-Type'],
         maxAge: cdk.Duration.days(1),
       },
+      deployOptions: {   
+        loggingLevel: apigateway.MethodLoggingLevel.INFO,
+        dataTraceEnabled: true
+      }
     });
 
     // Add Lambda integration
