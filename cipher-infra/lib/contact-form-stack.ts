@@ -1,8 +1,8 @@
-// lib/contact-form-stack.ts
 import * as cdk from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as logs from 'aws-cdk-lib/aws-logs'; // Corrected this import
 import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as path from 'path';
 
@@ -16,7 +16,7 @@ export class ContactFormStack extends cdk.Stack {
       entry: path.join(__dirname, '../lambda/contact-form/handler.ts'),
       handler: 'handler',
       environment: {
-        RECIPIENT_EMAIL: 'your@email.com', // Replace with your email
+        RECIPIENT_EMAIL: 'keith.vaughan@cipherprojects.com', // Replace with your email
       },
       timeout: cdk.Duration.seconds(10),
       memorySize: 128,
@@ -32,18 +32,33 @@ export class ContactFormStack extends cdk.Stack {
       resources: ['*'], // You might want to restrict this to specific SES ARNs
     }));
 
-    // Create API Gateway
+
+    // Add this first - create the logging role
+    const loggingRole = new iam.Role(this, 'ApiGatewayLoggingRole', {
+      assumedBy: new iam.ServicePrincipal('apigateway.amazonaws.com'),
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AmazonAPIGatewayPushToCloudWatchLogs')
+      ]
+    });
+
+    const logGroup = new logs.LogGroup(this, 'ApiGatewayLogs', {
+      retention: logs.RetentionDays.ONE_WEEK,
+    });
+
+    // Then your API Gateway with the role
     const api = new apigateway.RestApi(this, 'ContactFormApi', {
       restApiName: 'Contact Form Service',
       defaultCorsPreflightOptions: {
-        allowOrigins: apigateway.Cors.ALL_ORIGINS, // You should restrict this to your domain
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
         allowMethods: apigateway.Cors.ALL_METHODS,
         allowHeaders: ['Content-Type'],
         maxAge: cdk.Duration.days(1),
       },
-      deployOptions: {   
+      deployOptions: {
         loggingLevel: apigateway.MethodLoggingLevel.INFO,
-        dataTraceEnabled: true
+        dataTraceEnabled: true,
+        accessLogDestination: new apigateway.LogGroupLogDestination(logGroup),
+        accessLogFormat: apigateway.AccessLogFormat.jsonWithStandardFields(),
       }
     });
 
