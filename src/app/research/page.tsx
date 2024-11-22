@@ -18,6 +18,16 @@ const researchPosts = [
     excerpt: "What's the difference between a tourist and a visionary? About $100 million in potential value. A perspective on transforming daily frustrations into software opportunities."
   },
   {
+    id: 'repo-swatting',
+    title: "Repo Swatting: How False Reports Can Take Down Developer Accounts",
+    subtitle: "A new threat to source code platforms",
+    date: "November 22, 2024",
+    author: "Keith Vaughan",
+    category: "Security",
+    image: "/research/repo-swatting.jpg",
+    excerpt: "A concerning new attack method threatens developers' accounts on major platforms like GitHub and GitLab, exploiting trust and safety mechanisms through malicious file uploads."
+  },
+  {
     id: 'kitchen-nightmares-software',
     title: "Gordon Ramsay's Kitchen Nightmares: A Lesson for Software Development",
     subtitle: "What cooking can teach us about code",

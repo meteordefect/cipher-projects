@@ -273,7 +273,7 @@ export default function SelectedWork() {
           style={{ y: titleY }}
           className="text-6xl md:text-7xl font-normal"
         >
-          Selected Work
+          Selected Projects
         </motion.h2>
 
         {/* Right column - Description */}
@@ -313,7 +313,7 @@ export default function SelectedWork() {
               hover:bg-black hover:text-white transition-colors duration-300 rounded-sm"
           >
             <span>Start a Project</span>
-            <Arrow className="w-4 h-4" />
+            <Arrow className="w-[0.8em] h-[0.8em] translate-y-[0.1em]" />
           </Link>
         </MagneticButton>
       </div>
