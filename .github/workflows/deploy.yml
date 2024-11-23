@@ -86,7 +86,7 @@ jobs:
       # 11. Invalidate CloudFront Cache
       - name: Invalidate CloudFront Cache
         run: |
-          CLOUDFRONT_ID=$(jq -r '.EC2Stack.CloudFrontDistributionId' cipher-infra/ec2-outputs.json)
+          CLOUDFRONT_ID=$(jq -r '.EC2Stack.CloudFrontDistributionId // empty' cipher-infra/ec2-outputs.json)
           if [ -z "$CLOUDFRONT_ID" ]; then
             echo "CloudFront ID not found. Skipping invalidation."
           else
@@ -95,7 +95,8 @@ jobs:
             echo "CloudFront cache invalidated successfully."
           fi
 
-      # 12. Deploy ContactFormStack
+
+      # 13. Deploy ContactFormStack
       - name: Deploy ContactFormStack
         working-directory: cipher-infra
         run: |
