@@ -13,16 +13,26 @@ const letters = [
   '†', '‡', '§', '¶', '©', '®', '™', '⁂', '⁕', '⁜',
 ]
 
-export default function ScrambleButton() {
+interface ScrambleButtonProps {
+  onClickComplete?: () => void;
+}
+
+export default function ScrambleButton({ onClickComplete }: ScrambleButtonProps) {
   const { isDark } = useBackground()
+  const [mounted, setMounted] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const [displayText, setDisplayText] = useState(["LET'S", "TALK "])
-  // Removed originalText from here
   const [isAnimating, setIsAnimating] = useState(false)
 
   useEffect(() => {
-    const originalText = ["LET'S", "TALK "] // Moved inside useEffect
+    setMounted(true)
+  }, [])
 
+  useEffect(() => {
+    if (!mounted) return;
+
+    const originalText = ["LET'S", "TALK "]
+    
     if (isHovered) {
       setIsAnimating(true)
       let iteration = 0
@@ -71,18 +81,53 @@ export default function ScrambleButton() {
       }, 150)
       return () => clearTimeout(timeout)
     }
-  }, [isHovered]) // Removed originalText from dependencies
+  }, [isHovered, mounted])
+
+  if (!mounted) {
+    return (
+      <Link href="/contact" className="block">
+        <div className={`px-6 py-3 w-[160px] flex justify-center items-center border ${
+          isDark 
+            ? 'border-white border-opacity-90' 
+            : 'border-black border-opacity-60'
+        }`}>
+          <span className={`text-lg ${isDark ? 'text-white' : 'text-black'}`}>
+            LET'S TALK
+          </span>
+        </div>
+      </Link>
+    )
+  }
 
   return (
-    <Link href="/contact">
+    <Link 
+      href="/contact" 
+      onClick={(e) => {
+        if (onClickComplete) {
+          e.preventDefault()
+          onClickComplete()
+          setTimeout(() => {
+            window.location.href = '/contact'
+          }, 200)
+        }
+      }}
+      className="block"
+    >
       <motion.div
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="relative group"
         whileHover={{ scale: 1.02 }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
       >
-        <div className="relative px-6 py-3 w-[160px] flex justify-center items-center">
+        <div 
+          className={`relative px-6 py-3 w-[160px] flex justify-center items-center border ${
+            isDark 
+              ? 'border-white border-opacity-90 hover:bg-white/5' 
+              : 'border-black border-opacity-60 hover:bg-black/5'
+          } transition-colors duration-300`}
+        >
           <div className={`relative z-10 text-lg tracking-normal ${
             isDark ? 'text-white' : 'text-black'
           } flex items-center gap-2`}>
@@ -93,7 +138,7 @@ export default function ScrambleButton() {
                   className="flex items-center overflow-hidden"
                   style={{
                     letterSpacing: '0.01em',
-                    width: word === "LET'S" ? '48px' : '44px', // Fixed widths for each word
+                    width: word === "LET'S" ? '48px' : '44px',
                   }}
                 >
                   {word.split('').map((char, charIndex) => (
@@ -134,16 +179,20 @@ export default function ScrambleButton() {
           
           <motion.span 
             className={`absolute inset-0 border ${
-              isDark ? 'border-white' : 'border-black'
+              isDark 
+                ? 'border-white border-opacity-90' 
+                : 'border-black border-opacity-60'
             }`}
-            animate={isHovered ? {
-              boxShadow: isDark 
-                ? '0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(255,255,255,0.1)' 
-                : '0 0 10px rgba(0,0,0,0.2), 0 0 20px rgba(0,0,0,0.1)'
-            } : {
-              boxShadow: 'none'
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: isHovered ? 1 : 0 
             }}
             transition={{ duration: 0.3 }}
+            style={{
+              boxShadow: isDark 
+                ? '0 0 10px rgba(255,255,255,0.3), 0 0 20px rgba(255,255,255,0.1)' 
+                : '0 0 10px rgba(0,0,0,0.3), 0 0 20px rgba(0,0,0,0.2)'
+            }}
           />
         </div>
       </motion.div>
