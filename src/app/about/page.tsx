@@ -20,21 +20,25 @@ const values = [
 
 const milestones = [
   {
+    id: 1,
     year: "2024",
     title: "AWS Partnership",
     description: "Expanded our technical team to deliver enterprise-grade cloud solutions and custom software development."
   },
   {
+    id: 2,
     year: "2023",
     title: "Growth & Innovation",
     description: "Successfully delivered multiple cloud migration projects and established our cloud-native development framework for startups and enterprises."
   },
   {
+    id: 3,
     year: "2023",
     title: "Foundation",
     description: "Launched Cipher Projects with a focus on cloud excellence and modern software development, bringing together experienced AWS architects and developers."
   }
 ];
+
 
 export default function AboutPage() {
   return (
@@ -76,7 +80,9 @@ export default function AboutPage() {
               src="/about-hero.jpg"
               alt="Our team at work"
               fill
+              priority
               className="object-cover"
+              sizes="100vw"
             />
           </motion.div>
         </div>
@@ -148,7 +154,7 @@ export default function AboutPage() {
           <div className="space-y-16">
             {milestones.map((milestone, index) => (
               <motion.div
-                key={milestone.year}
+                key={milestone.id}  // Change from milestone.year to milestone.id
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}

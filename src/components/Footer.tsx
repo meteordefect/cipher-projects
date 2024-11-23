@@ -36,16 +36,16 @@ export default function Footer() {
           <div className="space-y-8">
             <div>
               <h3 className="text-sm uppercase tracking-wider mb-4 opacity-60">Contact</h3>
-              <Link href="tel:+61261761580" className="block text-xl hover:opacity-60 transition-opacity">
+              <Link href="tel:+61261761580" className="block text-normal hover:opacity-60 transition-opacity">
                 +61 2 6176 1580
               </Link>
-              <Link href="mailto:hello@cipherprojects.com" className="block text-xl hover:opacity-60 transition-opacity">
+              <Link href="mailto:hello@cipherprojects.com" className="block text-normal hover:opacity-60 transition-opacity">
                 hello@cipherprojects.com
               </Link>
             </div>
             <div>
               <h3 className="text-sm uppercase tracking-wider mb-4 opacity-60">Location</h3>
-              <p className="text-xl">
+              <p className="text-normal">
                 Mawson 2607
                 <br />
                 Canberra, Australia
@@ -63,6 +63,7 @@ export default function Footer() {
                 src="/white-logo.png"
                 alt="Cipher Projects"
                 fill
+                sizes="(max-width: 768px) 150px, 200px"
                 className="object-contain"
               />
             </div>

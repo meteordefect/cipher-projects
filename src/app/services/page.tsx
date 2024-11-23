@@ -78,6 +78,7 @@ export default function ServicesPage() {
               src="/services-hero.jpg"
               alt="Services hero image"
               fill
+              sizes="100vw"
               className="object-cover"
             />
           </motion.div>

@@ -112,7 +112,7 @@ export default function Hero() {
             src="/scrum-grey-wide.jpg"
             alt="Hero image"
             fill
-            priority
+            sizes="100vw"
             className="object-cover object-center transition-opacity duration-700"
             style={{ 
               opacity: isDark ? 0.8 : 1

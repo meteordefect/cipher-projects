@@ -83,8 +83,19 @@ jobs:
         run: |
           cdk deploy EC2Stack --require-approval never --outputs-file ec2-outputs.json
 
+      # 11. Invalidate CloudFront Cache
+      - name: Invalidate CloudFront Cache
+        run: |
+          CLOUDFRONT_ID=$(jq -r '.EC2Stack.CloudFrontDistributionId' cipher-infra/ec2-outputs.json)
+          if [ -z "$CLOUDFRONT_ID" ]; then
+            echo "CloudFront ID not found. Skipping invalidation."
+          else
+            echo "Invalidating CloudFront distribution: ${CLOUDFRONT_ID}"
+            aws cloudfront create-invalidation --distribution-id "$CLOUDFRONT_ID" --paths "/*"
+            echo "CloudFront cache invalidated successfully."
+          fi
 
-      # 11. Deploy ContactFormStack
+      # 12. Deploy ContactFormStack
       - name: Deploy ContactFormStack
         working-directory: cipher-infra
         run: |
@@ -92,3 +103,4 @@ jobs:
           npm ci
           echo "Deploying ContactFormStack..."
           cdk deploy ContactFormStack --require-approval never
+

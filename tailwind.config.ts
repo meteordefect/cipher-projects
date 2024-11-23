@@ -27,7 +27,7 @@ const config: Config = {
         'offwhite': '#f8f8f8',
       },
       cursor: {
-        'custom': 'url("/path/to/your/cursor-image.png"), auto',
+        'custom': 'url("/cursors/site-cursor.svg") 12 12, auto', // Center point offset
       },
       transform: {
         'perspective-1000': 'perspective(1000px)',

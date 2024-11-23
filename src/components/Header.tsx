@@ -154,6 +154,7 @@ export default function Header() {
                   </motion.div>
                 ))}
 
+
                 {/* Mobile Let's Talk Button */}
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
@@ -164,8 +165,20 @@ export default function Header() {
                   }}
                   className="pt-8"
                 >
-                  <ScrambleButton />
+                  <button
+                    onClick={() => {
+                      setIsMenuOpen(false) // Close the menu
+                    }}
+                    className={`py-3 px-6 text-2xl font-normal transition-colors duration-300 ${
+                      isDark ? 'bg-white text-black' : 'bg-black text-white'
+                    } hover:opacity-80`}
+                  >
+                    Let’s Talk
+                  </button>
                 </motion.div>
+
+
+             
               </nav>
             </div>
           </motion.div>

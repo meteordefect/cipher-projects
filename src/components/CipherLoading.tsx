@@ -148,6 +148,7 @@ export default function CipherLoading() {
                   src="/white-logo.png"
                   alt="Cipher Projects"
                   fill
+                  sizes="(max-width: 768px) 150px, 200px"
                   priority
                   className="object-contain"
                 />

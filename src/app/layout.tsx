@@ -4,6 +4,7 @@ import Script from 'next/script'
 import ClientProviders from '@/components/ClientProviders'
 import type { Metadata } from 'next'
 import './globals.css'
+import CustomCursor from '@/components/CustomCursor'
 
 const neueHaas = localFont({
   src: [
@@ -42,27 +43,44 @@ const neueHaas = localFont({
   display: 'swap',
 })
 
+
 export const metadata: Metadata = {
-  title: 'Cipher Projects',
-  description: 'Cipher Projects',
+  title: 'Cipher Projects', // Title shown in the browser tab and search engines
+  description: 'Cipher Projects delivers world-class software development services to clients across Europe, Asia & Australia. Web, mobile, cloud & AI expertise', // Meta description for search engines
   icons: {
-    icon: [
+    icon: { url: '/api/favicon', type: 'image/x-icon' }, // Main favicon
+    shortcut: { url: '/api/favicon', type: 'image/x-icon' }, // Shortcut icon
+  },
+  keywords: ['Cipher Projects', 'Cloud Solutions', 'Cybersecurity', 'Software Development', 'IT Outsourcing'], // SEO keywords
+  openGraph: {
+    title: 'Cipher Projects',
+    description: 'Dedicated teams delivering cloud solutions, cybersecurity, and software projects. Outsource smarter with Cipher Projects.',
+    url: 'https://cipherprojects.com', // Replace with your site's URL
+    siteName: 'Cipher Projects',
+    images: [
       {
-        url: '/favicon.ico',
-        sizes: 'any',
-      },
-      {
-        url: '/icon.png',
-        type: 'image/png',
-        sizes: '32x32',
+        url: '/og-image.jpg', // Path to your Open Graph image
+        width: 1200,
+        height: 630,
+        alt: 'Cipher Projects - Outsource smarter',
       },
     ],
-    apple: {
-      url: '/apple-touch-icon.png',
-      sizes: '180x180',
-    },
+    locale: 'en_US', // Replace with your locale
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Cipher Projects',
+    description: 'Dedicated teams delivering cloud solutions, cybersecurity, and software projects. Outsource smarter with Cipher Projects.',
+    images: ['/og-image.jpg'], // Same as Open Graph image
+  },
+  robots: {
+    index: true, // Allow indexing
+    follow: true, // Allow crawling links
   },
 }
+
+
 
 export default function RootLayout({
   children,
@@ -78,6 +96,7 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
         <ClientProviders>
+          <CustomCursor />
           <main id="main" className="relative">
             {children}
           </main>

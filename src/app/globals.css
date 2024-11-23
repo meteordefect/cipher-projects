@@ -124,3 +124,32 @@ html.lenis {
     animation-play-state: paused;
   }
 }
+
+
+@layer base {
+  /* Hide default cursor */
+  * {
+    cursor: none !important;
+  }
+
+  /* Show default cursor on mobile/touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    * {
+      cursor: auto !important;
+    }
+  }
+
+  /* Optimize performance */
+  .fixed {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+}
+
+@layer base {
+  /* Make sure links and buttons trigger hover state */
+  a, button, [role="button"], [href] {
+    cursor: none !important;
+  }
+}
