@@ -5,7 +5,14 @@ const nextConfig = {
       deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
       imageSizes: [16, 32, 48, 64, 96, 128, 256],
       formats: ['image/webp', 'image/avif'], // Modern image formats
-      domains: ['localhost'], // Add any image domains you need
+      remotePatterns: [ // Replaces "domains"
+        {
+          protocol: 'http',
+          hostname: 'localhost',
+          port: '',
+          pathname: '/**',
+        },
+      ],
       minimumCacheTTL: 60,
     },
     headers: async () => [
@@ -41,8 +48,7 @@ const nextConfig = {
       },
     ],
     poweredByHeader: false, // Remove X-Powered-By header
-    reactStrictMode: true,
-    swcMinify: true, // Use SWC for minification
+    reactStrictMode: true, // Enable React Strict Mode
   }
   
   // Enable bundle analysis if ANALYZE is true

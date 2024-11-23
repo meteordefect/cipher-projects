@@ -75,8 +75,8 @@ export const metadata: Metadata = {
     images: ['/og-image.jpg'], // Same as Open Graph image
   },
   robots: {
-    index: true, // Allow indexing
-    follow: true, // Allow crawling links
+    index: true,
+    follow: true,
   },
 }
 

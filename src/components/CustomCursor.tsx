@@ -7,7 +7,13 @@ import { useBackground } from '@/context/BackgroundContext'
 export default function CustomCursor() {
   const { isDark } = useBackground()
   const [isHoveringLink, setIsHoveringLink] = useState(false)
-  
+  const [isTouchDevice, setIsTouchDevice] = useState(false)
+
+  // Detect if the device is touch-based
+  useEffect(() => {
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
+  }, [])
+
   // Optimized spring config
   const springConfig = { 
     damping: 25, 
@@ -43,12 +49,16 @@ export default function CustomCursor() {
   }, [x, y, checkIfLink])
 
   useEffect(() => {
+    if (isTouchDevice) return
+
     window.addEventListener('mousemove', updatePosition, { passive: true })
-    
     return () => {
       window.removeEventListener('mousemove', updatePosition)
     }
-  }, [updatePosition])
+  }, [updatePosition, isTouchDevice])
+
+  // Disable rendering on touch devices
+  if (isTouchDevice) return null
 
   return (
     <motion.div
