@@ -1,70 +1,90 @@
-// src/components/contact/ContactForm.tsx
-"use client"; 
-import { useState, ChangeEvent, FormEvent } from 'react';
+'use client'
 
-interface FormData {
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import Link from 'next/link'
+import { Mail, Phone, MapPin } from 'lucide-react'
+
+interface FormState {
   name: string;
   email: string;
-  company: string;
-  role: string;
+  phone: string;
+  budget: string;
   message: string;
 }
 
-export const ContactForm = () => {
-  const [formData, setFormData] = useState<FormData>({
+export default function ContactPage() {
+  const [formData, setFormData] = useState<FormState>({
     name: '',
     email: '',
-    company: '',
-    role: '',
+    phone: '',
+    budget: '',
     message: ''
-  });
+  })
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log(formData);
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSubmitStatus('loading')
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+    try {
+      const response = await fetch('/api/contact', {  // We'll create this next
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      })
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`)
+      }
+
+      setSubmitStatus('success')
+      
+      // Clear form
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        budget: '',
+        message: ''
+      })
+
+    } catch (error) {
+      console.error('Error:', error)
+      setSubmitStatus('error')
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to send message')
+    }
+  }
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 py-16 bg-slate-50">
-      <div className="mb-16">
-        <h1 className="text-4xl md:text-5xl font-light mb-6">
-          Hello. Let's talk about what you need, and how we can help
-        </h1>
-        <p className="text-slate-600">
-          The more details you include, the easier it will be for us to get back to you.
-        </p>
-      </div>
+    // Your existing JSX stays exactly the same
+    // Just add these status indicators:
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {/* Your existing form fields stay the same */}
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="border-b border-slate-200">
-          <label className="block text-slate-700 mb-2">Your Name</label>
-          <input
-            type="text"
-            name="name"
-            placeholder="First and Last"
-            className="w-full bg-transparent py-3 focus:outline-none text-slate-800"
-            onChange={handleChange}
-            value={formData.name}
-          />
+      <button
+        type="submit"
+        disabled={submitStatus === 'loading'}
+        className={`w-full mt-8 px-8 py-4 border border-current transition-all duration-300 text-lg
+          ${submitStatus === 'loading' ? 'opacity-50 cursor-not-allowed' : 'hover:bg-black hover:text-white'}`}
+      >
+        {submitStatus === 'loading' ? 'Sending...' : 'Send Message'}
+      </button>
+
+      {submitStatus === 'success' && (
+        <div className="text-green-600 mt-4">
+          Message sent successfully!
         </div>
+      )}
 
-        {/* Other form fields remain the same but with proper TypeScript types */}
-        
-        <button
-          type="submit"
-          className="mt-8 px-8 py-3 bg-slate-800 text-white rounded-md hover:bg-slate-700 transition-colors"
-        >
-          Send Message
-        </button>
-      </form>
-    </div>
-  );
-};
+      {submitStatus === 'error' && (
+        <div className="text-red-600 mt-4">
+          {errorMessage || 'Failed to send message. Please try again.'}
+        </div>
+      )}
+    </form>
+  )
+}
