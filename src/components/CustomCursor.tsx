@@ -67,23 +67,22 @@ export default function CustomCursor() {
         WebkitTransform: 'translate3d(0,0,0)',
       }}
     >
-          {isHoveringLink ? (
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="20" 
-              height="20" 
-              viewBox="0 0 20 20"
-              style={{ transform: 'translateZ(0)' }}
-            >
-              <path 
-                fill="none" 
-                stroke="#808080"
-                strokeLinecap="round" 
-                strokeWidth="2" 
-                d="M2 2 18 18M18 2 2 18"  // Adjusted coordinates to fit 20x20 viewBox
-              />
-            </svg>
-          ) : (
+            {isHoveringLink ? (
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="20"   // Keeping the smaller size we had before
+                height="20" 
+                viewBox="0 0 24 24"
+                style={{ transform: 'translateZ(0)' }}
+              >
+                <path 
+                  fill="#FFFFFF"        // White fill
+                  stroke="#404040"      // Light gray stroke, using our previous color
+                  strokeWidth="2"       
+                  d="m16.24 12 3.18-3.18a1.5 1.5 0 0 0 0-2.12L17.3 4.58a1.5 1.5 0 0 0-2.12 0L12 7.76 8.82 4.58a1.5 1.5 0 0 0-2.12 0L4.58 6.7a1.5 1.5 0 0 0 0 2.12L7.76 12l-3.18 3.18a1.5 1.5 0 0 0 0 2.12l2.12 2.12a1.5 1.5 0 0 0 2.12 0L12 16.24l3.18 3.18a1.5 1.5 0 0 0 2.12 0l2.12-2.12a1.5 1.5 0 0 0 0-2.12L16.24 12Z"
+                />
+              </svg>
+            ) : (
         <svg 
           width="24" 
           height="24" 
@@ -96,7 +95,7 @@ export default function CustomCursor() {
             r="6" 
             fill="#ffffff" 
             stroke="#404040" 
-            strokeWidth="2.5"
+            strokeWidth="1.5"
           />
         </svg>
       )}
