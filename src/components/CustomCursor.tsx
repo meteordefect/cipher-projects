@@ -9,12 +9,10 @@ export default function CustomCursor() {
   const [isHoveringLink, setIsHoveringLink] = useState(false)
   const [isTouchDevice, setIsTouchDevice] = useState(false)
 
-  // Detect if the device is touch-based
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
   }, [])
 
-  // Optimized spring config
   const springConfig = { 
     damping: 25, 
     stiffness: 250, 
@@ -25,7 +23,6 @@ export default function CustomCursor() {
   const x = useSpring(0, springConfig)
   const y = useSpring(0, springConfig)
 
-  // Memoize the link hover check
   const checkIfLink = useCallback((element: HTMLElement) => {
     return (
       element.tagName === 'A' ||
@@ -35,18 +32,18 @@ export default function CustomCursor() {
     )
   }, [])
 
-  // Memoize position update
   const updatePosition = useCallback((e: MouseEvent) => {
-    x.set(e.clientX - 12)
-    y.set(e.clientY - 12)
+    // Adjust offset for smaller cursor size
+    const offset = isHoveringLink ? 14 : 12
+    x.set(e.clientX - offset)
+    y.set(e.clientY - offset)
 
-    // Check for link hover
     const hoveredElement = document.elementFromPoint(e.clientX, e.clientY)
     if (hoveredElement) {
       const isLink = hoveredElement instanceof HTMLElement && checkIfLink(hoveredElement)
       setIsHoveringLink(isLink)
     }
-  }, [x, y, checkIfLink])
+  }, [x, y, checkIfLink, isHoveringLink])
 
   useEffect(() => {
     if (isTouchDevice) return
@@ -57,12 +54,11 @@ export default function CustomCursor() {
     }
   }, [updatePosition, isTouchDevice])
 
-  // Disable rendering on touch devices
   if (isTouchDevice) return null
 
   return (
     <motion.div
-      className="fixed top-0 left-0 z-[100] pointer-events-none mix-blend-difference will-change-transform"
+      className="fixed top-0 left-0 z-[100] pointer-events-none will-change-transform"
       style={{ 
         x, 
         y,
@@ -71,21 +67,23 @@ export default function CustomCursor() {
         WebkitTransform: 'translate3d(0,0,0)',
       }}
     >
-      {isHoveringLink ? (
-        <svg 
-          width="24" 
-          height="24" 
-          viewBox="0 0 24 24"
-          style={{ transform: 'translateZ(0)' }}
-        >
-          <path 
-            d="m16.24 12 3.18-3.18a1.5 1.5 0 0 0 0-2.12L17.3 4.58a1.5 1.5 0 0 0-2.12 0L12 7.76 8.82 4.58a1.5 1.5 0 0 0-2.12 0L4.58 6.7a1.5 1.5 0 0 0 0 2.12L7.76 12l-3.18 3.18a1.5 1.5 0 0 0 0 2.12l2.12 2.12a1.5 1.5 0 0 0 2.12 0L12 16.24l3.18 3.18a1.5 1.5 0 0 0 2.12 0l2.12-2.12a1.5 1.5 0 0 0 0-2.12L16.24 12Z"
-            fill={isDark ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.9)'} 
-            stroke={isDark ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.9)'}
-            strokeWidth="1"
-          />
-        </svg>
-      ) : (
+          {isHoveringLink ? (
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="20" 
+              height="20" 
+              viewBox="0 0 20 20"
+              style={{ transform: 'translateZ(0)' }}
+            >
+              <path 
+                fill="none" 
+                stroke="#808080"
+                strokeLinecap="round" 
+                strokeWidth="2" 
+                d="M2 2 18 18M18 2 2 18"  // Adjusted coordinates to fit 20x20 viewBox
+              />
+            </svg>
+          ) : (
         <svg 
           width="24" 
           height="24" 
@@ -96,9 +94,9 @@ export default function CustomCursor() {
             cx="12" 
             cy="12" 
             r="6" 
-            fill={isDark ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.9)'} 
-            stroke={isDark ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.9)'}
-            strokeWidth="1.5"
+            fill="#ffffff" 
+            stroke="#404040" 
+            strokeWidth="2.5"
           />
         </svg>
       )}

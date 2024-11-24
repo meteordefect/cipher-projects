@@ -8,6 +8,16 @@ import { ArrowUpRight } from 'lucide-react'
 
 const researchPosts = [
   {
+    id: 'cdk-s3-exploit',
+    title: "How a Deleted S3 Bucket Could Hand Over Your Entire AWS Account to Attackers",
+    subtitle: "Critical security vulnerability discovered in AWS CDK",
+    date: "July 2, 2024",
+    author: "Cipher Projects Team",
+    category: "Security Alert",
+    image: "/research/cdk-s3-exploit.jpg",
+    excerpt: "A critical security vulnerability in AWS Cloud Development Kit (CDK) could allow attackers to gain full administrative access to AWS accounts through deleted S3 buckets. Research shows 10% of CDK users potentially affected."
+  },
+  {
     id: 'repo-swatting',
     title: "Repo Swatting: How False Reports Can Take Down Developer Accounts",
     subtitle: "A new threat to source code platforms",
@@ -42,7 +52,7 @@ const researchPosts = [
     title: "China's Green Energy Revolution: Lessons in Long-Term Thinking",
     subtitle: "Strategic insights for business leaders",
     date: "August 11, 2024",
-    author: "Cipher Weekly Team",
+    author: "Cipher Projects Team",
     category: "Strategic Innovation",
     image: "/research/china-energy.jpg",
     excerpt: "How China's approach to green energy offers compelling lessons in long-term strategic planning that business leaders can learn from, regardless of their industry."
@@ -52,7 +62,7 @@ const researchPosts = [
     title: "Enhancing Digital Security with AWS WAF",
     subtitle: "Protecting your cloud infrastructure",
     date: "June 18, 2024",
-    author: "Cipher Weekly Team",
+    author: "Cipher Projects Team",
     category: "Security",
     image: "/research/aws-waf.jpg",
     excerpt: "An exploration of AWS Web Application Firewall capabilities and how customized configurations can enhance security for businesses."
@@ -62,7 +72,7 @@ const researchPosts = [
     title: "What is SAP and How is it Used in Business?",
     subtitle: "A comprehensive guide to enterprise solutions",
     date: "June 18, 2024",
-    author: "Cipher Weekly Team",
+    author: "Cipher Projects Team",
     category: "Enterprise Solutions",
     image: "/research/sap.jpg",
     excerpt: "A deep dive into SAP's comprehensive modules and how they help businesses streamline their processes by integrating various functions into a single system."
