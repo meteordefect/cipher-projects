@@ -10,9 +10,21 @@ export const handler = async (event: APIGatewayEvent) => {
     const body = JSON.parse(event.body || '{}');
     console.log('Parsed body:', body);
 
+    // Input validation
+    if (!body.email || !body.message) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ error: 'Email and message are required' }),
+      };
+    }
+
     const params = {
       Destination: {
-        ToAddresses: ['keith.vaughan@cipherprojects.com'],
+        ToAddresses: ['keith.vaughan@cipherprojects.com'], // Your verified email
       },
       Message: {
         Body: {
@@ -20,24 +32,27 @@ export const handler = async (event: APIGatewayEvent) => {
             Data: `
 New Contact Form Submission:
 ---------------------------
-Name: ${body.name}
+Name: ${body.name || 'Not provided'}
 Email: ${body.email}
 Phone: ${body.phone || 'Not provided'}
 Budget: ${body.budget || 'Not provided'}
 Message: ${body.message}
+
+Submitted at: ${new Date().toISOString()}
 `,
           },
         },
-        Subject: { Data: 'New Contact Form Submission' },
+        Subject: { 
+          Data: 'New Contact Form Submission - Cipher Projects' 
+        },
       },
-      Source: 'keith.vaughan@cipherprojects.com',
+      Source: 'keith.vaughan@cipherprojects.com', // Your verified email
     };
 
-    // Actually send the email
     try {
       const command = new SendEmailCommand(params);
-      await ses.send(command);
-      console.log('Email sent successfully');
+      const result = await ses.send(command);
+      console.log('Email sent successfully:', result);
     } catch (sesError) {
       console.error('SES Error:', sesError);
       throw new Error('Failed to send email');
@@ -49,7 +64,10 @@ Message: ${body.message}
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ message: 'Email sent successfully' }),
+      body: JSON.stringify({ 
+        message: 'Email sent successfully',
+        success: true 
+      }),
     };
     
   } catch (error) {
@@ -60,7 +78,27 @@ Message: ${body.message}
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ error: 'Failed to process request' }),
+      body: JSON.stringify({ 
+        error: 'Failed to process request',
+        success: false,
+        details: error instanceof Error ? error.message : 'Unknown error'
+      }),
+    };
+  }
+};
+
+// Handle CORS preflight requests
+export const preHandler = async (event: APIGatewayEvent) => {
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token',
+        'Access-Control-Allow-Methods': 'OPTIONS,POST',
+        'Access-Control-Max-Age': '3600',
+      },
+      body: '',
     };
   }
 };
