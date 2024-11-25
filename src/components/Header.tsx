@@ -57,8 +57,9 @@ export default function Header() {
               <div className="relative w-40 h-14">
                 <img 
                   src={isDark ? "/white-logo.png" : "/black-logo.png"} 
-                  alt="Cipher" 
+                  alt="Cipher Projects" 
                   className="h-14 w-auto object-contain transition-opacity duration-700"
+                  loading="eager"
                 />
               </div>
             </Link>
