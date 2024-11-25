@@ -144,6 +144,13 @@ export class EC2Stack extends cdk.Stack {
       description: 'CloudFront Distribution URL',
     });
 
+    // Add explicit output for CloudFront Distribution ID
+    new cdk.CfnOutput(this, 'CloudFrontDistributionId', {
+      value: distribution.distributionId,
+      description: 'CloudFront Distribution ID',
+      exportName: 'CloudFrontDistributionId', // This makes it easily retrievable
+    });
+
     new cdk.CfnOutput(this, 'EC2PublicDNS', {
       value: instance.instancePublicDnsName,
       description: 'EC2 Public DNS (backup access)',
