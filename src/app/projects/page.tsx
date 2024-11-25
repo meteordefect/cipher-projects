@@ -186,14 +186,13 @@ const projects: DetailedProject[] = [
     results: [
       "Achieved 99.99% uptime for validator nodes",
       "Implemented real-time security monitoring and automated responses",
-      "Reduced infrastructure costs by 40% through optimized resource allocation",
-      "Successfully processed over 1M daily transactions"
+      "Utilize sentry node architecture for DDoS mitigation."
     ],
     technologies: [
       "AWS Network Firewall", "EC2 Auto Scaling", "VPC Security Groups",
-      "AWS CloudWatch", "AWS Systems Manager", "Terraform", "Docker", 
+      "AWS CloudWatch", "Terraform", "Docker", 
       "Github", "AWS KMS", "AWS Secrets Manager",
-      "AWS WAF", "AWS Shield", "Python"
+      "API Gateway", "Oracles", "Cosmos", "Python"
     ],
     year: "2023",
     client: "Critical Staking"
