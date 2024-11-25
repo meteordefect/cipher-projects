@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Cipher Projects',
     description: 'Expertly crafted cloud solutions, cybersecurity, and software projects tailored to your needs. Build smarter with Cipher Projects.',
-    images: ['/og-image.jpg'], // Same as Open Graph image
+    images: ['https://www.cipherprojects.com/og-image.jpg'], // Fully-qualified URL
   },
   robots: {
     index: true,
