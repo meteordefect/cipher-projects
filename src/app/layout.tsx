@@ -54,12 +54,12 @@ export const metadata: Metadata = {
   keywords: ['Cipher Projects', 'Cloud Solutions', 'Cybersecurity', 'Software Development', 'IT Outsourcing'], // SEO keywords
   openGraph: {
     title: 'Cipher Projects',
-    description: 'Dedicated teams delivering cloud solutions, cybersecurity, and software projects. Outsource smarter with Cipher Projects.',
+    description: 'Expertly crafted cloud solutions, cybersecurity, and software projects tailored to your needs. Build smarter with Cipher Projects.',
     url: 'https://cipherprojects.com', // Replace with your site's URL
     siteName: 'Cipher Projects',
     images: [
       {
-        url: '/og-image.jpg', // Path to your Open Graph image
+        url: 'https://www.cipherprojects.com/og-image.jpg', // Path to your Open Graph image
         width: 1200,
         height: 630,
         alt: 'Cipher Projects - Outsource smarter',
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Cipher Projects',
-    description: 'Dedicated teams delivering cloud solutions, cybersecurity, and software projects. Outsource smarter with Cipher Projects.',
+    description: 'Expertly crafted cloud solutions, cybersecurity, and software projects tailored to your needs. Build smarter with Cipher Projects.',
     images: ['/og-image.jpg'], // Same as Open Graph image
   },
   robots: {
