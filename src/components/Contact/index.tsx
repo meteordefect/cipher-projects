@@ -1,9 +1,14 @@
 'use client'
 
+// Test: 
+//      curl -X POST -H "Content-Type: application/json" \
+//      -d '{"name": "Test", "email": "test@example.com", "message": "Hello"}' \
+//      https://mkz66v3npa.execute-api.ap-southeast-2.amazonaws.com/prod/contact
+
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Mail, Phone, MapPin } from 'lucide-react'
-import { useState } from 'react'
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -13,11 +18,44 @@ export default function ContactPage() {
     budget: '',
     message: ''
   })
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission
-    console.log(formData)
+    setSubmitStatus('loading')
+    console.log('Form submitted with data:', formData)
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      })
+
+      const data = await response.json()
+      console.log('Response:', data)
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message')
+      }
+
+      setSubmitStatus('success')
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        budget: '',
+        message: ''
+      })
+
+    } catch (error) {
+      console.error('Error:', error)
+      setSubmitStatus('error')
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to send message')
+    }
   }
 
   return (
@@ -82,6 +120,7 @@ export default function ContactPage() {
                   placeholder="First and Last Name"
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  required
                 />
               </div>
 
@@ -93,6 +132,7 @@ export default function ContactPage() {
                   placeholder="name@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  required
                 />
               </div>
 
@@ -129,15 +169,42 @@ export default function ContactPage() {
                   placeholder="Tell us about your project"
                   value={formData.message}
                   onChange={(e) => setFormData({...formData, message: e.target.value})}
+                  required
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full mt-8 px-8 py-4 border border-current hover:bg-black hover:text-white transition-all duration-300 text-lg"
+                disabled={submitStatus === 'loading'}
+                className={`w-full mt-8 px-8 py-4 border border-current 
+                  ${submitStatus === 'loading' 
+                    ? 'opacity-50 cursor-not-allowed' 
+                    : 'hover:bg-black hover:text-white transition-all duration-300'} 
+                  text-lg`}
               >
-                Send Message
+                {submitStatus === 'loading' ? 'Sending...' : 'Send Message'}
               </button>
+
+              {/* Status Messages */}
+              {submitStatus === 'success' && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-green-600 mt-4 p-4 bg-green-50 rounded-md"
+                >
+                  Message sent successfully! We'll get back to you soon.
+                </motion.div>
+              )}
+
+              {submitStatus === 'error' && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-red-600 mt-4 p-4 bg-red-50 rounded-md"
+                >
+                  {errorMessage || 'Failed to send message. Please try again.'}
+                </motion.div>
+              )}
             </form>
           </div>
         </div>
