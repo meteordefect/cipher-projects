@@ -96,7 +96,7 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
         <ClientProviders>
-          <CustomCursor />
+          {/* <CustomCursor /> */} {/* Commented out or remove this line */}
           <main id="main" className="relative">
             {children}
           </main>
