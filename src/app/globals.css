@@ -129,13 +129,13 @@ html.lenis {
 @layer base {
   /* Hide default cursor */
   * {
-    cursor: none !important;
+    cursor: auto !important;
   }
 
   /* Show default cursor on mobile/touch devices */
   @media (hover: none) and (pointer: coarse) {
     * {
-      cursor: auto !important;
+      cursor: pointer !important;
     }
   }
 
@@ -150,6 +150,6 @@ html.lenis {
 @layer base {
   /* Make sure links and buttons trigger hover state */
   a, button, [role="button"], [href] {
-    cursor: none !important;
+    cursor: pointer !important;
   }
 }
