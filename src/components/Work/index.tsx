@@ -18,20 +18,6 @@ interface Project {
 
 const projects: Project[] = [
   {
-    title: "Blockchain",
-    subtitle: "Industry grade infrastructure for proof-of-stake",
-    image: "/work/pos.jpg",
-    category: "Blockchain Infrastructure",  // Updated from "Migrating"
-    accentColor: "#2F4F2F",
-    link: "/projects",
-    technologies: [
-      "AWS Network Firewall", 
-      "EC2 Auto Scaling",
-      "Terraform",
-      "VPC Security Groups"
-    ]
-  },
-  {
     title: "Cloud Migration",
     subtitle: "Enhancing security and reducing costs",
     image: "/work/cloud-migrate.jpg",
@@ -39,12 +25,28 @@ const projects: Project[] = [
     accentColor: "#1E3A8A",
     link: "/projects",
     technologies: [
-      "AWS Migration Hub",
-      "Terraform", 
-      "Docker", 
-      "ECS",
-      "AWS WAF",
-      "CloudWatch"
+      "AWS EC2",
+      "CloudWatch",
+      "Grafana",
+      "AWS Systems Manager",
+      "Docker",
+      "ECS"
+    ]
+  },
+  {
+    title: "Blockchain",
+    subtitle: "Industry grade infrastructure for proof-of-stake",
+    image: "/work/pos.jpg",
+    category: "Blockchain Infrastructure",
+    accentColor: "#2F4F2F",
+    link: "/projects",
+    technologies: [
+      "AWS Network Firewall",
+      "EC2 Auto Scaling",
+      "Terraform",
+      "Docker",
+      "Kubernetes",
+      "AWS CloudWatch"
     ]
   },
   {
@@ -55,30 +57,31 @@ const projects: Project[] = [
     accentColor: "#3B2F4F",
     link: "/projects",
     technologies: [
-      "AWS CDK", 
-      "Open-WebUI", 
-      "Ollama", 
-      "Docker",
+      "AWS CDK",
       "ECS Fargate",
-      "Lambda"
+      "Lambda",
+      "Open-WebUI",
+      "Ollama",
+      "Docker"
     ]
   },
   {
     title: "AWS Partnership",
     subtitle: "Software verification to become an AWS Partner",
     image: "/work/ftr.jpg",
-    category: "AWS Consulting",  // Updated from "Enterprise Development"
+    category: "AWS Consulting",
     accentColor: "#2F4F4F",
     link: "/projects",
     technologies: [
-      "AWS Well-Architected",
-      "AWS Control Tower", 
-      "CloudTrail", 
+      "AWS Control Tower",
+      "AWS Organizations",
+      "AWS Config",
       "AWS SSO",
-      "AWS Config"
+      "AWS GuardDuty",
+      "AWS CloudWatch"
     ]
   }
-]
+];
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
   const cardRef = useRef<HTMLDivElement>(null)
@@ -130,7 +133,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         rotateY: rotateYSpring,
         scale: scaleSpring,
       }}
-      className="relativebg-[#f8f8f8] rounded-sm overflow-hidden shadow-xl"
+      className="relative bg-[#f8f8f8] rounded-sm overflow-hidden shadow-xl"
     >
       <motion.div 
         className="aspect-[16/10] relative"
@@ -141,6 +144,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           src={project.image}
           alt={project.title}
           fill
+          loading={index === 0 ? "eager" : "lazy"}
           sizes="(max-width: 768px) 100vw, 50vw"
           className="object-cover"
         />
@@ -205,14 +209,8 @@ function MagneticButton({ children }: { children: React.ReactNode }) {
   const x = useMotionValue(0)
   const y = useMotionValue(0)
 
-  const mouseXSpring = useSpring(x, {
-    stiffness: 150,
-    damping: 15
-  })
-  const mouseYSpring = useSpring(y, {
-    stiffness: 150,
-    damping: 15
-  })
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15 })
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15 })
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!buttonRef.current) return
@@ -261,12 +259,9 @@ export default function SelectedWork() {
 
   return (
     <section className="py-32">
-      {/* Top Divider Line */}
       <div className="h-[1px] bg-current mb-32" />
 
-      {/* Header Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-32">
-        {/* Left column - Title */}
         <motion.h2 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -277,7 +272,6 @@ export default function SelectedWork() {
           Selected Projects
         </motion.h2>
 
-        {/* Right column - Description */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -289,7 +283,6 @@ export default function SelectedWork() {
         </motion.p>
       </div>
 
-      {/* Projects Grid */}
       <motion.div 
         ref={containerRef}
         className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-32"
@@ -305,7 +298,6 @@ export default function SelectedWork() {
         ))}
       </motion.div>
 
-      {/* Magnetic CTA Button */}
       <div className="text-center">
         <MagneticButton>
           <Link 

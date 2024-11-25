@@ -13,10 +13,7 @@ interface DetailedProject {
   challenge: string;
   solution: string;
   results: string[];
-  technologies: {
-    category: string;
-    items: string[];
-  }[];
+  technologies: string[];
   year: string;
   client: string;
 }
@@ -43,7 +40,6 @@ function Project({ project }: { project: DetailedProject }) {
       {/* Project Details */}
       <div className="space-y-8">
         <div>
-          {/* Apply accentColor to the category */}
           <span 
             className="text-sm font-normal opacity-60"
             style={{ color: project.accentColor }}
@@ -52,8 +48,6 @@ function Project({ project }: { project: DetailedProject }) {
           </span>
           <h2 className="text-4xl font-normal mt-2">{project.title}</h2>
           <p className="text-xl opacity-80 mt-4">{project.subtitle}</p>
-          
-          {/* Display the description */}
           <p className="mt-4 opacity-80">{project.description}</p>
         </div>
 
@@ -78,21 +72,17 @@ function Project({ project }: { project: DetailedProject }) {
 
         {/* Technologies */}
         <div className="space-y-4">
-          {project.technologies.map((tech, techIndex) => (
-            <div key={techIndex}>
-              <h4 className="text-sm font-normal opacity-60 mb-2">{tech.category}</h4>
-              <div className="flex flex-wrap gap-2">
-                {tech.items.map((item, itemIndex) => (
-                  <span 
-                    key={itemIndex}
-                    className="px-3 py-1 border border-current/20 rounded-sm text-sm opacity-60"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
+          <h3 className="text-xl font-normal">Technologies</h3>
+          <div className="flex flex-wrap gap-2">
+            {project.technologies.map((tech, index) => (
+              <span 
+                key={index}
+                className="px-3 py-1 border border-current/20 rounded-sm text-sm opacity-60"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
         </div>
 
         {/* Project Info */}
@@ -118,48 +108,23 @@ const projects: DetailedProject[] = [
     image: "/work/cloud-migrate.jpg",
     category: "Cloud Infrastructure & Security",
     accentColor: "#1E3A8A",
-    description: "Executed a comprehensive cloud migration strategy focusing on security enhancement and cost optimization.",
-    challenge: "The client's legacy infrastructure was becoming increasingly costly to maintain and posed security risks. They needed a seamless migration to AWS while ensuring zero downtime and maintaining strict security standards.",
-    solution: "Developed a phased migration approach using AWS Migration Hub, implementing infrastructure as code with Terraform, and containerizing applications for better scalability. Enhanced security measures were implemented through AWS WAF and comprehensive monitoring.",
+    description: "Helped manage a comprehensive cloud migration strategy focusing on security enhancement and cost optimization.",
+    challenge: "The client's legacy VMWare infrastructure was becoming increasingly costly to maintain. They needed a seamless migration to AWS while ensuring zero downtime and maintaining strict security standards.",
+    solution: "Helped develop a migration approach using AWS EC2, implementing infrastructure as code with CDK and Terraform, and containerizing applications for better scalability. Enhanced security measures were implemented through AWS WAF and comprehensive monitoring.",
     results: [
       "Completed migration with zero downtime",
-      "Reduced monthly infrastructure costs by 35%",
-      "Improved system response time by 60%",
-      "Enhanced security posture with real-time threat detection",
+      "Reduced monthly infrastructure costs by 41%",
+      "Improved system startup times by 15%",
+      "Enhanced security posture with real-time Grafana monitoring",
       "Automated 90% of deployment processes"
     ],
     technologies: [
-      {
-        category: "AWS Migration & Management",
-        items: [
-          "AWS Migration Hub",
-          "CloudWatch",
-          "AWS Systems Manager",
-          "AWS Organizations",
-          "AWS Control Tower"
-        ]
-      },
-      {
-        category: "Container & Orchestration",
-        items: [
-          "Docker",
-          "ECS",
-          "ECR",
-          "AWS App Mesh"
-        ]
-      },
-      {
-        category: "Security & Compliance",
-        items: [
-          "AWS WAF",
-          "AWS Shield",
-          "Security Hub",
-          "IAM"
-        ]
-      }
+      "AWS EC2", "CloudWatch", "Grafana", "AWS Systems Manager", "AWS Lambda",
+      "Docker", "ECS", "ECR", "AWS App Mesh", "AWS WAF",
+      "Security Hub", "IAM"
     ],
-    year: "2023",
-    client: "Enterprise Solutions Corp"
+    year: "2024",
+    client: "Fifth Domain"
   },
   {
     title: "AWS Infrastructure",
@@ -171,44 +136,19 @@ const projects: DetailedProject[] = [
     challenge: "The client required a private, secure environment for AI model deployment and management, with strict data privacy requirements and the need for scalable infrastructure.",
     solution: "Implemented a containerized architecture using AWS CDK and ECS Fargate, integrating Open-WebUI with Ollama for model management. Used Lambda for serverless processing and implemented comprehensive security measures.",
     results: [
-      "Achieved sub-second response times for AI queries",
+      "Achieved high-speed response times for AI queries",
       "Maintained 100% data privacy compliance",
       "Reduced operational costs by 45%",
       "Supported concurrent usage by 500+ users",
       "Automated deployment and scaling processes"
     ],
     technologies: [
-      {
-        category: "AWS Infrastructure",
-        items: [
-          "AWS CDK",
-          "ECS Fargate",
-          "Lambda",
-          "API Gateway",
-          "VPC"
-        ]
-      },
-      {
-        category: "AI & Container Technologies",
-        items: [
-          "Open-WebUI",
-          "Ollama",
-          "Docker",
-          "ECR"
-        ]
-      },
-      {
-        category: "Security & Monitoring",
-        items: [
-          "AWS CloudWatch",
-          "AWS X-Ray",
-          "IAM",
-          "AWS Secrets Manager"
-        ]
-      }
+      "AWS CDK", "ECS Fargate", "Lambda", "API Gateway", "VPC", 
+      "Open-WebUI", "Ollama", "Docker", "ECR", "AWS CloudWatch", 
+      "IAM", "AWS Secrets Manager"
     ],
     year: "2024",
-    client: "AI Innovation Labs"
+    client: "Redacted"
   },
   {
     title: "AWS Partnership",
@@ -227,36 +167,12 @@ const projects: DetailedProject[] = [
       "Enhanced overall security posture"
     ],
     technologies: [
-      {
-        category: "AWS Governance",
-        items: [
-          "AWS Control Tower",
-          "AWS Organizations",
-          "AWS Config",
-          "AWS SSO"
-        ]
-      },
-      {
-        category: "Security & Compliance",
-        items: [
-          "AWS GuardDuty",
-          "AWS Security Hub",
-          "AWS CloudTrail",
-          "AWS IAM"
-        ]
-      },
-      {
-        category: "Monitoring & Logging",
-        items: [
-          "AWS CloudWatch",
-          "AWS X-Ray",
-          "Amazon OpenSearch",
-          "AWS Systems Manager"
-        ]
-      }
+      "AWS Control Tower", "AWS Organizations", "AWS Config", "AWS SSO",
+      "AWS GuardDuty", "AWS Security Hub", "AWS CloudTrail", "AWS IAM",
+      "AWS CloudWatch", "Amazon OpenSearch", "AWS Systems Manager"
     ],
     year: "2023",
-    client: "Tech Solutions Group"
+    client: "Fifth Domain"
   },
   {
     title: "Blockchain",
@@ -274,49 +190,21 @@ const projects: DetailedProject[] = [
       "Successfully processed over 1M daily transactions"
     ],
     technologies: [
-      {
-        category: "AWS Infrastructure",
-        items: [
-          "AWS Network Firewall",
-          "EC2 Auto Scaling",
-          "VPC Security Groups",
-          "AWS CloudWatch",
-          "AWS Systems Manager"
-        ]
-      },
-      {
-        category: "DevOps & Automation",
-        items: [
-          "Terraform",
-          "Docker",
-          "Kubernetes",
-          "Jenkins"
-        ]
-      },
-      {
-        category: "Security",
-        items: [
-          "AWS KMS",
-          "AWS Secrets Manager",
-          "AWS WAF",
-          "AWS Shield"
-        ]
-      }
+      "AWS Network Firewall", "EC2 Auto Scaling", "VPC Security Groups",
+      "AWS CloudWatch", "AWS Systems Manager", "Terraform", "Docker", 
+      "Github", "AWS KMS", "AWS Secrets Manager",
+      "AWS WAF", "AWS Shield", "Python"
     ],
     year: "2023",
-    client: "DeFi Solutions Ltd"
+    client: "Critical Staking"
   }
 ];
-
 
 export default function ProjectsPage() {
   return (
     <main className="min-h-screen">
-      <section className="pt-48 pb-32"> {/* Updated padding to match */}
-        <div className="container"> 
-          {/* Remove the divider line */}
-          
-          {/* Title Section - Updated styling */}
+      <section className="pt-48 pb-32">
+        <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
@@ -338,8 +226,7 @@ export default function ProjectsPage() {
             </motion.p>
           </div>
 
-          {/* Projects List */}
-          <div className="space-y-32 mt-32"> {/* Added top margin to match */}
+          <div className="space-y-32 mt-32">
             {projects.map((project) => (
               <Project key={project.title} project={project} />
             ))}
