@@ -3,21 +3,31 @@
   <url>
     <loc>https://cipherprojects.com</loc>
     <lastmod>2024-11-11</lastmod>
+    <priority>1.0</priority>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://cipherprojects.com/about</loc>
-    <lastmod>2024-11-11/lastmod>
+    <lastmod>2024-11-11</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://cipherprojects.com/services</loc>
     <lastmod>2024-11-09</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://cipherprojects.com/projects</loc>
     <lastmod>2024-11-11</lastmod>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://cipherprojects.com/contact</loc>
     <lastmod>2024-11-11</lastmod>
+    <priority>0.5</priority>
+    <changefreq>monthly</changefreq>
   </url>
 </urlset>
