@@ -7,7 +7,7 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 const letters = [
-  '零', '壱', '弐', '参', '肆', '伍', '陸', '質', '捌', '玖',  
+  '零', '壱', '弐', '参', '肆', '伍', '陸', '質', '捌', '玖',
   'ｱ', 'ｲ', 'ｳ', 'ｴ', 'ｵ', 'ｶ', 'ｷ', 'ｸ', 'ｹ', 'ｺ',
   '⟨', '⟩', '⟪', '⟫', '⌈', '⌉', '⌊', '⌋', '∮', '∯',
   '†', '‡', '§', '¶', '©', '®', '™', '⁂', '⁕', '⁜',
@@ -36,7 +36,7 @@ function BackgroundMatrix() {
 
     const initialSymbols: MatrixSymbol[] = []
     const symbolCount = Math.floor((window.innerWidth * window.innerHeight) / 10000) * 2
-    
+
     for (let i = 0; i < symbolCount; i++) {
       initialSymbols.push({
         id: i,
@@ -50,7 +50,7 @@ function BackgroundMatrix() {
 
     const animate = (time: number) => {
       if (previousTimeRef.current !== undefined) {
-        setSymbols(prevSymbols => 
+        setSymbols(prevSymbols =>
           prevSymbols.map(symbol => ({
             ...symbol,
             char: Math.random() < 0.15 ? letters[Math.floor(Math.random() * letters.length)] : symbol.char,
@@ -98,11 +98,11 @@ export default function CipherLoading() {
     const [isVisible, setIsVisible] = useState(true)
     const { setIsDark, setIsInitialLoading } = useBackground()
     const pathname = usePathname()
-  
+
     useEffect(() => {
       // Force dark mode during loading
       setIsDark(true)
-      
+
       const timeout = setTimeout(() => {
         setIsVisible(false)
         setIsInitialLoading(false)
@@ -113,7 +113,7 @@ export default function CipherLoading() {
           setIsDark(false)
         }
       }, 1500)
-  
+
       return () => {
         clearTimeout(timeout)
         // Ensure we maintain the correct state on cleanup
@@ -122,7 +122,7 @@ export default function CipherLoading() {
         }
       }
     }, [setIsDark, setIsInitialLoading, pathname])
-    
+
     return (
       <AnimatePresence>
         {isVisible && (
@@ -133,8 +133,8 @@ export default function CipherLoading() {
             className="fixed inset-0 z-[100] flex items-center justify-center bg-black"
           >
             <BackgroundMatrix />
-            <motion.div 
-              className="relative z-10 w-64 md:w-96"
+            <motion.div
+              className="relative z-10 w-48 md:w-72"
               initial={{ scale: 1.2, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{
@@ -148,7 +148,7 @@ export default function CipherLoading() {
                   src="/white-logo.png"
                   alt="Cipher Projects"
                   fill
-                  sizes="(max-width: 768px) 150px, 200px"
+                  sizes="(max-width: 768px) 192px, 288px"
                   priority
                   className="object-contain"
                 />
