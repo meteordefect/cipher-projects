@@ -68,13 +68,14 @@ jobs:
           cdk --version
           echo "Deploying S3 Stack..."
           cdk deploy cipher-s3-stack --require-approval never --outputs-file s3-outputs.json
+          cat s3-outputs.json
 
 
       # 9. Upload Deployment Package to S3
       - name: Upload Deployment Package
         run: |
-          BUCKET_NAME=$(jq -r '.cipher-s3-stack.DeploymentBucketName' cipher-infra/s3-outputs.json)
-          echo "Uploading deployment package to bucket: ${BUCKET_NAME}"
+          BUCKET_NAME=$(jq -r '."cipher-s3-stack".DeploymentBucketName' cipher-infra/s3-outputs.json)
+          echo "Using bucket name: ${BUCKET_NAME}"
           aws s3 cp deploy.zip "s3://${BUCKET_NAME}/deploy.zip"
 
       # 10. Deploy EC2 Stack
