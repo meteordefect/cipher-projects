@@ -67,13 +67,13 @@ jobs:
           echo "Verifying CDK installation..."
           cdk --version
           echo "Deploying S3 Stack..."
-          cdk deploy S3Stack --require-approval never --outputs-file s3-outputs.json
+          cdk deploy cipher-s3-stack --require-approval never --outputs-file s3-outputs.json
 
 
       # 9. Upload Deployment Package to S3
       - name: Upload Deployment Package
         run: |
-          BUCKET_NAME=$(jq -r '.S3Stack.DeploymentBucketName' cipher-infra/s3-outputs.json)
+          BUCKET_NAME=$(jq -r '.cipher-s3-stack.DeploymentBucketName' cipher-infra/s3-outputs.json)
           echo "Uploading deployment package to bucket: ${BUCKET_NAME}"
           aws s3 cp deploy.zip "s3://${BUCKET_NAME}/deploy.zip"
 
@@ -81,14 +81,14 @@ jobs:
       - name: Deploy EC2 Stack
         working-directory: cipher-infra
         run: |
-          cdk deploy EC2Stack --require-approval never --outputs-file ec2-outputs.json
+          cdk deploy cipher-ec2-stack --require-approval never --outputs-file ec2-outputs.json
 
 # 11. Invalidate CloudFront Cache
       - name: Invalidate CloudFront Cache
         run: |
           echo "Checking EC2Stack outputs..."
           cat cipher-infra/ec2-outputs.json
-          CLOUDFRONT_ID=$(jq -r '.EC2Stack.CloudFrontDistributionId' cipher-infra/ec2-outputs.json)
+          CLOUDFRONT_ID=$(jq -r '.cipher-ec2-stack.CloudFrontDistributionId' cipher-infra/ec2-outputs.json)
           if [ -n "$CLOUDFRONT_ID" ] && [ "$CLOUDFRONT_ID" != "null" ]; then
             echo "Invalidating CloudFront distribution: ${CLOUDFRONT_ID}"
             aws cloudfront create-invalidation --distribution-id "$CLOUDFRONT_ID" --paths "/*"
@@ -107,5 +107,5 @@ jobs:
           echo "Installing dependencies for ContactFormStack..."
           npm ci
           echo "Deploying ContactFormStack..."
-          cdk deploy ContactFormStack --require-approval never
+          cdk deploy cipher-contact-form-stack --require-approval never
 
