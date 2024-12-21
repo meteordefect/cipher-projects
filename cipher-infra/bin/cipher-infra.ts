@@ -6,7 +6,7 @@ import { ContactFormStack } from '../lib/contact-form-stack';
 const app = new cdk.App();
 
 // Create the S3 Stack
-const s3Stack = new S3Stack(app, 'S3Stack', {
+const s3Stack = new S3Stack(app, 'cipher-s3-stack', {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION || 'ap-southeast-2',
@@ -14,7 +14,7 @@ const s3Stack = new S3Stack(app, 'S3Stack', {
 });
 
 // Create the EC2 Stack and pass the deployment bucket from the S3 Stack
-new EC2Stack(app, 'EC2Stack', {
+new EC2Stack(app, 'cipher-ec2-stack', {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION || 'ap-southeast-2',
@@ -23,7 +23,7 @@ new EC2Stack(app, 'EC2Stack', {
 });
 
 // Add the new Contact Form Stack
-new ContactFormStack(app, 'ContactFormStack', {
+new ContactFormStack(app, 'cipher-contact-form-stack', {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION || 'ap-southeast-2',
