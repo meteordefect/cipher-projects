@@ -12,10 +12,9 @@ jobs:
       id-token: write
 
     steps:
-      # 1. Checkout Code
+      # 1. Initial Setup
       - uses: actions/checkout@v3
 
-      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -25,30 +24,11 @@ jobs:
       - name: Install CDK CLI
         run: npm install -g aws-cdk
 
-      # 3. Install Dependencies for Next.js
-      - name: Install Dependencies for Next.js
+      # 2. Install Dependencies
+      - name: Install Next.js Dependencies
         run: npm ci
 
-      # 4. Build Next.js Application
-      - name: Build Next.js Application
-        run: npm run build
-
-      # 5. Package Deployment Files
-      - name: Package Deployment Files
-        run: |
-          echo "Creating deployment package..."
-          zip -r deploy.zip .next package.json package-lock.json public node_modules
-          echo "Package created successfully"
-
-      # 6. Verify Deployment Package
-      - name: Verify Deployment Package
-        run: |
-          if [ ! -f deploy.zip ]; then
-            echo "Error: deploy.zip not found"
-            exit 1
-          fi
-
-      # 7. Configure AWS Credentials
+      # 3. Configure AWS
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -56,59 +36,79 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-southeast-2
 
-      # 8. Deploy S3 Stack
-      - name: Deploy S3 Stack
+      # 4. Deploy Infrastructure
+      - name: Setup CDK Project
         working-directory: cipher-infra
         run: |
-          echo "Installing dependencies for CDK..."
           npm ci
           npm install --save-dev @types/node ts-node
           npm install aws-cdk-lib
-          echo "Verifying CDK installation..."
+          echo "CDK Version:"
           cdk --version
+
+      - name: Deploy S3 Stack
+        working-directory: cipher-infra
+        run: |
           echo "Deploying S3 Stack..."
           cdk deploy cipher-s3-stack --require-approval never --outputs-file s3-outputs.json
           cat s3-outputs.json
 
-
-      # 9. Upload Deployment Package to S3
-      - name: Upload Deployment Package
-        run: |
-          BUCKET_NAME=$(jq -r '."cipher-s3-stack".DeploymentBucketName' cipher-infra/s3-outputs.json)
-          echo "Using bucket name: ${BUCKET_NAME}"
-          aws s3 cp deploy.zip "s3://${BUCKET_NAME}/deploy.zip"
-
-      # 10. Deploy EC2 Stack
       - name: Deploy EC2 Stack
         working-directory: cipher-infra
         run: |
+          echo "Deploying EC2 Stack..."
           cdk deploy cipher-ec2-stack --require-approval never --outputs-file ec2-outputs.json
+          cat ec2-outputs.json
 
+      - name: Deploy Contact Form Stack
+        working-directory: cipher-infra
+        run: |
+          echo "Deploying Contact Form Stack..."
+          cdk deploy cipher-contact-form-stack --require-approval never --outputs-file contact-form-outputs.json
 
+          # Set up environment variables for Next.js build
+          API_GATEWAY_URL=$(jq -r '."cipher-contact-form-stack".ApiEndpoint' contact-form-outputs.json)contact
+          API_KEY=$(jq -r '."cipher-contact-form-stack".ApiKey' contact-form-outputs.json)
 
-# 11. Invalidate CloudFront Cache
+          echo "API Gateway URL: ${API_GATEWAY_URL}"
+          echo "API Key: ${API_KEY}"
+
+          echo "API_GATEWAY_URL=${API_GATEWAY_URL}" > ../.env.production
+          echo "API_KEY=${API_KEY}" >> ../.env.production
+          cat ../.env.production
+
+      # 5. Build and Package Next.js
+      - name: Build and Package Next.js
+        run: |
+          echo "Building Next.js application..."
+          npm run build
+
+          echo "Creating deployment package..."
+          zip -r deploy.zip .next package.json package-lock.json public node_modules
+
+          echo "Verifying package..."
+          if [ ! -f deploy.zip ]; then
+            echo "Error: deploy.zip not found"
+            exit 1
+          fi
+
+      # 6. Upload to S3
+      - name: Upload to S3
+        run: |
+          BUCKET_NAME=$(jq -r '."cipher-s3-stack".DeploymentBucketName' cipher-infra/s3-outputs.json)
+          echo "Uploading package to bucket: ${BUCKET_NAME}"
+          aws s3 cp deploy.zip "s3://${BUCKET_NAME}/deploy.zip"
+
+      # 7. Invalidate CloudFront
       - name: Invalidate CloudFront Cache
         run: |
-          echo "Checking EC2Stack outputs..."
-          cat cipher-infra/ec2-outputs.json
           CLOUDFRONT_ID=$(jq -r '."cipher-ec2-stack".CloudFrontDistributionId' cipher-infra/ec2-outputs.json)
           if [ -n "$CLOUDFRONT_ID" ] && [ "$CLOUDFRONT_ID" != "null" ]; then
             echo "Invalidating CloudFront distribution: ${CLOUDFRONT_ID}"
             aws cloudfront create-invalidation --distribution-id "$CLOUDFRONT_ID" --paths "/*"
             echo "CloudFront cache invalidated successfully."
           else
-            echo "Error: CloudFront Distribution ID not found in outputs"
-            echo "Contents of ec2-outputs.json:"
+            echo "Error: CloudFront Distribution ID not found"
             cat cipher-infra/ec2-outputs.json
             exit 1
           fi
-
-      # 13. Deploy ContactFormStack
-      - name: Deploy ContactFormStack
-        working-directory: cipher-infra
-        run: |
-          echo "Installing dependencies for ContactFormStack..."
-          npm ci
-          echo "Deploying ContactFormStack..."
-          cdk deploy cipher-contact-form-stack --require-approval never
-
