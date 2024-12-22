@@ -4,9 +4,10 @@ import { APIGatewayEvent } from 'aws-lambda';
 const ses = new SESClient({ region: "ap-southeast-2" });
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://www.cipherprojects.com',
   'Access-Control-Allow-Headers': 'Content-Type,X-Api-Key',
   'Access-Control-Allow-Methods': 'OPTIONS,POST',
+  'Access-Control-Allow-Credentials': 'true',
   'Content-Type': 'application/json'
 };
 

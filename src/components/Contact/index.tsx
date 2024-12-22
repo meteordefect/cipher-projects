@@ -41,9 +41,16 @@ export default function ContactPage() {
 
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(process.env.NEXT_PUBLIC_API_KEY && {
+            'x-api-key': process.env.NEXT_PUBLIC_API_KEY
+          })
+        },
+        credentials: 'include',
         body: JSON.stringify(formData)
-      })
+      });
+
 
       const data = await response.json()
       console.log('Response:', data)

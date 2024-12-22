@@ -2,77 +2,132 @@ import * as cdk from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import * as logs from 'aws-cdk-lib/aws-logs';
-import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
+import * as ses from 'aws-cdk-lib/aws-ses';
 import * as path from 'path';
+import { Construct } from 'constructs';
 
 export class ContactFormStack extends cdk.Stack {
-  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Create Lambda function (no changes)
-    const contactFormHandler = new nodejs.NodejsFunction(this, 'ContactFormHandler', {
+    // Create the Lambda function
+    const contactFormLambda = new lambda.Function(this, 'ContactFormFunction', {
       runtime: lambda.Runtime.NODEJS_18_X,
-      entry: path.join(__dirname, '../lambda/contact-form/handler.ts'),
-      handler: 'handler',
+      handler: 'index.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/contact-form')),
+      timeout: cdk.Duration.seconds(30),
       environment: {
-        RECIPIENT_EMAIL: 'keith.vaughan@cipherprojects.com',
+        NODE_ENV: 'production',
       },
-      timeout: cdk.Duration.seconds(10),
-      memorySize: 128,
     });
 
-    // Add SES permissions (no changes)
-    contactFormHandler.addToRolePolicy(new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: [
-        'ses:SendEmail',
-        'ses:SendRawEmail'
-      ],
-      resources: ['*'],
-    }));
-
-    // Create API Gateway with API key requirement
-    const api = new apigateway.RestApi(this, 'ContactFormApi', {
-      restApiName: 'Contact Form Service',
-      defaultCorsPreflightOptions: {
-        allowOrigins: apigateway.Cors.ALL_ORIGINS,
-        allowMethods: apigateway.Cors.ALL_METHODS,
-        allowHeaders: ['Content-Type', 'x-api-key'], // Added x-api-key
-        maxAge: cdk.Duration.days(1),
-      },
-      cloudWatchRole: true,
-      deployOptions: {   
-        loggingLevel: apigateway.MethodLoggingLevel.INFO,
-        dataTraceEnabled: true
-      }
-    });
-
-    // Create API key
-    const apiKey = new apigateway.ApiKey(this, 'ContactFormApiKey');
-
-    // Create usage plan
-    const plan = new apigateway.UsagePlan(this, 'ContactFormUsagePlan', {
-      name: 'ContactFormUsagePlan',
-      apiStages: [{
-        api,
-        stage: api.deploymentStage,
-      }],
-    });
-
-    // Associate API key with usage plan
-    plan.addApiKey(apiKey);
-
-    // Add Lambda integration with API key requirement
-    const contact = api.root.addResource('contact');
-    contact.addMethod('POST', 
-      new apigateway.LambdaIntegration(contactFormHandler),
-      {
-        apiKeyRequired: true // This makes the API key required
-      }
+    // Add SES permissions to Lambda
+    contactFormLambda.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ['ses:SendEmail', 'ses:SendRawEmail'],
+        resources: ['*'], // You might want to restrict this to specific SES ARNs
+      })
     );
 
-    // Output both API URL and API key
+    // Create API Gateway
+    const api = new apigateway.RestApi(this, 'ContactFormApi', {
+      restApiName: 'Contact Form API',
+      description: 'API for handling contact form submissions',
+      defaultCorsPreflightOptions: {
+        allowOrigins: ['https://www.cipherprojects.com'],
+        allowMethods: ['POST', 'OPTIONS'],
+        allowHeaders: ['Content-Type', 'X-Api-Key'],
+        allowCredentials: true,
+        maxAge: cdk.Duration.days(1),
+      },
+    });
+
+    // Create API Key and Usage Plan
+    const apiKey = api.addApiKey('ContactFormApiKey', {
+      apiKeyName: 'contact-form-key',
+      description: 'API Key for Contact Form',
+    });
+
+    const usagePlan = api.addUsagePlan('ContactFormUsagePlan', {
+      name: 'Contact Form Usage Plan',
+      throttle: {
+        rateLimit: 10,
+        burstLimit: 5,
+      },
+      quota: {
+        limit: 1000,
+        period: apigateway.Period.MONTH,
+      },
+    });
+
+    // Associate the API key with the usage plan
+    usagePlan.addApiKey(apiKey);
+
+    // Create the API resource and method
+    const contact = api.root.addResource('contact');
+
+    // Add Lambda integration
+    const integration = new apigateway.LambdaIntegration(contactFormLambda, {
+      proxy: true,
+      integrationResponses: [{
+        statusCode: '200',
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': "'https://www.cipherprojects.com'",
+          'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Api-Key'",
+          'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,POST'",
+          'method.response.header.Access-Control-Allow-Credentials': "'true'"
+        }
+      }]
+    });
+
+    // Add POST method
+    contact.addMethod('POST', integration, {
+      apiKeyRequired: true,
+      methodResponses: [{
+        statusCode: '200',
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Credentials': true
+        }
+      }]
+    });
+
+    // Add OPTIONS method (for CORS)
+    contact.addMethod('OPTIONS', new apigateway.MockIntegration({
+      integrationResponses: [{
+        statusCode: '200',
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': "'https://www.cipherprojects.com'",
+          'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Api-Key'",
+          'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,POST'",
+          'method.response.header.Access-Control-Allow-Credentials': "'true'"
+        }
+      }],
+      passthroughBehavior: apigateway.PassthroughBehavior.NEVER,
+      requestTemplates: {
+        'application/json': '{"statusCode": 200}'
+      }
+    }), {
+      methodResponses: [{
+        statusCode: '200',
+        responseParameters: {
+          'method.response.header.Access-Control-Allow-Origin': true,
+          'method.response.header.Access-Control-Allow-Headers': true,
+          'method.response.header.Access-Control-Allow-Methods': true,
+          'method.response.header.Access-Control-Allow-Credentials': true
+        }
+      }]
+    });
+
+    // Add Usage Plan to API stage
+    usagePlan.addApiStage({
+      stage: api.deploymentStage,
+    });
+
+    // Output values
     new cdk.CfnOutput(this, 'ApiEndpoint', {
       value: api.url,
       description: 'API Gateway endpoint URL',
