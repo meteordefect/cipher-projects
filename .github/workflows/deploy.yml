@@ -75,14 +75,8 @@ jobs:
 
           echo "NEXT_PUBLIC_API_GATEWAY_URL=${API_GATEWAY_URL}" > ../.env.production
           echo "NEXT_PUBLIC_API_KEY=${API_KEY}" >> ../.env.production
-
-
-      - name: Show env file
-        run: |
           echo "Showing .env.production content:"
-          cat .env.production
-          echo "Including env file in deployment..."
-          cp .env.production .next/.env.production
+          cat ../.env.production
 
       # 5. Build and Package Next.js
       - name: Build and Package Next.js
@@ -90,14 +84,18 @@ jobs:
           echo "Building Next.js application..."
           npm run build
 
-          echo "Creating deployment package..."
-          zip -r deploy.zip .next package.json package-lock.json public node_modules
+          echo "Copying .env.production to build directory..."
+          mkdir -p .next/standalone
+          cp .env.production .next/standalone/
 
-          echo "Verifying package..."
-          if [ ! -f deploy.zip ]; then
-            echo "Error: deploy.zip not found"
-            exit 1
-          fi
+          echo "Showing contents of .env.production:"
+          cat .env.production
+
+          echo "Creating deployment package..."
+          zip -r deploy.zip .next package.json package-lock.json public node_modules .env.production
+
+          echo "Verifying package contents:"
+          unzip -l deploy.zip | grep .env
 
       # 6. Upload to S3
       - name: Upload to S3
