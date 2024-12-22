@@ -1,63 +1,65 @@
 'use client'
 
-// Test:
-//      curl -X POST -H "Content-Type: application/json" \
-//      -d '{"name": "Test", "email": "test@example.com", "message": "Hello"}' \
-//      https://mkz66v3npa.execute-api.ap-southeast-2.amazonaws.com/prod/contact
-
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Mail, Phone, MapPin } from 'lucide-react'
 
-export default function ContactPage() {
-  const [formData, setFormData] = useState({
+type FormData = {
+  name: string
+  email: string
+  phone: string
+  budget: string
+  message: string
+}
+
+type SubmitStatus = 'idle' | 'loading' | 'success' | 'error'
+
+export default function Contact() {
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     phone: '',
     budget: '',
     message: ''
   })
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('idle')
   const [errorMessage, setErrorMessage] = useState('')
 
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setSubmitStatus('loading')
-    console.log('Form submitted with data:', formData)
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_GATEWAY_URL
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY
+
+    // Check if API URL is available
+    if (!apiUrl) {
+      setSubmitStatus('error')
+      setErrorMessage('API configuration error')
+      return
+    }
 
     try {
-      // Use environment variables if available, otherwise use /api/contact
-      const endpoint = process.env.NEXT_PUBLIC_API_GATEWAY_URL || '/api/contact'
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      }
+      console.log('Submitting to:', apiUrl)
+      console.log('Using API Key:', apiKey ? 'Yes' : 'No')
 
-      // Add API key if available
-      if (process.env.NEXT_PUBLIC_API_KEY) {
-        headers['x-api-key'] = process.env.NEXT_PUBLIC_API_KEY
-      }
-
-      const response = await fetch(endpoint, {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(process.env.NEXT_PUBLIC_API_KEY && {
-            'x-api-key': process.env.NEXT_PUBLIC_API_KEY
-          })
+          ...(apiKey && { 'x-api-key': apiKey })
         },
-        credentials: 'include',
         body: JSON.stringify(formData)
-      });
+      })
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
+      }
 
       const data = await response.json()
       console.log('Response:', data)
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to send message')
-      }
 
       setSubmitStatus('success')
       setFormData({
@@ -67,7 +69,6 @@ export default function ContactPage() {
         budget: '',
         message: ''
       })
-
     } catch (error) {
       console.error('Error:', error)
       setSubmitStatus('error')
@@ -75,13 +76,21 @@ export default function ContactPage() {
     }
   }
 
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
   return (
     <main className="min-h-screen pt-48 pb-32">
       <div className="container">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-32">
-          {/* Left Column - Header & Contact Info */}
           <div>
-            {/* Hero Text */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -92,84 +101,80 @@ export default function ContactPage() {
                 Let's talk about your next project.
               </h1>
               <p className="text-xl opacity-60">
-                The more details you include, the better we can understand your needs and provide the right solution.
+                The more details you include, the better we can understand your needs.
               </p>
             </motion.div>
 
-            {/* Contact Info */}
             <div className="space-y-8">
               <h2 className="text-2xl font-normal">Get in Touch</h2>
               <div className="space-y-6">
-                <Link
-                  href="tel:+61261761580"
-                  className="flex items-center gap-4 text-lg hover:opacity-60 transition-opacity duration-300"
-                >
+                <Link href="tel:+61261761580" className="flex items-center gap-4 text-lg hover:opacity-60 transition-opacity duration-300">
                   <Phone size={24} className="opacity-60" />
                   <span>+61 2 6176 1580</span>
                 </Link>
-                <Link
-                  href="mailto:hello@cipherprojects.com"
-                  className="flex items-center gap-4 text-lg hover:opacity-60 transition-opacity duration-300"
-                >
+                <Link href="mailto:hello@cipherprojects.com" className="flex items-center gap-4 text-lg hover:opacity-60 transition-opacity duration-300">
                   <Mail size={24} className="opacity-60" />
                   <span>hello@cipherprojects.com</span>
                 </Link>
                 <div className="flex items-center gap-4 text-lg">
                   <MapPin size={24} className="opacity-60" />
-                  <span>
-                    Mawson 2607
-                    <br />
-                    Canberra, Australia
-                  </span>
+                  <span>Mawson 2607<br />Canberra, Australia</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column - Contact Form */}
           <div>
             <form onSubmit={handleSubmit} className="space-y-8">
               <div>
-                <label className="text-lg mb-2 block">Your Name</label>
+                <label htmlFor="name" className="text-lg mb-2 block">Your Name</label>
                 <input
+                  id="name"
+                  name="name"
                   type="text"
                   className="w-full bg-transparent border-b border-current py-4 focus:outline-none text-lg"
                   placeholder="First and Last Name"
                   value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  onChange={handleChange}
                   required
                 />
               </div>
 
               <div>
-                <label className="text-lg mb-2 block">Email</label>
+                <label htmlFor="email" className="text-lg mb-2 block">Email</label>
                 <input
+                  id="email"
+                  name="email"
                   type="email"
                   className="w-full bg-transparent border-b border-current py-4 focus:outline-none text-lg"
                   placeholder="name@example.com"
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  onChange={handleChange}
                   required
                 />
               </div>
 
               <div>
-                <label className="text-lg mb-2 block">Phone</label>
+                <label htmlFor="phone" className="text-lg mb-2 block">Phone</label>
                 <input
+                  id="phone"
+                  name="phone"
                   type="tel"
                   className="w-full bg-transparent border-b border-current py-4 focus:outline-none text-lg"
                   placeholder="Your phone number"
                   value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  onChange={handleChange}
                 />
               </div>
 
               <div>
-                <label className="text-lg mb-2 block">Budget</label>
+                <label htmlFor="budget" className="text-lg mb-2 block">Budget</label>
                 <select
+                  id="budget"
+                  name="budget"
                   className="w-full bg-transparent border-b border-current py-4 focus:outline-none text-lg appearance-none cursor-pointer"
                   value={formData.budget}
-                  onChange={(e) => setFormData({...formData, budget: e.target.value})}
+                  onChange={handleChange}
                 >
                   <option value="">Select a budget range</option>
                   <option value="under-25k">Under $25,000</option>
@@ -180,12 +185,14 @@ export default function ContactPage() {
               </div>
 
               <div>
-                <label className="text-lg mb-2 block">Message</label>
+                <label htmlFor="message" className="text-lg mb-2 block">Message</label>
                 <textarea
+                  id="message"
+                  name="message"
                   className="w-full bg-transparent border-b border-current py-4 focus:outline-none text-lg min-h-[120px]"
                   placeholder="Tell us about your project"
                   value={formData.message}
-                  onChange={(e) => setFormData({...formData, message: e.target.value})}
+                  onChange={handleChange}
                   required
                 />
               </div>
@@ -202,7 +209,6 @@ export default function ContactPage() {
                 {submitStatus === 'loading' ? 'Sending...' : 'Send Message'}
               </button>
 
-              {/* Status Messages */}
               {submitStatus === 'success' && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}

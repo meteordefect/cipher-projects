@@ -74,23 +74,76 @@ export class ContactFormStack extends cdk.Stack {
     // Create the contact resource
     const contact = api.root.addResource('contact');
 
-    // Add POST method with Lambda integration
+    // Add POST method with Enhanced Lambda integration
     const integration = new apigateway.LambdaIntegration(contactFormLambda, {
       proxy: true,
+      integrationResponses: [
+        {
+          statusCode: '200',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'https://www.cipherprojects.com'",
+            'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Api-Key'",
+            'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,POST'",
+            'method.response.header.Access-Control-Allow-Credentials': "'true'"
+          }
+        },
+        {
+          // Handle 4XX errors
+          selectionPattern: '4\\d{2}',
+          statusCode: '400',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'https://www.cipherprojects.com'",
+            'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Api-Key'",
+            'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,POST'",
+            'method.response.header.Access-Control-Allow-Credentials': "'true'"
+          }
+        },
+        {
+          // Handle 5XX errors
+          selectionPattern: '5\\d{2}',
+          statusCode: '500',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': "'https://www.cipherprojects.com'",
+            'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Api-Key'",
+            'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,POST'",
+            'method.response.header.Access-Control-Allow-Credentials': "'true'"
+          }
+        }
+      ]
     });
 
-    // Add POST method
+    // Add POST method with expanded method responses
     contact.addMethod('POST', integration, {
       apiKeyRequired: true,
-      methodResponses: [{
-        statusCode: '200',
-        responseParameters: {
-          'method.response.header.Access-Control-Allow-Origin': true,
-          'method.response.header.Access-Control-Allow-Headers': true,
-          'method.response.header.Access-Control-Allow-Methods': true,
-          'method.response.header.Access-Control-Allow-Credentials': true,
+      methodResponses: [
+        {
+          statusCode: '200',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+            'method.response.header.Access-Control-Allow-Headers': true,
+            'method.response.header.Access-Control-Allow-Methods': true,
+            'method.response.header.Access-Control-Allow-Credentials': true
+          }
         },
-      }],
+        {
+          statusCode: '400',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+            'method.response.header.Access-Control-Allow-Headers': true,
+            'method.response.header.Access-Control-Allow-Methods': true,
+            'method.response.header.Access-Control-Allow-Credentials': true
+          }
+        },
+        {
+          statusCode: '500',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+            'method.response.header.Access-Control-Allow-Headers': true,
+            'method.response.header.Access-Control-Allow-Methods': true,
+            'method.response.header.Access-Control-Allow-Credentials': true
+          }
+        }
+      ]
     });
 
     // Add Usage Plan to API stage
