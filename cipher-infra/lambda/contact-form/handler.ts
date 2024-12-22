@@ -1,5 +1,5 @@
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
-import { APIGatewayEvent } from 'aws-lambda';
+import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 const ses = new SESClient({ region: "ap-southeast-2" });
 
@@ -11,29 +11,29 @@ const corsHeaders = {
   'Content-Type': 'application/json'
 };
 
-export const handler = async (event: APIGatewayEvent) => {
-  // Handle OPTIONS request
+const createResponse = (statusCode: number, body: any): APIGatewayProxyResult => ({
+  statusCode,
+  headers: corsHeaders,
+  body: JSON.stringify(body)
+});
+
+export const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+  console.log('Event:', JSON.stringify(event, null, 2));
+
   if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: corsHeaders,
-      body: ''
-    };
+    return createResponse(200, {});
   }
 
-  console.log('Event received:', JSON.stringify(event, null, 2));
-
   try {
-    const body = JSON.parse(event.body || '{}');
+    if (!event.body) {
+      return createResponse(400, { error: 'Missing request body' });
+    }
+
+    const body = JSON.parse(event.body);
     console.log('Parsed body:', body);
 
-    // Input validation
     if (!body.email || !body.message) {
-      return {
-        statusCode: 400,
-        headers: corsHeaders,
-        body: JSON.stringify({ error: 'Email and message are required' }),
-      };
+      return createResponse(400, { error: 'Email and message are required' });
     }
 
     const params = {
@@ -65,32 +65,24 @@ Submitted at: ${new Date().toISOString()}
 
     try {
       const command = new SendEmailCommand(params);
-      const result = await ses.send(command);
-      console.log('Email sent successfully:', result);
+      await ses.send(command);
+      return createResponse(200, {
+        message: 'Message sent successfully',
+        success: true
+      });
     } catch (sesError) {
       console.error('SES Error:', sesError);
-      throw new Error('Failed to send email');
+      return createResponse(500, {
+        error: 'Failed to send email',
+        success: false
+      });
     }
-
-    return {
-      statusCode: 200,
-      headers: corsHeaders,
-      body: JSON.stringify({
-        message: 'Email sent successfully',
-        success: true
-      }),
-    };
-
   } catch (error) {
     console.error('Error:', error);
-    return {
-      statusCode: 500,
-      headers: corsHeaders,
-      body: JSON.stringify({
-        error: 'Failed to process request',
-        success: false,
-        details: error instanceof Error ? error.message : 'Unknown error'
-      }),
-    };
+    return createResponse(500, {
+      error: 'Failed to process request',
+      success: false,
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
 };
