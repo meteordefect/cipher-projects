@@ -67,7 +67,7 @@ jobs:
           cdk deploy cipher-contact-form-stack --require-approval never --outputs-file contact-form-outputs.json
 
           # Set up environment variables for Next.js build
-          API_GATEWAY_URL=$(jq -r '."cipher-contact-form-stack".ApiEndpoint' contact-form-outputs.json)contact
+          API_GATEWAY_URL=$(jq -r '."cipher-contact-form-stack".ApiEndpoint' contact-form-outputs.json)
           API_KEY=$(jq -r '."cipher-contact-form-stack".ApiKey' contact-form-outputs.json)
 
           echo "API Gateway URL: ${API_GATEWAY_URL}"
