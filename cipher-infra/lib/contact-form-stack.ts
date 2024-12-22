@@ -26,11 +26,11 @@ export class ContactFormStack extends cdk.Stack {
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
         actions: ['ses:SendEmail', 'ses:SendRawEmail'],
-        resources: ['*'], // You might want to restrict this to specific SES ARNs
+        resources: ['*'],
       })
     );
 
-    // Create API Gateway
+    // Create API Gateway with CORS configuration
     const api = new apigateway.RestApi(this, 'ContactFormApi', {
       restApiName: 'Contact Form API',
       description: 'API for handling contact form submissions',
@@ -43,12 +43,13 @@ export class ContactFormStack extends cdk.Stack {
       },
     });
 
-    // Create API Key and Usage Plan
+    // Create API Key
     const apiKey = api.addApiKey('ContactFormApiKey', {
       apiKeyName: 'contact-form-key',
       description: 'API Key for Contact Form',
     });
 
+    // Create Usage Plan
     const usagePlan = api.addUsagePlan('ContactFormUsagePlan', {
       name: 'Contact Form Usage Plan',
       throttle: {
@@ -64,10 +65,10 @@ export class ContactFormStack extends cdk.Stack {
     // Associate the API key with the usage plan
     usagePlan.addApiKey(apiKey);
 
-    // Create the API resource and method
+    // Create the contact resource
     const contact = api.root.addResource('contact');
 
-    // Add Lambda integration
+    // Add POST method with Lambda integration
     const integration = new apigateway.LambdaIntegration(contactFormLambda, {
       proxy: true,
       integrationResponses: [{
@@ -84,33 +85,6 @@ export class ContactFormStack extends cdk.Stack {
     // Add POST method
     contact.addMethod('POST', integration, {
       apiKeyRequired: true,
-      methodResponses: [{
-        statusCode: '200',
-        responseParameters: {
-          'method.response.header.Access-Control-Allow-Origin': true,
-          'method.response.header.Access-Control-Allow-Headers': true,
-          'method.response.header.Access-Control-Allow-Methods': true,
-          'method.response.header.Access-Control-Allow-Credentials': true
-        }
-      }]
-    });
-
-    // Add OPTIONS method (for CORS)
-    contact.addMethod('OPTIONS', new apigateway.MockIntegration({
-      integrationResponses: [{
-        statusCode: '200',
-        responseParameters: {
-          'method.response.header.Access-Control-Allow-Origin': "'https://www.cipherprojects.com'",
-          'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Api-Key'",
-          'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,POST'",
-          'method.response.header.Access-Control-Allow-Credentials': "'true'"
-        }
-      }],
-      passthroughBehavior: apigateway.PassthroughBehavior.NEVER,
-      requestTemplates: {
-        'application/json': '{"statusCode": 200}'
-      }
-    }), {
       methodResponses: [{
         statusCode: '200',
         responseParameters: {
