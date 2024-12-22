@@ -73,9 +73,10 @@ jobs:
           echo "API Gateway URL: ${API_GATEWAY_URL}"
           echo "API Key: ${API_KEY}"
 
-          echo "API_GATEWAY_URL=${API_GATEWAY_URL}" > ../.env.production
-          echo "API_KEY=${API_KEY}" >> ../.env.production
-          cat ../.env.production
+          echo "NEXT_PUBLIC_API_GATEWAY_URL=${API_GATEWAY_URL}" > ../.env.production
+          echo "NEXT_PUBLIC_API_KEY=${API_KEY}" >> ../.env.production
+
+
 
       # 5. Build and Package Next.js
       - name: Build and Package Next.js
