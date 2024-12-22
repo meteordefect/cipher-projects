@@ -2,7 +2,6 @@ import * as cdk from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import * as ses from 'aws-cdk-lib/aws-ses';
 import * as path from 'path';
 import { Construct } from 'constructs';
 
@@ -18,6 +17,7 @@ export class ContactFormStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(30),
       environment: {
         NODE_ENV: 'production',
+        VERSION: '1.0.1', // Add version to force update
       },
     });
 
@@ -34,6 +34,12 @@ export class ContactFormStack extends cdk.Stack {
     const api = new apigateway.RestApi(this, 'ContactFormApi', {
       restApiName: 'Contact Form API',
       description: 'API for handling contact form submissions',
+      deployOptions: {
+        stageName: 'prod',
+        tracingEnabled: true,
+        dataTraceEnabled: true,
+        loggingLevel: apigateway.MethodLoggingLevel.INFO,
+      },
       defaultCorsPreflightOptions: {
         allowOrigins: ['https://www.cipherprojects.com'],
         allowMethods: ['POST', 'OPTIONS'],
@@ -45,7 +51,7 @@ export class ContactFormStack extends cdk.Stack {
 
     // Create API Key
     const apiKey = api.addApiKey('ContactFormApiKey', {
-      apiKeyName: 'contact-form-key',
+      apiKeyName: `contact-form-key-${Date.now()}`, // Add timestamp to force update
       description: 'API Key for Contact Form',
     });
 
@@ -71,15 +77,6 @@ export class ContactFormStack extends cdk.Stack {
     // Add POST method with Lambda integration
     const integration = new apigateway.LambdaIntegration(contactFormLambda, {
       proxy: true,
-      integrationResponses: [{
-        statusCode: '200',
-        responseParameters: {
-          'method.response.header.Access-Control-Allow-Origin': "'https://www.cipherprojects.com'",
-          'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Api-Key'",
-          'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,POST'",
-          'method.response.header.Access-Control-Allow-Credentials': "'true'"
-        }
-      }]
     });
 
     // Add POST method
@@ -91,9 +88,9 @@ export class ContactFormStack extends cdk.Stack {
           'method.response.header.Access-Control-Allow-Origin': true,
           'method.response.header.Access-Control-Allow-Headers': true,
           'method.response.header.Access-Control-Allow-Methods': true,
-          'method.response.header.Access-Control-Allow-Credentials': true
-        }
-      }]
+          'method.response.header.Access-Control-Allow-Credentials': true,
+        },
+      }],
     });
 
     // Add Usage Plan to API stage
@@ -101,9 +98,9 @@ export class ContactFormStack extends cdk.Stack {
       stage: api.deploymentStage,
     });
 
-    // Output values
+    // Output values with more descriptive information
     new cdk.CfnOutput(this, 'ApiEndpoint', {
-      value: api.url,
+      value: `${api.url}contact`,
       description: 'API Gateway endpoint URL',
     });
 
