@@ -3,9 +3,25 @@ import { APIGatewayEvent } from 'aws-lambda';
 
 const ses = new SESClient({ region: "ap-southeast-2" });
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type,X-Api-Key',
+  'Access-Control-Allow-Methods': 'OPTIONS,POST',
+  'Content-Type': 'application/json'
+};
+
 export const handler = async (event: APIGatewayEvent) => {
+  // Handle OPTIONS request
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: corsHeaders,
+      body: ''
+    };
+  }
+
   console.log('Event received:', JSON.stringify(event, null, 2));
-  
+
   try {
     const body = JSON.parse(event.body || '{}');
     console.log('Parsed body:', body);
@@ -14,17 +30,14 @@ export const handler = async (event: APIGatewayEvent) => {
     if (!body.email || !body.message) {
       return {
         statusCode: 400,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Content-Type': 'application/json',
-        },
+        headers: corsHeaders,
         body: JSON.stringify({ error: 'Email and message are required' }),
       };
     }
 
     const params = {
       Destination: {
-        ToAddresses: ['keith.vaughan@cipherprojects.com'], // Your verified email
+        ToAddresses: ['keith.vaughan@cipherprojects.com'],
       },
       Message: {
         Body: {
@@ -42,11 +55,11 @@ Submitted at: ${new Date().toISOString()}
 `,
           },
         },
-        Subject: { 
-          Data: 'New Contact Form Submission - Cipher Projects' 
+        Subject: {
+          Data: 'New Contact Form Submission - Cipher Projects'
         },
       },
-      Source: 'keith.vaughan@cipherprojects.com', // Your verified email
+      Source: 'keith.vaughan@cipherprojects.com',
     };
 
     try {
@@ -60,45 +73,23 @@ Submitted at: ${new Date().toISOString()}
 
     return {
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
+      headers: corsHeaders,
+      body: JSON.stringify({
         message: 'Email sent successfully',
-        success: true 
+        success: true
       }),
     };
-    
+
   } catch (error) {
     console.error('Error:', error);
     return {
       statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
+      headers: corsHeaders,
+      body: JSON.stringify({
         error: 'Failed to process request',
         success: false,
         details: error instanceof Error ? error.message : 'Unknown error'
       }),
-    };
-  }
-};
-
-// Handle CORS preflight requests
-export const preHandler = async (event: APIGatewayEvent) => {
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token',
-        'Access-Control-Allow-Methods': 'OPTIONS,POST',
-        'Access-Control-Max-Age': '3600',
-      },
-      body: '',
     };
   }
 };
