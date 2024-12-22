@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, FormEvent, ChangeEvent } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Mail, Phone, MapPin } from 'lucide-react'
 
-type FormData = {
+interface FormData {
   name: string
   email: string
   phone: string
@@ -26,36 +26,33 @@ export default function Contact() {
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('idle')
   const [errorMessage, setErrorMessage] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setSubmitStatus('loading')
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_GATEWAY_URL
-    const apiKey = process.env.NEXT_PUBLIC_API_KEY
-
-    // Check if API URL is available
-    if (!apiUrl) {
-      setSubmitStatus('error')
-      setErrorMessage('API configuration error')
-      return
-    }
-
     try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_GATEWAY_URL
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY
+
+      if (!apiUrl || !apiKey) {
+        throw new Error('API configuration missing')
+      }
+
       console.log('Submitting to:', apiUrl)
-      console.log('Using API Key:', apiKey ? 'Yes' : 'No')
+      console.log('API Key configured:', !!apiKey)
 
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(apiKey && { 'x-api-key': apiKey })
+          'x-api-key': apiKey
         },
         body: JSON.stringify(formData)
       })
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
+        throw new Error(errorData.message || `Error: ${response.status}`)
       }
 
       const data = await response.json()
@@ -70,14 +67,14 @@ export default function Contact() {
         message: ''
       })
     } catch (error) {
-      console.error('Error:', error)
+      console.error('Submission error:', error)
       setSubmitStatus('error')
       setErrorMessage(error instanceof Error ? error.message : 'Failed to send message')
     }
   }
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target
     setFormData(prev => ({

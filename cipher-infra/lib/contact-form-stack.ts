@@ -17,7 +17,7 @@ export class ContactFormStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(30),
       environment: {
         NODE_ENV: 'production',
-        VERSION: '1.0.1', // Add version to force update
+        VERSION: '1.0.2', // Increment version to force update
       },
     });
 
@@ -30,7 +30,7 @@ export class ContactFormStack extends cdk.Stack {
       })
     );
 
-    // Create API Gateway with CORS configuration
+    // Create API Gateway
     const api = new apigateway.RestApi(this, 'ContactFormApi', {
       restApiName: 'Contact Form API',
       description: 'API for handling contact form submissions',
@@ -45,19 +45,25 @@ export class ContactFormStack extends cdk.Stack {
         allowMethods: ['POST', 'OPTIONS'],
         allowHeaders: ['Content-Type', 'X-Api-Key'],
         allowCredentials: true,
-        maxAge: cdk.Duration.days(1),
       },
     });
 
-    // Create API Key
+    // Create API Key - remove the enabled property
     const apiKey = api.addApiKey('ContactFormApiKey', {
-      apiKeyName: `contact-form-key-${Date.now()}`, // Add timestamp to force update
-      description: 'API Key for Contact Form',
+      apiKeyName: `contact-form-key-${Date.now()}`,
+      description: 'API Key for Contact Form'
     });
+
+
 
     // Create Usage Plan
     const usagePlan = api.addUsagePlan('ContactFormUsagePlan', {
-      name: 'Contact Form Usage Plan',
+      name: `ContactFormUsagePlan-${Date.now()}`,
+      description: 'Usage plan for the contact form API',
+      apiStages: [{
+        api,
+        stage: api.deploymentStage
+      }],
       throttle: {
         rateLimit: 10,
         burstLimit: 5,
@@ -68,15 +74,29 @@ export class ContactFormStack extends cdk.Stack {
       },
     });
 
-    // Associate the API key with the usage plan
+    // Associate API key with usage plan
     usagePlan.addApiKey(apiKey);
 
-    // Create the contact resource
+    // Create contact resource
     const contact = api.root.addResource('contact');
 
-    // Add POST method with Enhanced Lambda integration
+    // Create integration response model
+    const errorResponseModel = api.addModel('ErrorResponseModel', {
+      contentType: 'application/json',
+      modelName: 'ErrorResponse',
+      schema: {
+        schema: apigateway.JsonSchemaVersion.DRAFT4,
+        title: 'errorResponse',
+        type: apigateway.JsonSchemaType.OBJECT,
+        properties: {
+          message: { type: apigateway.JsonSchemaType.STRING }
+        }
+      }
+    });
+
+    // Add POST method with integration
     const integration = new apigateway.LambdaIntegration(contactFormLambda, {
-      proxy: true,
+      proxy: false,
       integrationResponses: [
         {
           statusCode: '200',
@@ -88,8 +108,7 @@ export class ContactFormStack extends cdk.Stack {
           }
         },
         {
-          // Handle 4XX errors
-          selectionPattern: '4\\d{2}',
+          selectionPattern: '.*"statusCode":400.*',
           statusCode: '400',
           responseParameters: {
             'method.response.header.Access-Control-Allow-Origin': "'https://www.cipherprojects.com'",
@@ -99,9 +118,8 @@ export class ContactFormStack extends cdk.Stack {
           }
         },
         {
-          // Handle 5XX errors
-          selectionPattern: '5\\d{2}',
-          statusCode: '500',
+          selectionPattern: '.*"statusCode":403.*',
+          statusCode: '403',
           responseParameters: {
             'method.response.header.Access-Control-Allow-Origin': "'https://www.cipherprojects.com'",
             'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Api-Key'",
@@ -109,10 +127,13 @@ export class ContactFormStack extends cdk.Stack {
             'method.response.header.Access-Control-Allow-Credentials': "'true'"
           }
         }
-      ]
+      ],
+      requestTemplates: {
+        'application/json': '{ "statusCode": 200 }'
+      }
     });
 
-    // Add POST method with expanded method responses
+    // Add POST method with responses for all status codes
     contact.addMethod('POST', integration, {
       apiKeyRequired: true,
       methodResponses: [
@@ -132,26 +153,27 @@ export class ContactFormStack extends cdk.Stack {
             'method.response.header.Access-Control-Allow-Headers': true,
             'method.response.header.Access-Control-Allow-Methods': true,
             'method.response.header.Access-Control-Allow-Credentials': true
+          },
+          responseModels: {
+            'application/json': errorResponseModel
           }
         },
         {
-          statusCode: '500',
+          statusCode: '403',
           responseParameters: {
             'method.response.header.Access-Control-Allow-Origin': true,
             'method.response.header.Access-Control-Allow-Headers': true,
             'method.response.header.Access-Control-Allow-Methods': true,
             'method.response.header.Access-Control-Allow-Credentials': true
+          },
+          responseModels: {
+            'application/json': errorResponseModel
           }
         }
       ]
     });
 
-    // Add Usage Plan to API stage
-    usagePlan.addApiStage({
-      stage: api.deploymentStage,
-    });
-
-    // Output values with more descriptive information
+    // Output values
     new cdk.CfnOutput(this, 'ApiEndpoint', {
       value: `${api.url}contact`,
       description: 'API Gateway endpoint URL',
