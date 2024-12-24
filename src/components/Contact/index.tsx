@@ -1,9 +1,12 @@
 'use client'
 
-// Test: 
+// Test:
 //      curl -X POST -H "Content-Type: application/json" \
 //      -d '{"name": "Test", "email": "test@example.com", "message": "Hello"}' \
 //      https://mkz66v3npa.execute-api.ap-southeast-2.amazonaws.com/prod/contact
+//
+//
+//   set the api key in a file called .env.production
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
@@ -65,7 +68,7 @@ export default function ContactPage() {
           {/* Left Column - Header & Contact Info */}
           <div>
             {/* Hero Text */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
@@ -83,14 +86,14 @@ export default function ContactPage() {
             <div className="space-y-8">
               <h2 className="text-2xl font-normal">Get in Touch</h2>
               <div className="space-y-6">
-                <Link 
+                <Link
                   href="tel:+61261761580"
                   className="flex items-center gap-4 text-lg hover:opacity-60 transition-opacity duration-300"
                 >
                   <Phone size={24} className="opacity-60" />
                   <span>+61 2 6176 1580</span>
                 </Link>
-                <Link 
+                <Link
                   href="mailto:hello@cipherprojects.com"
                   className="flex items-center gap-4 text-lg hover:opacity-60 transition-opacity duration-300"
                 >
@@ -176,10 +179,10 @@ export default function ContactPage() {
               <button
                 type="submit"
                 disabled={submitStatus === 'loading'}
-                className={`w-full mt-8 px-8 py-4 border border-current 
-                  ${submitStatus === 'loading' 
-                    ? 'opacity-50 cursor-not-allowed' 
-                    : 'hover:bg-black hover:text-white transition-all duration-300'} 
+                className={`w-full mt-8 px-8 py-4 border border-current
+                  ${submitStatus === 'loading'
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-black hover:text-white transition-all duration-300'}
                   text-lg`}
               >
                 {submitStatus === 'loading' ? 'Sending...' : 'Send Message'}
@@ -187,7 +190,7 @@ export default function ContactPage() {
 
               {/* Status Messages */}
               {submitStatus === 'success' && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-green-600 mt-4 p-4 bg-green-50 rounded-md"
@@ -197,7 +200,7 @@ export default function ContactPage() {
               )}
 
               {submitStatus === 'error' && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-red-600 mt-4 p-4 bg-red-50 rounded-md"
