@@ -40,7 +40,7 @@ function Project({ project }: { project: DetailedProject }) {
       {/* Project Details */}
       <div className="space-y-8">
         <div>
-          <span 
+          <span
             className="text-sm font-normal opacity-60"
             style={{ color: project.accentColor }}
           >
@@ -75,7 +75,7 @@ function Project({ project }: { project: DetailedProject }) {
           <h3 className="text-xl font-normal">Technologies</h3>
           <div className="flex flex-wrap gap-2">
             {project.technologies.map((tech, index) => (
-              <span 
+              <span
                 key={index}
                 className="px-3 py-1 border border-current/20 rounded-sm text-sm opacity-60"
               >
@@ -138,13 +138,11 @@ const projects: DetailedProject[] = [
     results: [
       "Achieved high-speed response times for AI queries",
       "Maintained 100% data privacy compliance",
-      "Reduced operational costs by 45%",
-      "Supported concurrent usage by 500+ users",
       "Automated deployment and scaling processes"
     ],
     technologies: [
-      "AWS CDK", "ECS Fargate", "Lambda", "API Gateway", "VPC", 
-      "Open-WebUI", "Ollama", "Docker", "ECR", "AWS CloudWatch", 
+      "AWS CDK", "ECS Fargate", "Lambda", "API Gateway", "VPC",
+      "Open-WebUI", "Ollama", "Docker", "ECR", "AWS CloudWatch",
       "IAM", "AWS Secrets Manager"
     ],
     year: "2024",
@@ -162,8 +160,6 @@ const projects: DetailedProject[] = [
     results: [
       "Achieved AWS Partner status within 3 months",
       "Implemented 100% of required security controls",
-      "Reduced incident response time by 70%",
-      "Automated 85% of compliance reporting",
       "Enhanced overall security posture"
     ],
     technologies: [
@@ -190,7 +186,7 @@ const projects: DetailedProject[] = [
     ],
     technologies: [
       "AWS Network Firewall", "EC2 Auto Scaling", "VPC Security Groups",
-      "AWS CloudWatch", "Terraform", "Docker", 
+      "AWS CloudWatch", "Terraform", "Docker",
       "Github", "AWS KMS", "AWS Secrets Manager",
       "API Gateway", "Oracles", "Cosmos", "Python"
     ],
@@ -205,7 +201,7 @@ export default function ProjectsPage() {
       <section className="pt-48 pb-32">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
@@ -230,7 +226,7 @@ export default function ProjectsPage() {
               <Project key={project.title} project={project} />
             ))}
           </div>
-        </div> 
+        </div>
       </section>
     </main>
   )
