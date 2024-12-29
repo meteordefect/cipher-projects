@@ -24,8 +24,8 @@ export default function Footer() {
               <br />
               Let's make it happen.
             </h2>
-            <Link 
-              href="/contact" 
+            <Link
+              href="/contact"
               className="inline-block text-lg border border-white px-8 py-4 hover:bg-white hover:text-black transition-all duration-300"
             >
               Start a Project
@@ -74,14 +74,24 @@ export default function Footer() {
             <h3 className="text-sm uppercase tracking-wider mb-4 opacity-60">Menu</h3>
             <nav className="flex flex-col gap-2">
               {['Projects', 'Services', 'About', 'Research'].map((item) => (
-                <Link 
-                  key={item} 
+                <Link
+                  key={item}
                   href={`/${item.toLowerCase()}`}
-                  className="hover:opacity-60 transition-opacity"
+                  className="hover:opacity-60 transition-opacity group flex items-center gap-2"
                 >
                   {item}
+                  <span className="opacity-0 group-hover:opacity-60 transition-opacity">↗</span>
                 </Link>
               ))}
+              <Link
+                href="https://zimaw.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:opacity-60 transition-opacity group flex items-center gap-2"
+              >
+                Zimaw
+                <span className="opacity-0 group-hover:opacity-60 transition-opacity">↗</span>
+              </Link>
             </nav>
           </div>
 
@@ -90,8 +100,8 @@ export default function Footer() {
             <h3 className="text-sm uppercase tracking-wider mb-4 opacity-60">Social</h3>
             <nav className="flex flex-col gap-2">
               {Object.entries(socialLinks).map(([platform, url]) => (
-                <Link 
-                  key={platform} 
+                <Link
+                  key={platform}
                   href={url}
                   target="_blank"  // Opens in new tab
                   rel="noopener noreferrer"  // Security best practice
