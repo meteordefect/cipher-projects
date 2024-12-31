@@ -9,10 +9,10 @@ import { ArrowUpRight } from 'lucide-react'
 const researchPosts = [
   {
     id: 'software-development-team',
-    title: "Building an Effective Software Development Team: The Complete Guide for 2024",
+    title: "Building an Effective Software Development Team: The Complete Guide for 2025",
     subtitle: "Essential strategies for assembling and managing high-performing development teams",
-    date: "December 31, 2024",
-    author: "Cipher Projcects Team",
+    date: "January 1, 2025",
+    author: "Cipher Projects Team",
     category: "Development",
     image: "/research/software-development-team.jpg",
     excerpt: "Discover how to build and maintain a high-performing software development team in 2024. Learn about crucial team roles, optimal structures, and best practices for fostering collaboration and innovation in modern development environments."

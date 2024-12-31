@@ -22,7 +22,7 @@ export default function SoftwareDevTeamPage() {
           <div className="space-y-4">
             <span className="text-sm opacity-60">Development</span>
             <h1 className="text-5xl font-normal leading-tight">
-              Building an Effective Software Development Team: The Complete Guide for 2024
+              Building an Effective Software Development Team: The Complete Guide for 2025
             </h1>
           </div>
         </div>
@@ -42,7 +42,7 @@ export default function SoftwareDevTeamPage() {
         <div className="flex items-center gap-4 mb-16 text-sm opacity-60">
           <span>Cipher Projects Team</span>
           <span className="w-1 h-1 rounded-full bg-current" />
-          <span>December 31, 2024</span>
+          <span>January 1, 2025</span>
         </div>
 
         {/* Content */}
@@ -106,7 +106,7 @@ export default function SoftwareDevTeamPage() {
           <div className="flex items-center gap-4">
             <span className="text-sm opacity-60">Share this article</span>
             <Link
-              href={`https://twitter.com/intent/tweet?text=Building an Effective Software Development Team: The Complete Guide for 2024&url=${encodeURIComponent('https://yourwebsite.com/blog/software-development-team')}`}
+              href={`https://twitter.com/intent/tweet?text=Building an Effective Software Development Team: The Complete Guide for 2025&url=${encodeURIComponent('https://yourwebsite.com/blog/software-development-team')}`}
               target="_blank"
               rel="noopener noreferrer"
               className="opacity-60 hover:opacity-100 transition-opacity"
@@ -114,7 +114,7 @@ export default function SoftwareDevTeamPage() {
               <Twitter size={20} />
             </Link>
             <Link
-              href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent('https://yourwebsite.com/blog/software-development-team')}&title=Building an Effective Software Development Team: The Complete Guide for 2024`}
+              href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent('https://yourwebsite.com/blog/software-development-team')}&title=Building an Effective Software Development Team: The Complete Guide for 2025`}
               target="_blank"
               rel="noopener noreferrer"
               className="opacity-60 hover:opacity-100 transition-opacity"
