@@ -8,6 +8,16 @@ import { ArrowUpRight } from 'lucide-react'
 
 const researchPosts = [
   {
+    id: 'software-development-team',
+    title: "Building an Effective Software Development Team: The Complete Guide for 2024",
+    subtitle: "Essential strategies for assembling and managing high-performing development teams",
+    date: "December 31, 2024",
+    author: "Cipher Projcects Team",
+    category: "Development",
+    image: "/research/software-development-team.jpg",
+    excerpt: "Discover how to build and maintain a high-performing software development team in 2024. Learn about crucial team roles, optimal structures, and best practices for fostering collaboration and innovation in modern development environments."
+  },
+  {
     id: 'cdk-s3-exploit',
     title: "How a Deleted S3 Bucket Could Hand Over Your Entire AWS Account to Attackers",
     subtitle: "Critical security vulnerability discovered in AWS CDK",
@@ -42,7 +52,7 @@ const researchPosts = [
     title: "Gordon Ramsay's Kitchen Nightmares: A Lesson for Software Development",
     subtitle: "What cooking can teach us about code",
     date: "September 23, 2024",
-    author: "Cipher Weekly Team",
+    author: "Cipher Projects Team",
     category: "Software Development",
     image: "/research/kitchen-dev.jpg",
     excerpt: "How the principles that make a successful kitchen mirror those that create successful software projects. Insights from Gordon Ramsay's approach to fixing failing restaurants."
@@ -86,7 +96,7 @@ export default function ResearchPage() {
       <div className="container">
         {/* Header */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-32">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -101,7 +111,7 @@ export default function ResearchPage() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-3xl md:text-4xl font-normal leading-tight opacity-80 mt-8 lg:mt-16"
           >
-            Deep dives into technology, innovation, 
+            Deep dives into technology, innovation,
             and strategic thinking.
           </motion.p>
         </div>
@@ -124,7 +134,7 @@ export default function ResearchPage() {
                       src={post.image}
                       alt={post.title}
                       fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
@@ -146,7 +156,7 @@ export default function ResearchPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-sm opacity-60">{post.author}</span>
                         <div className="inline-flex items-center gap-2 text-lg opacity-60 group-hover:opacity-100 transition-opacity duration-300">
-                          Read Article 
+                          Read Article
                           <ArrowUpRight className="w-4 h-4" />
                         </div>
                       </div>
