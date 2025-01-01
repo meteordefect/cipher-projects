@@ -1,4 +1,3 @@
-// src/components/ImageWithLoader.tsx
 'use client'
 
 import { useState } from 'react'
@@ -18,7 +17,7 @@ export function ImageWithLoader({ src, alt, className = '', priority = false }: 
   return (
     <div className="relative overflow-hidden">
       {isLoading && (
-        <motion.div 
+        <motion.div
           className="absolute inset-0 bg-gray-100 dark:bg-gray-800"
           animate={{ opacity: [0.5, 1] }}
           transition={{ duration: 1, repeat: Infinity, repeatType: "reverse" }}

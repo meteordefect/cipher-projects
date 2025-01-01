@@ -1,4 +1,3 @@
-// src/components/Experts/index.tsx
 'use client'
 
 import { motion } from 'framer-motion'
@@ -51,10 +50,10 @@ export default function Experts() {
     <section className="py-32">
       {/* Top Divider */}
       <div className="h-[1px] bg-current mb-32" />
-      
+
       {/* Header */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-32">
-        <motion.h2 
+        <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -69,7 +68,7 @@ export default function Experts() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-3xl md:text-4xl font-normal leading-tight opacity-80"
         >
-          Deep technical knowledge combined with 
+          Deep technical knowledge combined with
           years of enterprise experience.
         </motion.p>
       </div>
@@ -103,7 +102,7 @@ export default function Experts() {
                 {expert.tags.map((tag, tagIndex) => (
                   <span
                     key={tagIndex}
-                    className="inline-flex px-3 py-1 text-sm border border-current/10 
+                    className="inline-flex px-3 py-1 text-sm border border-current/10
                              opacity-60 group-hover:opacity-100 transition-opacity duration-300"
                   >
                     {tag}
@@ -112,12 +111,12 @@ export default function Experts() {
               </div>
 
               {/* Hover Effect Border */}
-              <motion.div 
+              <motion.div
                 className="absolute inset-0 pointer-events-none"
                 initial={false}
                 whileHover={{
-                  boxShadow: isDark 
-                    ? '0 0 20px rgba(255,255,255,0.1)' 
+                  boxShadow: isDark
+                    ? '0 0 20px rgba(255,255,255,0.1)'
                     : '0 0 20px rgba(0,0,0,0.05)'
                 }}
               />

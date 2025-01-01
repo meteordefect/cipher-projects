@@ -1,4 +1,3 @@
-// src/components/ClientProviders.tsx
 'use client'
 
 import dynamic from 'next/dynamic'

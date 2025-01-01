@@ -5,7 +5,7 @@ const ses = new SESClient({ region: "ap-southeast-2" });
 
 export const handler = async (event: APIGatewayEvent) => {
   console.log('Event received:', JSON.stringify(event, null, 2));
-  
+
   try {
     const body = JSON.parse(event.body || '{}');
     console.log('Parsed body:', body);
@@ -42,8 +42,8 @@ Submitted at: ${new Date().toISOString()}
 `,
           },
         },
-        Subject: { 
-          Data: 'New Contact Form Submission - Cipher Projects' 
+        Subject: {
+          Data: 'New Contact Form Submission - Cipher Projects'
         },
       },
       Source: 'keith.vaughan@cipherprojects.com', // Your verified email
@@ -64,12 +64,12 @@ Submitted at: ${new Date().toISOString()}
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         message: 'Email sent successfully',
-        success: true 
+        success: true
       }),
     };
-    
+
   } catch (error) {
     console.error('Error:', error);
     return {
@@ -78,7 +78,7 @@ Submitted at: ${new Date().toISOString()}
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         error: 'Failed to process request',
         success: false,
         details: error instanceof Error ? error.message : 'Unknown error'

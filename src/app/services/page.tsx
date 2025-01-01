@@ -47,13 +47,13 @@ export default function ServicesPage() {
       <section className="pt-48 pb-32">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               className="text-5xl md:text-[4vw] leading-[1.2] font-normal"
             >
-              Engineering 
+              Engineering
               <br />
               Digital Excellence
             </motion.h1>
@@ -92,9 +92,9 @@ export default function ServicesPage() {
             <div key={service.title}>
               {/* Divider line */}
               <div className="h-[1px] bg-current opacity-20" />
-              
+
               <div className="py-24 md:py-32">
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6 }}

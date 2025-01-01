@@ -1,4 +1,3 @@
-// src/app/research/aws-waf-security/page.tsx
 'use client'
 
 import Image from 'next/image'
@@ -10,7 +9,7 @@ export default function WAFSecurityPost() {
     <main className="min-h-screen pt-48 pb-32">
       <article className="container max-w-3xl">
         {/* Back Link */}
-        <Link 
+        <Link
           href="/research"
           className="inline-flex items-center gap-2 text-lg opacity-60 hover:opacity-100 transition-opacity duration-300 mb-16"
         >
@@ -51,11 +50,11 @@ export default function WAFSecurityPost() {
           <div className="space-y-6"> {/* Abstract section */}
             <h2 className="text-3xl font-normal">Abstract</h2>
             <p className="text-lg leading-relaxed opacity-80">
-              In the contemporary digital environment, businesses utilize AWS services like Amazon CloudFront 
-              to distribute content globally. Protecting applications and APIs from vulnerabilities and 
-              malicious bots is paramount. AWS Web Application Firewall (AWS WAF) offers an essential 
-              defense, providing control over incoming traffic and protection for operations. This research 
-              article explores the capabilities of AWS WAF and how customized configurations can enhance 
+              In the contemporary digital environment, businesses utilize AWS services like Amazon CloudFront
+              to distribute content globally. Protecting applications and APIs from vulnerabilities and
+              malicious bots is paramount. AWS Web Application Firewall (AWS WAF) offers an essential
+              defense, providing control over incoming traffic and protection for operations. This research
+              article explores the capabilities of AWS WAF and how customized configurations can enhance
               security for businesses.
             </p>
           </div>
@@ -63,9 +62,9 @@ export default function WAFSecurityPost() {
           <div className="space-y-6"> {/* Introduction section */}
             <h2 className="text-3xl font-normal">Introduction</h2>
             <p className="text-lg leading-relaxed opacity-80">
-              As organizations leverage AWS services for global content distribution, ensuring robust 
-              security measures is critical. AWS WAF, an AWS-native solution, provides comprehensive 
-              protection for applications and APIs. This article examines the features of AWS WAF and 
+              As organizations leverage AWS services for global content distribution, ensuring robust
+              security measures is critical. AWS WAF, an AWS-native solution, provides comprehensive
+              protection for applications and APIs. This article examines the features of AWS WAF and
               the importance of customized configurations to meet specific business needs.
             </p>
           </div>
@@ -73,10 +72,10 @@ export default function WAFSecurityPost() {
           <div className="space-y-6"> {/* Capabilities section */}
             <h2 className="text-3xl font-normal">AWS WAF Capabilities</h2>
             <p className="text-lg leading-relaxed opacity-80">
-              AWS WAF offers managed rule sets that provide immediate and continuously updated defense 
-              against a variety of threats. These rule sets simplify the security process, offering 
-              protection from the outset. The AWS Marketplace further extends specialized managed 
-              protection plans, including coverage for the OWASP Top 10 security risks and defense 
+              AWS WAF offers managed rule sets that provide immediate and continuously updated defense
+              against a variety of threats. These rule sets simplify the security process, offering
+              protection from the outset. The AWS Marketplace further extends specialized managed
+              protection plans, including coverage for the OWASP Top 10 security risks and defense
               against automated bots.
             </p>
           </div>
@@ -95,8 +94,8 @@ export default function WAFSecurityPost() {
           <div className="space-y-6"> {/* Challenges section */}
             <h2 className="text-3xl font-normal">Challenges in AWS WAF Setup and Maintenance</h2>
             <p className="text-lg leading-relaxed opacity-80">
-              Implementing and maintaining a comprehensive AWS WAF rule set can be daunting for IT 
-              Security Departments. It requires balancing security needs with performance and 
+              Implementing and maintaining a comprehensive AWS WAF rule set can be daunting for IT
+              Security Departments. It requires balancing security needs with performance and
               accessibility considerations.
             </p>
           </div>
@@ -104,7 +103,7 @@ export default function WAFSecurityPost() {
           <div className="space-y-6"> {/* Custom Configurations section */}
             <h2 className="text-3xl font-normal">Custom AWS WAF Configurations by Tech Ops Asia</h2>
             <p className="text-lg leading-relaxed opacity-80">
-              Tech Ops Asia specializes in tailoring AWS WAF configurations to align with unique 
+              Tech Ops Asia specializes in tailoring AWS WAF configurations to align with unique
               business requirements. Our services include:
             </p>
             <ul className="space-y-3 list-disc pl-6 text-lg opacity-80">
@@ -118,8 +117,8 @@ export default function WAFSecurityPost() {
           <div className="space-y-6"> {/* Conclusion section */}
             <h2 className="text-3xl font-normal">Conclusion</h2>
             <p className="text-lg leading-relaxed opacity-80">
-              Leveraging AWS WAF's comprehensive capabilities and Tech Ops Asia's expertise, businesses 
-              can achieve a secure, fully integrated solution. Customized AWS WAF configurations ensure 
+              Leveraging AWS WAF's comprehensive capabilities and Tech Ops Asia's expertise, businesses
+              can achieve a secure, fully integrated solution. Customized AWS WAF configurations ensure
               robust protection for applications and APIs, enhancing overall digital security.
             </p>
           </div>
@@ -129,7 +128,7 @@ export default function WAFSecurityPost() {
         <div className="mt-32 pt-8 border-t border-current/10"> {/* Increased top margin */}
           <div className="flex items-center gap-4">
             <span className="text-sm opacity-60">Share this article</span>
-            <Link 
+            <Link
               href={`https://twitter.com/intent/tweet?text=Enhancing Digital Security with AWS WAF&url=${encodeURIComponent('https://cipherprojects.com/research/aws-waf-security')}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -137,7 +136,7 @@ export default function WAFSecurityPost() {
             >
               <Twitter size={20} />
             </Link>
-            <Link 
+            <Link
               href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent('https://cipherprojects.com/research/aws-waf-security')}&title=Enhancing Digital Security with AWS WAF`}
               target="_blank"
               rel="noopener noreferrer"

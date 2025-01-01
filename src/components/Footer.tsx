@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
 
-// First, create a social media links configuration
 const socialLinks = {
   LinkedIn: 'https://www.linkedin.com/company/cipherprojects',
   Twitter: 'https://twitter.com/cipherprojects',

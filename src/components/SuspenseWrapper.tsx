@@ -1,4 +1,3 @@
-// src/components/SuspenseWrapper.tsx
 import { Suspense, ReactNode } from 'react'
 import { ComponentLoading } from './LoadingStates'
 

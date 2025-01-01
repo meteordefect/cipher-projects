@@ -1,4 +1,3 @@
-// src/components/ui/Section.tsx
 import { ReactNode } from 'react'
 
 interface SectionProps {
@@ -8,14 +7,14 @@ interface SectionProps {
   hasBorder?: boolean;
 }
 
-export default function Section({ 
-  children, 
-  className = '', 
+export default function Section({
+  children,
+  className = '',
   id,
   hasBorder = false
 }: SectionProps) {
   return (
-    <section 
+    <section
       id={id}
       className={`
         section-padding

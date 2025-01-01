@@ -1,4 +1,3 @@
-// src/app/research/aws-cloud-101/page.tsx
 'use client'
 
 import Image from 'next/image'
@@ -10,7 +9,7 @@ export default function AWSCloudPage() {
     <main className="min-h-screen pt-48 pb-32">
       <article className="container max-w-3xl">
         {/* Back Link */}
-        <Link 
+        <Link
           href="/research"
           className="inline-flex items-center gap-2 text-lg opacity-60 hover:opacity-100 transition-opacity duration-300 mb-16"
         >
@@ -95,7 +94,7 @@ export default function AWSCloudPage() {
         <div className="mt-32 pt-8 border-t border-current/10">
           <div className="flex items-center gap-4">
             <span className="text-sm opacity-60">Share this article</span>
-            <Link 
+            <Link
               href={`https://twitter.com/intent/tweet?text=AWS Cloud 101: How It Can Help Your Business Grow&url=${encodeURIComponent('https://cipherprojects.com/research/aws-cloud-101')}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -103,7 +102,7 @@ export default function AWSCloudPage() {
             >
               <Twitter size={20} />
             </Link>
-            <Link 
+            <Link
               href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent('https://cipherprojects.com/research/aws-cloud-101')}&title=AWS Cloud 101: How It Can Help Your Business Grow`}
               target="_blank"
               rel="noopener noreferrer"

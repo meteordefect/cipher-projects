@@ -1,4 +1,3 @@
-// src/app/research/repo-swatting/page.tsx
 'use client'
 
 import Image from 'next/image'
@@ -10,7 +9,7 @@ export default function RepoSwattingPage() {
     <main className="min-h-screen pt-48 pb-32">
       <article className="container max-w-3xl">
         {/* Back Link */}
-        <Link 
+        <Link
           href="/research"
           className="inline-flex items-center gap-2 text-lg opacity-60 hover:opacity-100 transition-opacity duration-300 mb-16"
         >
@@ -93,7 +92,7 @@ export default function RepoSwattingPage() {
         <div className="mt-32 pt-8 border-t border-current/10">
           <div className="flex items-center gap-4">
             <span className="text-sm opacity-60">Share this article</span>
-            <Link 
+            <Link
               href={`https://twitter.com/intent/tweet?text=Repo Swatting: How False Reports Can Take Down Developer Accounts&url=${encodeURIComponent('https://cipherprojects.com/research/repo-swatting')}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -101,7 +100,7 @@ export default function RepoSwattingPage() {
             >
               <Twitter size={20} />
             </Link>
-            <Link 
+            <Link
               href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent('https://cipherprojects.com/research/repo-swatting')}&title=Repo Swatting: How False Reports Can Take Down Developer Accounts`}
               target="_blank"
               rel="noopener noreferrer"

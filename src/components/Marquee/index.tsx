@@ -1,4 +1,3 @@
-// src/components/Marquee/index.tsx
 'use client'
 
 import { useBackground } from '@/context/BackgroundContext'
@@ -47,13 +46,13 @@ export default function ClientMarquee() {
       <div className="h-[1px] bg-current mb-32" />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           {/* Left column - Title */}
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="text-6xl md:text-7xl font-normal"
           >
-            Future-ready 
+            Future-ready
             <br />technology
           </motion.h2>
 
@@ -69,7 +68,7 @@ export default function ClientMarquee() {
         </div>
 
         {/* Logo grid */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.4 }}
@@ -93,7 +92,7 @@ export default function ClientMarquee() {
             </motion.div>
           ))}
         </motion.div>
-      
+
     </section>
   )
 }

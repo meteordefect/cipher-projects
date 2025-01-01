@@ -1,4 +1,3 @@
-// src/context/BackgroundContext.tsx
 'use client'
 
 import { createContext, useContext, useState, useEffect } from 'react'
@@ -38,10 +37,10 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
     }
 
     handleScroll() // Initial check
-    
+
     // Subscribe to scroll changes
     const unsubscribe = scrollY.on('change', handleScroll)
-    
+
     return () => {
       unsubscribe()
     }
@@ -55,11 +54,11 @@ export function BackgroundProvider({ children }: { children: React.ReactNode }) 
   }, [isInitialLoading, pathname])
 
   return (
-    <BackgroundContext.Provider value={{ 
-      isDark, 
-      setIsDark, 
-      isInitialLoading, 
-      setIsInitialLoading 
+    <BackgroundContext.Provider value={{
+      isDark,
+      setIsDark,
+      isInitialLoading,
+      setIsInitialLoading
     }}>
       {children}
     </BackgroundContext.Provider>

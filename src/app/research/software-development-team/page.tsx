@@ -106,7 +106,7 @@ export default function SoftwareDevTeamPage() {
           <div className="flex items-center gap-4">
             <span className="text-sm opacity-60">Share this article</span>
             <Link
-              href={`https://twitter.com/intent/tweet?text=Building an Effective Software Development Team: The Complete Guide for 2025&url=${encodeURIComponent('https://cipherprojects.com/blog/software-development-team')}`}
+              href={`https://twitter.com/intent/tweet?text=Building an Effective Software Development Team: The Complete Guide for 2025&url=${encodeURIComponent('https://cipherprojects.com/research/software-development-team')}`}
               target="_blank"
               rel="noopener noreferrer"
               className="opacity-60 hover:opacity-100 transition-opacity"
@@ -114,7 +114,7 @@ export default function SoftwareDevTeamPage() {
               <Twitter size={20} />
             </Link>
             <Link
-              href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent('https://cipherprojects.com/blog/software-development-team')}&title=Building an Effective Software Development Team: The Complete Guide for 2025`}
+              href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent('https://cipherprojects.com/research/software-development-team')}&title=Building an Effective Software Development Team: The Complete Guide for 2025`}
               target="_blank"
               rel="noopener noreferrer"
               className="opacity-60 hover:opacity-100 transition-opacity"
