@@ -1,4 +1,3 @@
-// src/app/research/sap-enterprise-guide/page.tsx
 'use client'
 
 import Image from 'next/image'
@@ -10,7 +9,7 @@ export default function SAPGuidePage() {
     <main className="min-h-screen pt-48 pb-32">
       <article className="container max-w-3xl">
         {/* Back Link */}
-        <Link 
+        <Link
           href="/research"
           className="inline-flex items-center gap-2 text-lg opacity-60 hover:opacity-100 transition-opacity duration-300 mb-16"
         >
@@ -108,7 +107,7 @@ export default function SAPGuidePage() {
         <div className="mt-32 pt-8 border-t border-current/10">
           <div className="flex items-center gap-4">
             <span className="text-sm opacity-60">Share this article</span>
-            <Link 
+            <Link
               href={`https://twitter.com/intent/tweet?text=What is SAP and How is it Used in Business?&url=${encodeURIComponent('https://cipherprojects.com/research/sap-enterprise-guide')}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -116,7 +115,7 @@ export default function SAPGuidePage() {
             >
               <Twitter size={20} />
             </Link>
-            <Link 
+            <Link
               href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent('https://cipherprojects.com/research/sap-enterprise-guide')}&title=What is SAP and How is it Used in Business?`}
               target="_blank"
               rel="noopener noreferrer"

@@ -1,4 +1,3 @@
-// src/components/MouseEffect.tsx
 'use client'
 
 import { useEffect } from 'react'
@@ -16,11 +15,11 @@ export default function MouseEffect() {
     const handleMouseMove = (e: MouseEvent) => {
       const screenWidth = window.innerWidth
       const screenHeight = window.innerHeight
-      
+
       // Convert mouse position to percentage (-20 to 20)
       const xPercent = ((e.clientX / screenWidth) - 0.5) * 40
       const yPercent = ((e.clientY / screenHeight) - 0.5) * 40
-      
+
       mouseX.set(xPercent)
       mouseY.set(yPercent)
     }
@@ -30,7 +29,7 @@ export default function MouseEffect() {
   }, [mouseX, mouseY])
 
   return (
-    <motion.div 
+    <motion.div
       className="fixed inset-0 -z-5 opacity-50 pointer-events-none"
       style={{
         background: 'radial-gradient(circle at center, rgba(0,102,204,0.15), transparent 50%)',

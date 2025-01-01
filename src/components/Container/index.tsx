@@ -1,4 +1,3 @@
-// src/components/Container/index.tsx
 interface ContainerProps {
   children: React.ReactNode;
   className?: string;
