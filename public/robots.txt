@@ -1,9 +1,11 @@
 # Allow all crawlers
 User-agent: *
 
-# Exclude specific sensitive directories (if any)
-Disallow: /admin/
-Disallow: /private/
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
 
-# Link to the sitemap for better indexing
+# Sitemap
 Sitemap: https://cipherprojects.com/sitemap.xml

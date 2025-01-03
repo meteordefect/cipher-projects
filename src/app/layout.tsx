@@ -4,7 +4,7 @@ import Script from 'next/script'
 import ClientProviders from '@/components/ClientProviders'
 import type { Metadata } from 'next'
 import './globals.css'
-import CustomCursor from '@/components/CustomCursor'
+import SchemaMarkup from '@/components/SchemaMarkup'
 
 const neueHaas = localFont({
   src: [
@@ -89,21 +89,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${neueHaas.variable}`}>
+      <head>
+        <SchemaMarkup />
+      </head>
       <body className="font-sans">
-        <Script 
+        <Script
           src="https://s.ahrefs.com/website-analytics.js"
           data-domain="cipherprojects.com"
           strategy="afterInteractive"
         />
         <ClientProviders>
-          {/* <CustomCursor /> */} {/* Commented out or remove this line */}
+          {/* <CustomCursor /> */}
           <main id="main" className="relative">
             {children}
           </main>
         </ClientProviders>
 
-        <a 
-          href="#main" 
+        <a
+          href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-black"
         >
           Skip to main content
