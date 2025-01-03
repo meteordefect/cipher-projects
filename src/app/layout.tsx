@@ -48,14 +48,14 @@ export const metadata: Metadata = {
   title: 'Cipher Projects', // Title shown in the browser tab and search engines
   description: 'Cipher Projects delivers world-class software development services to clients across Europe, Asia & Australia. Web, mobile, cloud & AI expertise', // Meta description for search engines
   icons: {
-    icon: { url: '/api/favicon', type: 'image/x-icon' }, // Main favicon
-    shortcut: { url: '/api/favicon', type: 'image/x-icon' }, // Shortcut icon
+    icon: { url: '/api/favicon', type: 'image/x-icon' },
+    shortcut: { url: '/api/favicon', type: 'image/x-icon' },
   },
   keywords: ['Cipher Projects', 'Cloud Solutions', 'Cybersecurity', 'Software Development', 'IT Outsourcing'], // SEO keywords
   openGraph: {
     title: 'Cipher Projects',
     description: 'Expertly crafted cloud solutions, cybersecurity, and software projects tailored to your needs. Build smarter with Cipher Projects.',
-    url: 'https://cipherprojects.com', // Replace with your site's URL
+    url: 'https://cipherprojects.com',
     siteName: 'Cipher Projects',
     images: [
       {
@@ -65,14 +65,14 @@ export const metadata: Metadata = {
         alt: 'Cipher Projects - Outsource smarter',
       },
     ],
-    locale: 'en_US', // Replace with your locale
+    locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cipher Projects',
     description: 'Expertly crafted cloud solutions, cybersecurity, and software projects tailored to your needs. Build smarter with Cipher Projects.',
-    images: ['https://www.cipherprojects.com/og-image.jpg'], // Fully-qualified URL
+    images: ['https://www.cipherprojects.com/og-image.jpg'],
   },
   robots: {
     index: true,
