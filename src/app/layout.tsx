@@ -1,4 +1,3 @@
-// src/app/layout.tsx
 import localFont from 'next/font/local'
 import Script from 'next/script'
 import ClientProviders from '@/components/ClientProviders'
@@ -79,7 +78,6 @@ export const metadata: Metadata = {
     follow: true,
   },
 }
-
 
 
 export default function RootLayout({

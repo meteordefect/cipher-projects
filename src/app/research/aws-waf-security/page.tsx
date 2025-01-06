@@ -1,8 +1,35 @@
-'use client'
-
+import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, Linkedin, Twitter } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'Enhancing Digital Security with AWS WAF: A Complete Implementation Guide | Cipher Projects',
+  description: 'Comprehensive guide to AWS WAF implementation, including integration with CloudFront, API Gateway, and ALB. Learn how to protect your applications from web vulnerabilities and optimize security configurations.',
+  keywords: 'AWS WAF, web application firewall, AWS security, cloud security, CloudFront security, API Gateway protection, application security, OWASP protection, AWS security configuration, web security, cloud protection, AWS managed rules, security automation',
+  openGraph: {
+    title: 'Enhancing Digital Security with AWS WAF: Implementation Guide 2024',
+    description: 'In-depth guide to implementing AWS WAF for comprehensive web application security. Learn about managed rules, custom configurations, and integration with AWS services.',
+    url: 'https://cipherprojects.com/research/aws-waf-security',
+    siteName: 'Cipher Projects',
+    images: [
+      {
+        url: 'https://cipherprojects.com/research/aws-security.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'AWS WAF Security Implementation',
+      }
+    ],
+    locale: 'en_US',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AWS WAF Security Implementation Guide 2024',
+    description: 'Complete guide to enhancing application security with AWS WAF. Protect your apps from web vulnerabilities.',
+    images: ['https://cipherprojects.com/research/aws-security.jpg'],
+  }
+}
 
 export default function WAFSecurityPost() {
   return (

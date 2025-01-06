@@ -85,6 +85,16 @@ const BlogPost = ({ post }: BlogPostProps): ReactElement => {
 export default function ResearchPage(): ReactElement {
   const researchPosts: ResearchPost[] = [
     {
+      id: 'expo-vs-flutter',
+      title: "Expo vs Flutter: A Technical Analysis for Enterprise Mobile Development",
+      subtitle: "Making data-driven framework decisions",
+      date: "January 6, 2025",
+      author: "Keith Vaughan",
+      category: "Development",
+      image: "/research/cross-platform.jpg",
+      excerpt: "A comprehensive technical comparison of Expo and Flutter for enterprise mobile development, analyzing performance metrics, developer productivity, and total cost of ownership across real-world implementations."
+    },
+    {
       id: 'software-development-australia',
       title: "Software Development in Australia: The Strategic Advantage of Next-Generation Technologies",
       subtitle: "How Australian businesses are leveraging Cloud, AI, and Cybersecurity for digital transformation",
@@ -161,7 +171,7 @@ export default function ResearchPage(): ReactElement {
       date: "June 18, 2024",
       author: "Cipher Projects Team",
       category: "Security",
-      image: "/research/aws-waf.jpg",
+      image: "/research/aws-security.jpg",
       excerpt: "An exploration of AWS Web Application Firewall capabilities and how customized configurations can enhance security for businesses."
     },
     {

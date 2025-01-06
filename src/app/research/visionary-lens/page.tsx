@@ -1,16 +1,42 @@
-// src/app/research/visionary-lens/page.tsx
-'use client'
-
+import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, Linkedin, Twitter } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: "The Visionary's Lens: Turning Everyday Frustrations into Software Gold | Cipher Projects",
+  description: 'Discover how successful software innovators transform daily frustrations into valuable solutions. Learn the mindset that turns common problems into million-dollar opportunities.',
+  keywords: 'software innovation, visionary thinking, software development mindset, business opportunities, software solutions, problem solving, innovation mindset, software entrepreneurship',
+  openGraph: {
+    title: "The Visionary's Lens: Turning Everyday Frustrations into Software Gold",
+    description: 'How visionary software builders transform daily frustrations into valuable solutions - insights from real-world examples.',
+    url: 'https://cipherprojects.com/research/visionary-lens',
+    siteName: 'Cipher Projects',
+    images: [
+      {
+        url: 'https://cipherprojects.com/research/visionary.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Visionary perspective',
+      }
+    ],
+    locale: 'en_US',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "The Visionary's Lens: Software Innovation Mindset",
+    description: 'How to transform everyday frustrations into valuable software solutions - a visionary approach.',
+    images: ['https://cipherprojects.com/research/visionary.jpg'],
+  }
+}
 
 export default function VisionaryLensPage() {
   return (
     <main className="min-h-screen pt-48 pb-32">
       <article className="container max-w-3xl">
         {/* Back Link */}
-        <Link 
+        <Link
           href="/research"
           className="inline-flex items-center gap-2 text-lg opacity-60 hover:opacity-100 transition-opacity duration-300 mb-16"
         >
@@ -97,7 +123,7 @@ export default function VisionaryLensPage() {
         <div className="mt-32 pt-8 border-t border-current/10">
           <div className="flex items-center gap-4">
             <span className="text-sm opacity-60">Share this article</span>
-            <Link 
+            <Link
               href={`https://twitter.com/intent/tweet?text=The Visionary's Lens: Turning Everyday Frustrations into Software Gold&url=${encodeURIComponent('https://cipherprojects.com/research/visionary-lens')}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -105,7 +131,7 @@ export default function VisionaryLensPage() {
             >
               <Twitter size={20} />
             </Link>
-            <Link 
+            <Link
               href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent('https://cipherprojects.com/research/visionary-lens')}&title=The Visionary's Lens: Turning Everyday Frustrations into Software Gold`}
               target="_blank"
               rel="noopener noreferrer"

@@ -1,8 +1,35 @@
-'use client'
-
+import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, Linkedin, Twitter } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'Building an Effective Software Development Team: The Complete Guide for 2025 | Cipher Projects',
+  description: 'Comprehensive guide to building and managing high-performing software development teams in 2025. Learn about team structures, key roles, and best practices for modern software development.',
+  keywords: 'software development team, team building, development team structure, agile teams, software team management, tech team leadership, software team roles, development team best practices',
+  openGraph: {
+    title: 'Building an Effective Software Development Team: The Complete Guide for 2025',
+    description: 'Learn how to build and manage high-performing software development teams in 2025. Expert insights on team structures, roles, and best practices.',
+    url: 'https://cipherprojects.com/blog/software-development-team',
+    siteName: 'Cipher Projects',
+    images: [
+      {
+        url: 'https://cipherprojects.com/research/software-development-team.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Software Development Team Collaboration',
+      }
+    ],
+    locale: 'en_US',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Building Effective Software Development Teams: 2025 Guide',
+    description: 'Complete guide to building high-performing software development teams. Key roles, structures, and best practices for 2025.',
+    images: ['https://cipherprojects.com/research/software-development-team.jpg'],
+  }
+}
 
 export default function SoftwareDevTeamPage() {
   return (

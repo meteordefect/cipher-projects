@@ -1,8 +1,35 @@
-'use client'
-
+import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, Linkedin, Twitter } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'Software Development in Australia: The Strategic Advantage of Next-Generation Technologies | Cipher Projects',
+  description: 'Explore how Australian businesses leverage cloud computing, AI, and cybersecurity through strategic software development partnerships. Insights from Cipher Projects Canberra.',
+  keywords: 'software development Australia, Canberra software development, cloud computing, artificial intelligence, cybersecurity, Australian tech industry, digital transformation',
+  openGraph: {
+    title: 'Software Development in Australia: The Strategic Advantage of Next-Generation Technologies',
+    description: 'How Australian businesses are leveraging next-generation technologies through strategic software development partnerships.',
+    url: 'https://cipherprojects.com/research/software-development-australia',
+    siteName: 'Cipher Projects',
+    images: [
+      {
+        url: 'https://cipherprojects.com/research/software-development-australia.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Modern software development team at work',
+      }
+    ],
+    locale: 'en_US',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Software Development in Australia: Next-Gen Tech Advantage',
+    description: 'Strategic insights on software development and next-generation technologies in Australia',
+    images: ['https://cipherprojects.com/research/software-development-australia.jpg'],
+  }
+}
 
 export default function SoftwareDevelopmentAustraliaPage() {
   return (

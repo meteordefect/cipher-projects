@@ -1,8 +1,35 @@
-'use client'
-
+import { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, Linkedin, Twitter } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'What is SAP? A Complete Guide to Enterprise Resource Planning | Cipher Projects',
+  description: 'Comprehensive guide to SAP ERP systems, including core modules, business applications, and implementation insights. Learn how SAP transforms business operations through integrated enterprise solutions.',
+  keywords: 'SAP, SAP ERP, enterprise resource planning, SAP implementation, SAP modules, SAP business suite, SAP HANA, SAP consulting, business process management, enterprise software, SAP integration, SAP S/4HANA, digital transformation',
+  openGraph: {
+    title: 'What is SAP and How is it Used in Business? Complete Guide 2024',
+    description: 'Explore how SAP ERP systems transform business operations through integrated enterprise solutions. Comprehensive overview of modules, capabilities, and implementation.',
+    url: 'https://cipherprojects.com/research/sap-enterprise-guide',
+    siteName: 'Cipher Projects',
+    images: [
+      {
+        url: 'https://cipherprojects.com/research/sap.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'SAP Enterprise Solutions',
+      }
+    ],
+    locale: 'en_US',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SAP Enterprise Solutions: Complete Guide 2024',
+    description: 'In-depth guide to SAP ERP systems, modules, and business applications. Learn how SAP transforms enterprise operations.',
+    images: ['https://cipherprojects.com/research/sap.jpg'],
+  }
+}
 
 export default function SAPGuidePage() {
   return (
