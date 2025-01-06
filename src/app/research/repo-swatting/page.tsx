@@ -1,5 +1,3 @@
-'use client'
-
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, Linkedin, Twitter } from 'lucide-react'
@@ -7,8 +5,33 @@ import { ArrowLeft, Linkedin, Twitter } from 'lucide-react'
 export async function generateMetadata() {
   return {
     title: 'Expo vs Flutter: A 2025 Technical Analysis for Enterprise Mobile Development | Cipher Projects',
-    description: 'In-depth comparison of Expo and Flutter for enterprise mobile apps. Real-world performance analysis and implementation insights from enterprise mobile projects.',
-    keywords: 'Expo, Flutter, mobile development, cross-platform development, React Native, enterprise mobile apps'
+    description: 'In-depth technical comparison of Expo and Flutter frameworks for enterprise mobile apps in 2025. Analysis of performance, costs, and real-world implementation data for CTOs and technical leaders.',
+    keywords: 'Expo, Flutter, mobile development, cross-platform development, React Native, enterprise mobile apps, mobile framework comparison, mobile app development 2025, React Native vs Flutter, Expo performance, Flutter performance, mobile development costs, enterprise mobile strategy',
+    openGraph: {
+      title: 'Expo vs Flutter: A 2025 Technical Analysis for Enterprise Mobile Development',
+      description: 'In-depth technical comparison of Expo and Flutter frameworks for enterprise mobile apps in 2025.',
+      url: 'https://cipherprojects.com/research/expo-flutter-analysis',
+      siteName: 'Cipher Projects',
+      images: [
+        {
+          url: 'https://cipherprojects.com/research/cross-platform.jpg',
+          width: 1200,
+          height: 630,
+          alt: 'Cross-platform mobile development comparison',
+        }
+      ],
+      locale: 'en_US',
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Expo vs Flutter: A 2025 Technical Analysis',
+      description: 'In-depth comparison of Expo and Flutter for enterprise mobile development',
+      images: ['https://cipherprojects.com/research/cross-platform.jpg'],
+    },
+    alternates: {
+      canonical: 'https://cipherprojects.com/research/expo-flutter-analysis'
+    }
   }
 }
 
