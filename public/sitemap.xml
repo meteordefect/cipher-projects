@@ -30,4 +30,35 @@
     <priority>0.5</priority>
     <changefreq>monthly</changefreq>
   </url>
+  <!-- Research Articles -->
+  <url>
+    <loc>https://cipherprojects.com/research/expo-flutter-analysis</loc>
+    <lastmod>2024-01-06</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://cipherprojects.com/research/aws-waf-security</loc>
+    <lastmod>2024-06-18</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://cipherprojects.com/research/software-development-australia</loc>
+    <lastmod>2024-01-01</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://cipherprojects.com/research/software-development-team</loc>
+    <lastmod>2024-01-01</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://cipherprojects.com/research/visionary-lens</loc>
+    <lastmod>2024-11-09</lastmod>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+  </url>
 </urlset>
