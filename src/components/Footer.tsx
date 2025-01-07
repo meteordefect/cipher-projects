@@ -116,7 +116,7 @@ export default function Footer() {
           {/* Copyright */}
           <div className="col-span-12 md:col-span-3 flex flex-col justify-between">
             <div className="text-sm opacity-60">
-              <p className="mb-2">© 2024 Cipher Projects.</p>
+              <p className="mb-2">© 2025 Cipher Projects.</p>
               <Link href="/privacy-policy" className="hover:opacity-100 transition-opacity">
                 Privacy Policy
               </Link>

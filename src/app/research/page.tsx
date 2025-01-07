@@ -1,3 +1,5 @@
+// remember to add the sitemap.xml listing
+
 'use client'
 
 import { motion } from 'framer-motion'
