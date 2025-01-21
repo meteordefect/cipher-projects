@@ -87,6 +87,16 @@ const BlogPost = ({ post }: BlogPostProps): ReactElement => {
 export default function ResearchPage(): ReactElement {
   const researchPosts: ResearchPost[] = [
     {
+      id: 'aws-security-australia',
+      title: "AWS Security Best Practices for Australian Businesses in 2025",
+      subtitle: "Implementing robust cloud security for the evolving threat landscape",
+      date: "January 21, 2025",
+      author: "Cipher Projects Team",
+      category: "Security",
+      image: "/research/aws-security-australia.jpg",
+      excerpt: "An in-depth analysis of AWS security implementation for Australian enterprises, covering emerging threats, compliance requirements, and proven strategies. Learn how leading organizations are securing their cloud infrastructure while maintaining operational efficiency and regulatory compliance."
+    },
+    {
       id: 'expo-vs-flutter',
       title: "Expo vs Flutter: A Technical Analysis for Enterprise Mobile Development",
       subtitle: "Making data-driven framework decisions",
