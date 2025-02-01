@@ -1,5 +1,3 @@
-// remember to add the sitemap.xml listing
-
 'use client'
 
 import { motion } from 'framer-motion'
@@ -87,6 +85,26 @@ const BlogPost = ({ post }: BlogPostProps): ReactElement => {
 export default function ResearchPage(): ReactElement {
   const researchPosts: ResearchPost[] = [
     {
+      id: 'remote-devops-teams',
+      title: "Building Successful Remote DevOps Teams: Best Practices and Strategies",
+      subtitle: "Creating high-performing distributed DevOps teams",
+      date: "February 1, 2025",
+      author: "Cipher Projects Team",
+      category: "Team Management",
+      image: "/research/remote-devops-teams.jpg",
+      excerpt: "A comprehensive guide to building and managing successful remote DevOps teams. Learn key strategies for communication, collaboration, and maintaining high performance in distributed teams while fostering a strong remote work culture."
+    },
+    {
+      id: 'hire-remote-devops-engineer',
+      title: "How to Hire Remote DevOps Engineers: A Strategic Guide for Australian Companies",
+      subtitle: "Building effective remote DevOps teams in the digital age",
+      date: "February 1, 2025",
+      author: "Cipher Projects Team",
+      category: "Hiring",
+      image: "/research/hire-remote-devops-engineer.jpg",
+      excerpt: "A comprehensive guide for Australian companies on hiring and managing remote DevOps engineers. Learn about essential skills, hiring processes, and best practices for building successful remote DevOps teams that drive innovation and maintain operational excellence."
+    },
+    {
       id: 'aws-security-australia',
       title: "AWS Security Best Practices for Australian Businesses in 2025",
       subtitle: "Implementing robust cloud security for the evolving threat landscape",
@@ -143,7 +161,7 @@ export default function ResearchPage(): ReactElement {
       date: "November 22, 2024",
       author: "Keith Vaughan",
       category: "Security",
-      image: "/research/repo-swatting.jpg",
+      image: "/repo-swatting.jpg",
       excerpt: "A concerning new attack method threatens developers' accounts on major platforms like GitHub and GitLab, exploiting trust and safety mechanisms through malicious file uploads."
     },
     {
@@ -163,7 +181,7 @@ export default function ResearchPage(): ReactElement {
       date: "September 23, 2024",
       author: "Cipher Projects Team",
       category: "Software Development",
-      image: "/research/kitchen-dev.jpg",
+      image: "/kitchen-dev.jpg",
       excerpt: "How the principles that make a successful kitchen mirror those that create successful software projects. Insights from Gordon Ramsay's approach to fixing failing restaurants."
     },
     {
@@ -173,7 +191,7 @@ export default function ResearchPage(): ReactElement {
       date: "August 11, 2024",
       author: "Cipher Projects Team",
       category: "Strategic Innovation",
-      image: "/research/china-energy.jpg",
+      image: "/china-energy.jpg",
       excerpt: "How China's approach to green energy offers compelling lessons in long-term strategic planning that business leaders can learn from, regardless of their industry."
     },
     {
@@ -183,7 +201,7 @@ export default function ResearchPage(): ReactElement {
       date: "June 18, 2024",
       author: "Cipher Projects Team",
       category: "Security",
-      image: "/research/aws-security.jpg",
+      image: "/aws-security.jpg",
       excerpt: "An exploration of AWS Web Application Firewall capabilities and how customized configurations can enhance security for businesses."
     },
     {
@@ -193,7 +211,7 @@ export default function ResearchPage(): ReactElement {
       date: "June 18, 2024",
       author: "Cipher Projects Team",
       category: "Enterprise Solutions",
-      image: "/research/sap.jpg",
+      image: "/sap.jpg",
       excerpt: "A deep dive into SAP's comprehensive modules and how they help businesses streamline their processes by integrating various functions into a single system."
     }
   ]

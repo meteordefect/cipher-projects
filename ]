@@ -1,0 +1,16 @@
+# Default settings
+Host *
+    AddKeysToAgent yes
+    # UseKeychain yes  # Remove or comment out this line
+
+# Meteor GitHub
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/github2
+
+# GitLab
+Host gitlab.com
+    HostName gitlab.com
+    User git
+    IdentityFile ~/.ssh/gitlab
