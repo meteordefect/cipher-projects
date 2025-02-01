@@ -85,6 +85,16 @@ const BlogPost = ({ post }: BlogPostProps): ReactElement => {
 export default function ResearchPage(): ReactElement {
   const researchPosts: ResearchPost[] = [
     {
+      id: 'offshore-development-team',
+      title: "Managing Offshore Development Teams: A Comprehensive Guide",
+      subtitle: "Strategies for successful offshore collaboration",
+      date: "February 1, 2025",
+      author: "Cipher Projects Team",
+      category: "Team Management",
+      image: "/research/offshore-development-team.jpg",
+      excerpt: "A detailed guide on effectively managing offshore development teams, covering communication strategies, cultural considerations, and best practices for maintaining productivity and quality across distributed teams."
+    },
+    {
       id: 'remote-devops-teams',
       title: "Building Successful Remote DevOps Teams: Best Practices and Strategies",
       subtitle: "Creating high-performing distributed DevOps teams",
@@ -181,7 +191,7 @@ export default function ResearchPage(): ReactElement {
       date: "September 23, 2024",
       author: "Cipher Projects Team",
       category: "Software Development",
-      image: "/kitchen-dev.jpg",
+      image: "/research/kitchen-dev.jpg",
       excerpt: "How the principles that make a successful kitchen mirror those that create successful software projects. Insights from Gordon Ramsay's approach to fixing failing restaurants."
     },
     {
@@ -191,7 +201,7 @@ export default function ResearchPage(): ReactElement {
       date: "August 11, 2024",
       author: "Cipher Projects Team",
       category: "Strategic Innovation",
-      image: "/china-energy.jpg",
+      image: "/research/china-energy.jpg",
       excerpt: "How China's approach to green energy offers compelling lessons in long-term strategic planning that business leaders can learn from, regardless of their industry."
     },
     {
@@ -201,7 +211,7 @@ export default function ResearchPage(): ReactElement {
       date: "June 18, 2024",
       author: "Cipher Projects Team",
       category: "Security",
-      image: "/aws-security.jpg",
+      image: "/research/aws-security.jpg",
       excerpt: "An exploration of AWS Web Application Firewall capabilities and how customized configurations can enhance security for businesses."
     },
     {
@@ -211,7 +221,7 @@ export default function ResearchPage(): ReactElement {
       date: "June 18, 2024",
       author: "Cipher Projects Team",
       category: "Enterprise Solutions",
-      image: "/sap.jpg",
+      image: "/research/sap.jpg",
       excerpt: "A deep dive into SAP's comprehensive modules and how they help businesses streamline their processes by integrating various functions into a single system."
     }
   ]
