@@ -80,50 +80,63 @@ export default function SoftwareDevelopmentAustraliaPage() {
             </p>
           </div>
 
+          <div>
+            <h3 className="text-xl font-medium mb-4">Table of Contents</h3>
+            <ol className="list-decimal pl-4 space-y-2">
+              <li><a href="#evolution" className="text-lg opacity-80 hover:opacity-100 transition-opacity">The Evolution of Software Development in Australia</a></li>
+              <li><a href="#cloud" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Cloud Solutions: Building for Scale</a></li>
+              <li><a href="#ai" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Artificial Intelligence: The Competitive Edge</a></li>
+              <li><a href="#security" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Cybersecurity: Protecting Digital Assets</a></li>
+              <li><a href="#full-stack" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Full-Stack Excellence</a></li>
+              <li><a href="#advantage" className="text-lg opacity-80 hover:opacity-100 transition-opacity">The Cipher Projects Advantage</a></li>
+              <li><a href="#future" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Looking Forward</a></li>
+            </ol>
+          </div>
+
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">The Evolution of Software Development in Australia</h2>
+            <h2 id="evolution" className="text-3xl font-normal">The Evolution of Software Development in Australia</h2>
             <p className="text-lg leading-relaxed opacity-80">
               The Australian software development landscape has transformed dramatically in recent years. While many providers focus on traditional development approaches, forward-thinking companies are embracing next-generation technologies. Cipher Projects leads this evolution by integrating cutting-edge solutions with robust development practices, ensuring businesses stay ahead of the technology curve.
             </p>
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Cloud Solutions: Building for Scale</h2>
+            <h2 id="cloud" className="text-3xl font-normal">Cloud Solutions: Building for Scale</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Cloud computing has revolutionized how businesses operate, and our expertise in this domain enables organizations to achieve unprecedented scalability and efficiency. We architect solutions that leverage the full potential of cloud platforms, ensuring businesses can adapt and grow without technological constraints. Our cloud implementations focus on cost-effectiveness while maintaining peak performance and security.
             </p>
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Artificial Intelligence: The Competitive Edge</h2>
+            <h2 id="ai" className="text-3xl font-normal">Artificial Intelligence: The Competitive Edge</h2>
             <p className="text-lg leading-relaxed opacity-80">
               AI isn't just about automation; it's about creating intelligent systems that provide strategic advantages. Our AI solutions range from predictive analytics that forecast market trends to natural language processing systems that enhance customer engagement. By integrating AI into core business processes, we help organizations make data-driven decisions and stay competitive in an increasingly automated world.
             </p>
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Cybersecurity: Protecting Digital Assets</h2>
+            <h2 id="security" className="text-3xl font-normal">Cybersecurity: Protecting Digital Assets</h2>
             <p className="text-lg leading-relaxed opacity-80">
               In today's digital landscape, security isn't an afterthought—it's a fundamental requirement. Our cybersecurity approach integrates advanced threat protection with practical usability, ensuring systems remain both secure and efficient. From government agencies to private enterprises, our security implementations protect critical digital assets while enabling business growth.
             </p>
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Full-Stack Excellence</h2>
+            <h2 id="full-stack" className="text-3xl font-normal">Full-Stack Excellence</h2>
             <p className="text-lg leading-relaxed opacity-80">
               While we excel in emerging technologies, our foundation lies in comprehensive full-stack development. Our team delivers exceptional user experiences through responsive web applications and cross-platform mobile solutions, supported by robust backend systems that ensure reliability and performance. This full-stack capability allows us to create cohesive solutions that address all aspects of digital needs.
             </p>
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">The Cipher Projects Advantage</h2>
+            <h2 id="advantage" className="text-3xl font-normal">The Cipher Projects Advantage</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Located in Canberra, we combine local presence with global expertise. Our understanding of Australian business contexts, coupled with our technical excellence, makes us an ideal partner for organizations seeking digital transformation. We maintain transparent communication throughout the development process, ensuring projects stay aligned with business objectives while meeting the highest technical standards.
             </p>
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Looking Forward</h2>
+            <h2 id="future" className="text-3xl font-normal">Looking Forward</h2>
             <p className="text-lg leading-relaxed opacity-80">
               As technology continues to evolve, choosing the right software development partner becomes increasingly crucial. Cipher Projects stands ready to help organizations navigate this digital future, combining innovative solutions with practical implementation to drive real business value. Whether you're looking to modernize existing systems or build new digital capabilities, our team provides the expertise and support needed for success in today's technology-driven world.
             </p>

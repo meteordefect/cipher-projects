@@ -79,15 +79,28 @@ export default function AWSSecurityAnalysis() {
             </p>
           </div>
 
+          <div>
+            <h3 className="text-xl font-medium mb-4">Table of Contents</h3>
+            <ol className="list-decimal pl-4 space-y-2">
+              <li><a href="#current-state" className="text-lg opacity-80 hover:opacity-100 transition-opacity">The Current State of AWS Security in Australia</a></li>
+              <li><a href="#compliance" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Australian Compliance and Regulatory Framework</a></li>
+              <li><a href="#tools" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Essential AWS Security Tools for Australian Enterprises</a></li>
+              <li><a href="#implementation" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Implementation Strategy for Australian Organizations</a></li>
+              <li><a href="#patterns" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Common Security Implementation Patterns</a></li>
+              <li><a href="#success-stories" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Australian Industry Success Stories</a></li>
+              <li><a href="#future" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Future-Proofing Australian Cloud Security</a></li>
+            </ol>
+          </div>
+
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">The Current State of AWS Security in Australia</h2>
+            <h2 id="current-state" className="text-3xl font-normal">The Current State of AWS Security in Australia</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Recent studies show that 44% of companies globally have experienced cloud data breaches, with Australian businesses particularly targeted due to our strong economy and digital infrastructure. The Australian Cyber Security Centre reports a 13% increase in cloud-specific attacks in the past year, with finance and healthcare sectors being primary targets. Our analysis of over 50 Australian enterprise implementations reveals that organizations using proper security controls experience 65% fewer security incidents.
             </p>
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Australian Compliance and Regulatory Framework</h2>
+            <h2 id="compliance" className="text-3xl font-normal">Australian Compliance and Regulatory Framework</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Australian businesses must navigate complex regulatory requirements including:
             </p>
@@ -101,7 +114,7 @@ export default function AWSSecurityAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Essential AWS Security Tools for Australian Enterprises</h2>
+            <h2 id="tools" className="text-3xl font-normal">Essential AWS Security Tools for Australian Enterprises</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Based on our experience implementing AWS security solutions across Australia, we've identified critical tools and configurations specific to the Australian market:
             </p>
@@ -115,7 +128,7 @@ export default function AWSSecurityAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Implementation Strategy for Australian Organizations</h2>
+            <h2 id="implementation" className="text-3xl font-normal">Implementation Strategy for Australian Organizations</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Our proven implementation framework for Australian businesses follows three key phases:
             </p>
@@ -145,7 +158,7 @@ export default function AWSSecurityAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Common Security Implementation Patterns</h2>
+            <h2 id="patterns" className="text-3xl font-normal">Common Security Implementation Patterns</h2>
             <p className="text-lg leading-relaxed opacity-80">
               We've observed several successful security implementation patterns across Australian sectors:
             </p>
@@ -157,7 +170,7 @@ export default function AWSSecurityAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Australian Industry Success Stories</h2>
+            <h2 id="success-stories" className="text-3xl font-normal">Australian Industry Success Stories</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Our implementations across various Australian sectors demonstrate significant improvements in security posture:
             </p>
@@ -169,7 +182,7 @@ export default function AWSSecurityAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Future-Proofing Australian Cloud Security</h2>
+            <h2 id="future" className="text-3xl font-normal">Future-Proofing Australian Cloud Security</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Looking ahead, Australian businesses must prepare for emerging challenges. Our research indicates key focus areas for 2025 and beyond:
             </p>

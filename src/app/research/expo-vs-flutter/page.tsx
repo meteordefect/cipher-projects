@@ -89,8 +89,20 @@ export default function ExpoFlutterAnalysis() {
             </p>
           </div>
 
+          <div>
+            <h3 className="text-xl font-medium mb-4">Table of Contents</h3>
+            <ol className="list-decimal pl-4 space-y-2">
+              <li><a href="#architecture" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Technical Architecture Deep Dive</a></li>
+              <li><a href="#workflow" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Development Workflow Comparison</a></li>
+              <li><a href="#implementation" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Enterprise Implementation Insights</a></li>
+              <li><a href="#cost" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Cost and Resource Implications</a></li>
+              <li><a href="#trends" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Future Trends and Framework Evolution</a></li>
+              <li><a href="#conclusion" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Conclusion</a></li>
+            </ol>
+          </div>
+
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Technical Architecture Deep Dive</h2>
+            <h2 id="architecture" className="text-3xl font-normal">Technical Architecture Deep Dive</h2>
             <p className="text-lg leading-relaxed opacity-80">
               When comparing Expo and Flutter in 2025, the fundamental architectural differences define their respective strengths. Flutter's approach to native compilation sets it apart - the framework compiles directly to native code and utilizes its own rendering engine. This contrasts sharply with Expo's architecture, which bridges JavaScript to native components through React Native's infrastructure.
             </p>
@@ -103,7 +115,7 @@ export default function ExpoFlutterAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Development Workflow Comparison</h2>
+            <h2 id="workflow" className="text-3xl font-normal">Development Workflow Comparison</h2>
             <p className="text-lg leading-relaxed opacity-80">
               The development experience differs significantly between Flutter and Expo. Flutter developers work with Dart, a strongly-typed language optimized for UI development. This learning curve is offset by Flutter's comprehensive development tools and hot reload capabilities. Expo leverages JavaScript and React, making it immediately accessible to web developers and teams with React experience.
             </p>
@@ -113,7 +125,7 @@ export default function ExpoFlutterAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Enterprise Implementation Insights</h2>
+            <h2 id="implementation" className="text-3xl font-normal">Enterprise Implementation Insights</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Our analysis of enterprise-scale implementations reveals clear patterns in how organizations choose between Flutter and Expo. Business applications overwhelmingly benefit from Expo's streamlined development cycle, with teams reporting 40% faster development times and the ability to push updates without App Store approval processes.
             </p>
@@ -126,7 +138,7 @@ export default function ExpoFlutterAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Cost and Resource Implications</h2>
+            <h2 id="cost" className="text-3xl font-normal">Cost and Resource Implications</h2>
             <p className="text-lg leading-relaxed opacity-80">
               The total cost of ownership varies significantly between Flutter and Expo implementations. Initial development costs typically favor Expo, with projects seeing 30-40% lower development costs due to faster development cycles and familiar technology stack. However, Flutter projects often demonstrate 15% lower long-term maintenance costs, particularly in applications with complex UI requirements.
             </p>
@@ -136,7 +148,7 @@ export default function ExpoFlutterAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Future Trends and Framework Evolution</h2>
+            <h2 id="trends" className="text-3xl font-normal">Future Trends and Framework Evolution</h2>
             <p className="text-lg leading-relaxed opacity-80">
               As both Flutter and Expo continue to evolve, their respective ecosystems show different growth patterns. Flutter's widget-based approach and growing popularity in the enterprise space suggest increased adoption for complex applications. Meanwhile, Expo's integration with the React Native ecosystem positions it strongly for business applications and rapid development needs.
             </p>
@@ -146,7 +158,7 @@ export default function ExpoFlutterAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Conclusion</h2>
+            <h2 id="conclusion" className="text-3xl font-normal">Conclusion</h2>
             <p className="text-lg leading-relaxed opacity-80">
               For enterprise mobile development in 2025, our research indicates that Expo provides the optimal choice for business applications and teams with React expertise, while Flutter remains superior for custom-branded experiences requiring sophisticated animations. The decision between Flutter and Expo ultimately hinges on specific technical requirements, existing team composition, and long-term maintenance considerations.
             </p>

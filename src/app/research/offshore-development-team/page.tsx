@@ -83,14 +83,28 @@ export default function OffshoreTeamAnalysis() {
 
         <div className="[&>*]:mb-8 space-y-8">
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Abstract</h2>
+            <h2 id="abstract" className="text-3xl font-normal">Abstract</h2>
             <p className="text-lg leading-relaxed opacity-80">
               In today's hyper-competitive tech landscape, Australian businesses face mounting pressure to innovate and scale quickly while managing costs effectively. As we move into 2025, leveraging global talent through offshore development teams has become not just an option, but a strategic necessity for maintaining competitive advantage.
             </p>
           </div>
 
+          <div>
+            <h3 className="text-xl font-medium mb-4">Table of Contents</h3>
+            <ol className="list-decimal pl-4 space-y-2">
+              <li><a href="#abstract" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Abstract</a></li>
+              <li><a href="#global-talent" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Why Global Talent is Critical in 2025</a></li>
+              <li><a href="#management-advantage" className="text-lg opacity-80 hover:opacity-100 transition-opacity">The Australian Management Advantage</a></li>
+              <li><a href="#management-structure" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Effective Management Structure</a></li>
+              <li><a href="#security" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Security and Compliance in 2025</a></li>
+              <li><a href="#location" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Selecting the Right Offshore Location</a></li>
+              <li><a href="#strategy" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Building Your Offshore Strategy</a></li>
+              <li><a href="#conclusion" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Conclusion</a></li>
+            </ol>
+          </div>
+
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Why Global Talent is Critical in 2025</h2>
+            <h2 id="global-talent" className="text-3xl font-normal">Why Global Talent is Critical in 2025</h2>
             <p className="text-lg leading-relaxed opacity-80">
               The Australian tech sector continues to grow rapidly, but local talent shortages present significant challenges. Forward-thinking companies are increasingly turning to offshore development teams to accelerate product development cycles, access specialized technical expertise, scale teams quickly to meet project demands, and maintain competitive advantage in a fast-moving market.
             </p>
@@ -100,7 +114,7 @@ export default function OffshoreTeamAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">The Australian Management Advantage</h2>
+            <h2 id="management-advantage" className="text-3xl font-normal">The Australian Management Advantage</h2>
             <p className="text-lg leading-relaxed opacity-80">
               The key differentiator for successful offshore operations lies in having strong Australian management oversight. Local leadership ensures that offshore teams operate in alignment with Australian business practices and expectations.
             </p>
@@ -110,7 +124,7 @@ export default function OffshoreTeamAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Effective Management Structure</h2>
+            <h2 id="management-structure" className="text-3xl font-normal">Effective Management Structure</h2>
             <p className="text-lg leading-relaxed opacity-80">
               The most successful offshore arrangements typically feature a hybrid management model with Australian Project Leadership including senior project managers based in Australia, business analysts who understand local market needs, and technical leads who can bridge cultural gaps.
             </p>
@@ -120,7 +134,7 @@ export default function OffshoreTeamAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Security and Compliance in 2025</h2>
+            <h2 id="security" className="text-3xl font-normal">Security and Compliance in 2025</h2>
             <p className="text-lg leading-relaxed opacity-80">
               As cyber threats continue to evolve, security considerations have become paramount when managing offshore teams. Modern offshore operations must address data protection through implementation of robust data encryption protocols, secure access management systems, regular security audits and compliance checks, and clear data handling procedures aligned with Australian privacy laws.
             </p>
@@ -130,7 +144,7 @@ export default function OffshoreTeamAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Selecting the Right Offshore Location</h2>
+            <h2 id="location" className="text-3xl font-normal">Selecting the Right Offshore Location</h2>
             <p className="text-lg leading-relaxed opacity-80">
               While many regions offer offshore development services, Vietnam has emerged as a particularly attractive option for Australian businesses in 2025 due to timezone alignment with near-perfect overlap with Australian business hours, real-time collaboration capabilities, and minimal communication delays.
             </p>
@@ -140,7 +154,7 @@ export default function OffshoreTeamAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Building Your Offshore Strategy</h2>
+            <h2 id="strategy" className="text-3xl font-normal">Building Your Offshore Strategy</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Start with an assessment phase by evaluating your organization's specific needs: required technical skills and expertise, project timelines and milestones, budget considerations, and security requirements.
             </p>
@@ -156,7 +170,7 @@ export default function OffshoreTeamAnalysis() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Conclusion</h2>
+            <h2 id="conclusion" className="text-3xl font-normal">Conclusion</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Building successful offshore development teams in 2025 requires a balanced approach that combines global talent with local Australian management expertise. By focusing on strong governance, security, and cultural alignment, businesses can create high-performing offshore teams that drive innovation and growth while maintaining Australian business standards and practices.
             </p>
