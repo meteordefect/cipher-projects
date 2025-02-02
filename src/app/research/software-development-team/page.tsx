@@ -80,8 +80,19 @@ export default function SoftwareDevTeamPage() {
             </p>
           </div>
 
+          <div>
+            <h3 className="text-xl font-medium mb-4">Table of Contents</h3>
+            <ol className="list-decimal pl-4 space-y-2">
+              <li><a href="#core-roles" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Core Roles in Modern Software Development Teams</a></li>
+              <li><a href="#team-structure" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Choosing the Right Team Structure</a></li>
+              <li><a href="#characteristics" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Characteristics of High-Performing Teams</a></li>
+              <li><a href="#excellence" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Building and Maintaining Team Excellence</a></li>
+              <li><a href="#future" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Looking Ahead: Future of Development Teams</a></li>
+            </ol>
+          </div>
+
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Core Roles in Modern Software Development Teams</h2>
+            <h2 id="core-roles" className="text-3xl font-normal">Core Roles in Modern Software Development Teams</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Today's software development teams are intricate ecosystems where each role plays a vital part in the product's success. The key roles typically include product managers who oversee the product vision, software developers who bring that vision to life, UX/UI designers who ensure user-friendly interfaces, and quality assurance engineers who maintain product quality.
             </p>
@@ -91,7 +102,7 @@ export default function SoftwareDevTeamPage() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Choosing the Right Team Structure</h2>
+            <h2 id="team-structure" className="text-3xl font-normal">Choosing the Right Team Structure</h2>
             <p className="text-lg leading-relaxed opacity-80">
               The structure of your development team can significantly impact its effectiveness. While traditional hierarchical structures work well for some organizations, many modern teams are adopting more flexible, Agile-based approaches. Agile teams typically consist of 4-10 members and emphasize self-organization, cross-functionality, and iterative development.
             </p>
@@ -101,7 +112,7 @@ export default function SoftwareDevTeamPage() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Characteristics of High-Performing Teams</h2>
+            <h2 id="characteristics" className="text-3xl font-normal">Characteristics of High-Performing Teams</h2>
             <p className="text-lg leading-relaxed opacity-80">
               High-performing software development teams share several key characteristics. They excel at collaboration, with team members working seamlessly together while sharing knowledge and supporting each other. These teams maintain a strong customer focus, understanding user needs and incorporating feedback effectively into their development cycle.
             </p>
@@ -111,7 +122,7 @@ export default function SoftwareDevTeamPage() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Building and Maintaining Team Excellence</h2>
+            <h2 id="excellence" className="text-3xl font-normal">Building and Maintaining Team Excellence</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Creating an effective software development team requires careful attention to both technical skills and team dynamics. Start by establishing clear objectives and expectations, then focus on fostering a collaborative culture where innovation and continuous learning are encouraged. Regular team meetings, code reviews, and knowledge-sharing sessions help maintain technical excellence while strengthening team bonds.
             </p>
@@ -121,7 +132,7 @@ export default function SoftwareDevTeamPage() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Looking Ahead: Future of Development Teams</h2>
+            <h2 id="future" className="text-3xl font-normal">Looking Ahead: Future of Development Teams</h2>
             <p className="text-lg leading-relaxed opacity-80">
               As we move forward, software development teams must evolve to meet changing technological demands and work patterns. Remote and hybrid work arrangements are becoming permanent fixtures, requiring teams to master virtual collaboration tools and asynchronous communication methods. Additionally, the rising importance of DevOps, artificial intelligence, and cloud technologies means teams must continuously adapt their skillsets and working methods.
             </p>

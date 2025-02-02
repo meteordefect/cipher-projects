@@ -78,8 +78,21 @@ export default function RemoteDevOpsTeams() {
             <p className="text-xl leading-relaxed opacity-80">As Australian businesses scale their digital operations, many are turning to Asian tech hubs for remote DevOps talent. The region offers a compelling combination of technical expertise, favorable time zones, and cost advantages. This comprehensive analysis helps you navigate the diverse landscape of Asian DevOps talent and make informed hiring decisions.</p>
           </div>
 
+          <div>
+            <h3 className="text-xl font-medium mb-4">Table of Contents</h3>
+            <ol className="list-decimal pl-4 space-y-2">
+              <li><a href="#evolution" className="text-lg opacity-80 hover:opacity-100 transition-opacity">The Evolution of Asian Tech Hubs</a></li>
+              <li><a href="#timezone" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Time Zone Advantages for Australian Companies</a></li>
+              <li><a href="#expertise" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Technical Expertise and Specializations</a></li>
+              <li><a href="#management" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Maximizing Value Through Australian-Led Management</a></li>
+              <li><a href="#building" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Building Successful Remote DevOps Teams</a></li>
+              <li><a href="#success" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Success Stories and Learning Opportunities</a></li>
+              <li><a href="#choice" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Making the Right Choice for Your Business</a></li>
+            </ol>
+          </div>
+
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">The Evolution of Asian Tech Hubs</h2>
+            <h2 id="evolution" className="text-3xl font-normal">The Evolution of Asian Tech Hubs</h2>
             <p className="text-lg leading-relaxed opacity-80">The Asia-Pacific region has transformed into a powerhouse of technical talent, with Vietnam emerging as a particularly attractive destination for Australian businesses seeking DevOps expertise. The shifting landscape of tech talent has created new opportunities for companies looking to build efficient, cost-effective remote teams.</p>
           </div>
 
@@ -155,7 +168,7 @@ export default function RemoteDevOpsTeams() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Time Zone Advantages for Australian Companies</h2>
+            <h2 id="timezone" className="text-3xl font-normal">Time Zone Advantages for Australian Companies</h2>
             <p className="text-lg leading-relaxed opacity-80">One of the most compelling reasons for Australian businesses to consider Asian tech hubs is the favorable time zone alignment. This geographical advantage enables various collaboration models and coverage strategies.</p>
           </div>
 
@@ -177,7 +190,7 @@ export default function RemoteDevOpsTeams() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Technical Expertise and Specializations</h2>
+            <h2 id="expertise" className="text-3xl font-normal">Technical Expertise and Specializations</h2>
             <p className="text-lg leading-relaxed opacity-80">Each region has developed distinct technical specializations that reflect local industry demands and educational focus areas.</p>
           </div>
 
@@ -215,7 +228,7 @@ export default function RemoteDevOpsTeams() {
           </div>
 
           <div className="space-y-6">
-            <h3 className="text-3xl font-normal mt-12">Maximizing Value Through Australian-Led Management</h3>
+            <h3 id="management" className="text-3xl font-normal mt-12">Maximizing Value Through Australian-Led Management</h3>
             <p className="text-lg leading-relaxed opacity-80">When building remote DevOps teams in Asia, the key to success lies in finding the right balance between cost efficiency and operational excellence. Australian businesses should prioritize working with companies that provide strong Australian management oversight – this approach combines the cost advantages of offshore talent with local business understanding and professional standards.</p>
           </div>
 
@@ -232,7 +245,7 @@ export default function RemoteDevOpsTeams() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Building Successful Remote DevOps Teams</h2>
+            <h2 id="building" className="text-3xl font-normal">Building Successful Remote DevOps Teams</h2>
             <p className="text-lg leading-relaxed opacity-80">Success with remote Asian DevOps teams requires thoughtful planning and ongoing commitment to team development. Consider these proven strategies:</p>
           </div>
 
@@ -252,7 +265,7 @@ export default function RemoteDevOpsTeams() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Success Stories and Learning Opportunities</h2>
+            <h2 id="success" className="text-3xl font-normal">Success Stories and Learning Opportunities</h2>
             <h3 className="text-2xl font-normal mt-12">Case Study: E-commerce Platform Scale-up</h3>
             <p className="text-lg leading-relaxed opacity-80">An Australian e-commerce company successfully scaled its operations by building a distributed DevOps team across Vietnam and India. The Vietnamese team handled primary development and deployment during Australian business hours, while the Indian team provided overnight coverage and specialized in infrastructure optimization.</p>
 
@@ -266,7 +279,7 @@ export default function RemoteDevOpsTeams() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Making the Right Choice for Your Business</h2>
+            <h2 id="choice" className="text-3xl font-normal">Making the Right Choice for Your Business</h2>
             <p className="text-lg leading-relaxed opacity-80">When selecting an Asian tech hub for your remote DevOps team, consider:</p>
             <ol className="list-decimal pl-6 space-y-2 text-lg leading-relaxed opacity-80">
               <li>Your specific technical requirements</li>

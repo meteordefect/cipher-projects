@@ -171,7 +171,7 @@ export default function ResearchPage(): ReactElement {
       date: "November 22, 2024",
       author: "Keith Vaughan",
       category: "Security",
-      image: "/repo-swatting.jpg",
+      image: "/research/repo-swatting.jpg",
       excerpt: "A concerning new attack method threatens developers' accounts on major platforms like GitHub and GitLab, exploiting trust and safety mechanisms through malicious file uploads."
     },
     {

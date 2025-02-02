@@ -79,8 +79,22 @@ export default function RemoteDevOpsHiring() {
             </p>
           </div>
 
+          <div>
+            <h3 className="text-xl font-medium mb-4">Table of Contents</h3>
+            <ol className="list-decimal pl-4 space-y-2">
+              <li><a href="#why-remote" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Why Australian Companies Are Embracing Remote DevOps Engineers</a></li>
+              <li><a href="#essential-skills" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Essential Skills to Look for in Remote DevOps Engineers</a></li>
+              <li><a href="#hiring-process" className="text-lg opacity-80 hover:opacity-100 transition-opacity">The Strategic Hiring Process</a></li>
+              <li><a href="#managing-teams" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Managing Remote DevOps Teams Successfully</a></li>
+              <li><a href="#best-practices" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Best Practices for Remote DevOps Management</a></li>
+              <li><a href="#cost-roi" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Cost Considerations and ROI</a></li>
+              <li><a href="#security" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Security and Compliance</a></li>
+              <li><a href="#conclusion" className="text-lg opacity-80 hover:opacity-100 transition-opacity">Conclusion</a></li>
+            </ol>
+          </div>
+
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Why Australian Companies Are Embracing Remote DevOps Engineers</h2>
+            <h2 id="why-remote" className="text-3xl font-normal">Why Australian Companies Are Embracing Remote DevOps Engineers</h2>
             <p className="text-lg leading-relaxed opacity-80">
               The shift towards remote DevOps talent isn't just a trend – it's a strategic advantage. With the growing complexity of modern software development and deployment, having access to a global talent pool has become crucial for:
             </p>
@@ -93,7 +107,7 @@ export default function RemoteDevOpsHiring() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Essential Skills to Look for in Remote DevOps Engineers</h2>
+            <h2 id="essential-skills" className="text-3xl font-normal">Essential Skills to Look for in Remote DevOps Engineers</h2>
             <p className="text-lg leading-relaxed opacity-80">
               When hiring remote DevOps engineers, look for candidates who combine technical expertise with strong remote collaboration capabilities:
             </p>
@@ -121,7 +135,7 @@ export default function RemoteDevOpsHiring() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">The Strategic Hiring Process</h2>
+            <h2 id="hiring-process" className="text-3xl font-normal">The Strategic Hiring Process</h2>
             <div className="space-y-4 text-lg leading-relaxed opacity-80">
               <h3 className="font-medium">1. Preparation Phase</h3>
               <ul className="list-disc pl-6 space-y-2">
@@ -159,7 +173,7 @@ export default function RemoteDevOpsHiring() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Managing Remote DevOps Teams Successfully</h2>
+            <h2 id="managing-teams" className="text-3xl font-normal">Managing Remote DevOps Teams Successfully</h2>
             <p className="text-lg leading-relaxed opacity-80">
               The success of a remote DevOps team hinges on having the right combination of tools, processes, and management practices. Modern collaboration platforms like Slack and Microsoft Teams serve as the digital workplace for your team, enabling real-time communication and quick problem-solving. These should be complemented by robust project management tools such as Jira or Trello to track progress and maintain accountability.
             </p>
@@ -169,7 +183,7 @@ export default function RemoteDevOpsHiring() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Best Practices for Remote DevOps Management</h2>
+            <h2 id="best-practices" className="text-3xl font-normal">Best Practices for Remote DevOps Management</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Successful remote DevOps teams thrive on clear structure and expectations. Begin by establishing well-defined communication protocols that specify when and how team members should interact. This includes setting regular check-in schedules that accommodate different time zones while ensuring adequate overlap for collaborative work.
             </p>
@@ -179,7 +193,7 @@ export default function RemoteDevOpsHiring() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Cost Considerations and ROI</h2>
+            <h2 id="cost-roi" className="text-3xl font-normal">Cost Considerations and ROI</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Understanding the financial implications of hiring remote DevOps engineers requires a comprehensive view of both direct and indirect costs. Beyond competitive salary benchmarking, organisations must account for the investment in tools, infrastructure, and training necessary to support remote operations. Time zone coverage may also command premium rates, particularly for positions requiring on-call availability during Australian business hours.
             </p>
@@ -198,7 +212,7 @@ export default function RemoteDevOpsHiring() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Security and Compliance</h2>
+            <h2 id="security" className="text-3xl font-normal">Security and Compliance</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Security considerations take on added complexity when managing remote DevOps teams. Australian companies must navigate a landscape of data protection regulations while ensuring their intellectual property remains secure. This requires a multi-faceted approach to security and compliance.
             </p>
@@ -211,7 +225,7 @@ export default function RemoteDevOpsHiring() {
           </div>
 
           <div className="space-y-6">
-            <h2 className="text-3xl font-normal">Conclusion</h2>
+            <h2 id="conclusion" className="text-3xl font-normal">Conclusion</h2>
             <p className="text-lg leading-relaxed opacity-80">
               Hiring remote DevOps engineers offers Australian companies a powerful way to access global talent and drive innovation. By following this strategic guide and implementing robust remote work practices, organisations can build high-performing DevOps teams that deliver exceptional results, regardless of geographic location.
             </p>
