@@ -1,3 +1,11 @@
+## Overview of Cipher Projects
+
+A modern fullstack application built with Next.js with TypeScript and Tailwind CSS for the frontend, utilizing Framer Motion for animations and ShadCN UI components.
+
+The infrastructure is deployed on AWS using a multi-stack CDK setup with CloudFront distribution, EC2 for hosting, API Gateway and Lambda for the contact form functionality, plus comprehensive security measures including WAF and custom VPC configurations.
+
+## We use Next.js
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
