@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useBackground } from '@/context/BackgroundContext'
+import SubscribeButton from '@/components/ui/SubscribeButton'
 import { Menu, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ScrambleButton from '@/components/ScrambleButton'
@@ -65,7 +66,8 @@ export default function Header() {
             </Link>
             
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-12">
+            <div className="hidden md:flex items-center space-x-8">
+              <SubscribeButton />
               {menuItems.map((item) => (
                 <Link 
                   key={item.name}
