@@ -4,6 +4,8 @@ import ClientProviders from '@/components/ClientProviders'
 import type { Metadata } from 'next'
 import './globals.css'
 import SchemaMarkup from '@/components/SchemaMarkup'
+import RB2BScript from '@/components/RB2BScript'
+
 
 const neueHaas = localFont({
   src: [
@@ -79,7 +81,6 @@ export const metadata: Metadata = {
   },
 }
 
-
 export default function RootLayout({
   children,
 }: {
@@ -89,6 +90,7 @@ export default function RootLayout({
     <html lang="en" className={`${neueHaas.variable}`}>
       <head>
         <SchemaMarkup />
+        <RB2BScript />
       </head>
       <body className="font-sans">
         <Script
@@ -96,20 +98,12 @@ export default function RootLayout({
           data-domain="cipherprojects.com"
           strategy="afterInteractive"
         />
-        <Script id="rb2b-script" strategy="beforeInteractive">
-          {`!function(){var reb2b=window.reb2b=window.reb2b||[];if(reb2b.invoked)return;reb2b.invoked=true;reb2b.methods=["identify","collect"];reb2b.factory=function(method){return function(){var args=Array.prototype.slice.call(arguments);args.unshift(method);reb2b.push(args);return reb2b;}};for(var i=0;i<reb2b.methods.length;i++){var key=reb2b.methods[i];reb2b[key]=reb2b.factory(key);}reb2b.load=function(key){var script=document.createElement("script");script.type="text/javascript";script.async=true;script.src="https://s3-us-west-2.amazonaws.com/b2bjsstore/b/"+key+"/GNLKQHELP06Q.js.gz";var first=document.getElementsByTagName("script")[0];first.parentNode.insertBefore(script,first);};reb2b.SNIPPET_VERSION="1.0.1";reb2b.load("GNLKQHELP06Q");}();`}
-        </Script>
         <ClientProviders>
-          {/* <CustomCursor /> */}
           <main id="main" className="relative">
             {children}
           </main>
         </ClientProviders>
-
-        <a
-          href="#main"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-black"
-        >
+        <a href="#main" className="sr-only focus:not-sr-only...">
           Skip to main content
         </a>
       </body>
