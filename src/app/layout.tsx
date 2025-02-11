@@ -48,10 +48,11 @@ const neueHaas = localFont({
 export const metadata: Metadata = {
   title: 'Cipher Projects', // Title shown in the browser tab and search engines
   description: 'Cipher Projects delivers world-class software development services to clients across Europe, Asia & Australia. Web, mobile, cloud & AI expertise', // Meta description for search engines
-  icons: {
-    icon: { url: '/api/favicon', type: 'image/x-icon' },
-    shortcut: { url: '/api/favicon', type: 'image/x-icon' },
-  },
+  icons: [
+    { rel: 'icon', url: '/favicon.ico' },
+    { rel: 'icon', url: '/favicon.png', type: 'image/png' },
+    { rel: 'icon', url: '/favicon-16x16.png', type: 'image/png', sizes: '16x16' }
+  ],
   keywords: ['Cipher Projects', 'Cloud Solutions', 'Cybersecurity', 'Software Development', 'IT Outsourcing'], // SEO keywords
   openGraph: {
     title: 'Cipher Projects',
