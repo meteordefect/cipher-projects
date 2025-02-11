@@ -12,6 +12,18 @@ const nextConfig = {
           port: '',
           pathname: '/**',
         },
+        {
+          protocol: 'https',
+          hostname: 'www.cipherprojects.com',
+          port: '',
+          pathname: '/**',
+        },
+        {
+          protocol: 'https',
+          hostname: 'cipherprojects.com',
+          port: '',
+          pathname: '/**',
+        },
       ],
       minimumCacheTTL: 60,
     },
@@ -43,6 +55,16 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, must-revalidate',
+          },
+        ],
+      },
+      {
+        // Cache favicons
+        source: '/favicon.:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },

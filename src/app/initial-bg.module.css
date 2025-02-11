@@ -1,0 +1,13 @@
+.initialBg {
+  background-color: black;
+  animation: fadeOutBg 300ms 1500ms forwards;
+}
+
+@keyframes fadeOutBg {
+  from {
+    background-color: black;
+  }
+  to {
+    background-color: transparent;
+  }
+}
