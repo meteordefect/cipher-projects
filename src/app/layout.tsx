@@ -1,59 +1,18 @@
-import localFont from 'next/font/local'
-import Script from 'next/script'
-import ClientProviders from '@/components/ClientProviders'
 import type { Metadata } from 'next'
 import './globals.css'
-import SchemaMarkup from '@/components/SchemaMarkup'
-import RB2BScript from '@/components/RB2BScript'
-
-
-const neueHaas = localFont({
-  src: [
-    {
-      path: '../../public/fonts/NeueHaasDisplay-Thin.woff2',
-      weight: '100',
-      style: 'normal',
-    },
-    {
-      path: '../../public/fonts/NeueHaasDisplay-Light.woff2',
-      weight: '300',
-      style: 'normal',
-    },
-    {
-      path: '../../public/fonts/NeueHaasDisplay-Roman.woff2',
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: '../../public/fonts/NeueHaasDisplay-Medium.woff2',
-      weight: '500',
-      style: 'normal',
-    },
-    {
-      path: '../../public/fonts/NeueHaasDisplay-Bold.woff2',
-      weight: '700',
-      style: 'normal',
-    },
-    {
-      path: '../../public/fonts/NeueHaasDisplay-Black.woff2',
-      weight: '900',
-      style: 'normal',
-    }
-  ],
-  variable: '--font-neue-haas',
-  display: 'swap',
-})
-
+import { neueHaas } from '@/lib/fonts'
+import RootLayoutClient from '@/components/RootLayoutClient'
+import BodyWrapper from '@/components/BodyWrapper'
 
 export const metadata: Metadata = {
-  title: 'Cipher Projects', // Title shown in the browser tab and search engines
-  description: 'Cipher Projects delivers world-class software development services to clients across Europe, Asia & Australia. Web, mobile, cloud & AI expertise', // Meta description for search engines
+  title: 'Cipher Projects',
+  description: 'Cipher Projects delivers world-class software development services to clients across Europe, Asia & Australia. Web, mobile, cloud & AI expertise',
   icons: [
     { rel: 'icon', url: '/favicon.ico' },
     { rel: 'icon', url: '/favicon.png', type: 'image/png' },
     { rel: 'icon', url: '/favicon-16x16.png', type: 'image/png', sizes: '16x16' }
   ],
-  keywords: ['Cipher Projects', 'Cloud Solutions', 'Cybersecurity', 'Software Development', 'IT Outsourcing'], // SEO keywords
+  keywords: ['Cipher Projects', 'Cloud Solutions', 'Cybersecurity', 'Software Development', 'IT Outsourcing'],
   openGraph: {
     title: 'Cipher Projects',
     description: 'Expertly crafted cloud solutions, cybersecurity, and software projects tailored to your needs. Build smarter with Cipher Projects.',
@@ -61,7 +20,7 @@ export const metadata: Metadata = {
     siteName: 'Cipher Projects',
     images: [
       {
-        url: 'https://www.cipherprojects.com/og-image.jpg', // Path to your Open Graph image
+        url: 'https://www.cipherprojects.com/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'Cipher Projects - Outsource smarter',
@@ -82,25 +41,12 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${neueHaas.variable}`}>
-      <body className="font-sans">
-        <SchemaMarkup />
-        <RB2BScript />
-        <Script
-          src="https://s.ahrefs.com/website-analytics.js"
-          data-domain="cipherprojects.com"
-          strategy="lazyOnload"
-        />
-        <ClientProviders>
-          {children}
-        </ClientProviders>
-      </body>
+    <html lang="en" className={neueHaas.variable}>
+      <BodyWrapper className="font-sans">
+        <RootLayoutClient>{children}</RootLayoutClient>
+      </BodyWrapper>
     </html>
   )
 }

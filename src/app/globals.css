@@ -29,7 +29,7 @@
   }
 
   body {
-    @apply font-sans text-cipherblack bg-[#f8f8f8];
+    @apply font-sans text-cipherblack bg-black;
     -webkit-font-smoothing: antialiased;
   }
 

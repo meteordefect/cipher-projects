@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode, useEffect } from 'react'
-import Lenis from '@studio-freight/lenis'
+import { useScroll, useSpring, motion } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 
 interface SmoothScrollProps {
@@ -10,33 +10,33 @@ interface SmoothScrollProps {
 
 export default function SmoothScroll({ children }: SmoothScrollProps) {
   const pathname = usePathname()
+  const { scrollYProgress } = useScroll()
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  })
 
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,  // use this instead of 'smooth'
-      wheelMultiplier: 1, // use this instead of 'mouseMultiplier'
-      touchMultiplier: 2,
-      infinite: false,
-    })
-
-    function raf(time: number) {
-      lenis.raf(time)
-      requestAnimationFrame(raf)
-    }
-
-    requestAnimationFrame(raf)
-
     if (window) {
-      window.scrollTo(0, 0)
-      lenis.scrollTo(0)
-    }
-
-    return () => {
-      lenis.destroy()
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      })
     }
   }, [pathname])
 
-  return <>{children}</>
+  return (
+    <motion.div
+      style={{
+        y: scaleX,
+      }}
+      transition={{
+        duration: 1.2,
+        ease: [0.32, 0.72, 0, 1]
+      }}
+    >
+      {children}
+    </motion.div>
+  )
 }

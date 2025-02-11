@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Mail, Phone, MapPin, ArrowUpRight } from 'lucide-react'
+import { Mail, Phone, MapPin, ArrowUpRight } from '../ui/SharedIcons'
+import LazySection from '../ui/LazySection'
 import AnimatedSection from '../../app/about/components/AnimatedSection'
 import ContactForm from './ContactForm'
 

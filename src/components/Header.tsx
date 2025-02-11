@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useBackground } from '@/context/BackgroundContext'
-import { Menu, X } from 'lucide-react'
+import { Menu, X } from '@/components/ui/SharedIcons'
 import { motion, AnimatePresence } from 'framer-motion'
 import ScrambleButton from '@/components/ScrambleButton'
 
