@@ -58,7 +58,7 @@ export default function RemoteDevOpsHiring() {
 
         <div className="relative aspect-[21/9] mb-16 overflow-hidden rounded-sm">
           <Image
-            src="/hire-remote-devops-engineer.jpg"
+            src="/research/hire-remote-devops-engineer.jpg"
             alt="Remote DevOps Engineer Hiring Guide"
             fill
             className="object-cover"
