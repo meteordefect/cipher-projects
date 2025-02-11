@@ -7,6 +7,7 @@ import SmoothScroll from '@/components/SmoothScroll'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import PageTransition from '@/components/PageTransition'
+import LoadingWrapper from '@/components/LoadingWrapper'
 
 const ColorTransition = dynamic(() => import('@/components/ColorTransition'), {
   ssr: false
@@ -27,14 +28,16 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
     <Suspense fallback={<LoadingFallback />}>
       <BackgroundProvider>
         <CipherLoading />
-        <SmoothScroll>
-          <ColorTransition />
-          <Header />
-          <PageTransition>
-            {children}
-          </PageTransition>
-          <Footer />
-        </SmoothScroll>
+        <LoadingWrapper>
+          <SmoothScroll>
+            <ColorTransition />
+            <Header />
+            <PageTransition>
+              {children}
+            </PageTransition>
+            <Footer />
+          </SmoothScroll>
+        </LoadingWrapper>
       </BackgroundProvider>
     </Suspense>
   )
