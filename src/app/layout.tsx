@@ -89,24 +89,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${neueHaas.variable}`}>
-      <head>
+      <body className="font-sans">
         <SchemaMarkup />
         <RB2BScript />
-      </head>
-      <body className="font-sans">
         <Script
           src="https://s.ahrefs.com/website-analytics.js"
           data-domain="cipherprojects.com"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
         <ClientProviders>
-          <main id="main" className="relative">
-            {children}
-          </main>
+          {children}
         </ClientProviders>
-        <a href="#main" className="sr-only focus:not-sr-only...">
-          Skip to main content
-        </a>
       </body>
     </html>
   )
