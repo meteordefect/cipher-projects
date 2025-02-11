@@ -1,7 +1,5 @@
-'use client'
-
-import { motion } from 'framer-motion'
 import Image from 'next/image'
+import AnimatedSection from './components/AnimatedSection'
 
 const values = [
   {
@@ -46,32 +44,23 @@ export default function AboutContent() {
       <section className="pt-48 pb-32">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-5xl md:text-[4vw] leading-[1.2] font-normal"
-            >
+            <AnimatedSection className="text-5xl md:text-[4vw] leading-[1.2] font-normal">
               Where innovation
               <br />
               Meets Engineering
-            </motion.h1>
+            </AnimatedSection>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+            <AnimatedSection 
+              delay={0.2}
               className="text-3xl md:text-4xl font-normal leading-tight opacity-80 mt-8 lg:mt-16"
             >
               We are a trusted technology partner transforming business visions into powerful technical solutions, delivering excellence across Australia, Europe and Asia.
-            </motion.p>
+            </AnimatedSection>
           </div>
 
           {/* Hero Image */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+          <AnimatedSection
+            delay={0.3}
             className="mt-32 relative aspect-[21/9] w-full overflow-hidden rounded-lg"
           >
             <Image
@@ -82,7 +71,7 @@ export default function AboutContent() {
               className="object-cover"
               sizes="100vw"
             />
-          </motion.div>
+          </AnimatedSection>
         </div>
       </section>
 
@@ -90,37 +79,28 @@ export default function AboutContent() {
       <section className="py-32">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-32">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-6xl md:text-7xl font-normal"
-            >
+            <AnimatedSection className="text-6xl md:text-7xl font-normal">
               Our Values
-            </motion.h2>
+            </AnimatedSection>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+            <AnimatedSection
+              delay={0.2}
               className="text-3xl md:text-4xl font-normal leading-tight opacity-80"
             >
               Guided by principles that prioritize excellence, security, and lasting partnerships.
-            </motion.p>
+            </AnimatedSection>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
             {values.map((value, index) => (
-              <motion.div
+              <AnimatedSection
                 key={value.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
+                delay={index * 0.2}
                 className="space-y-4"
               >
                 <h3 className="text-2xl font-normal">{value.title}</h3>
                 <p className="text-lg opacity-60">{value.description}</p>
-              </motion.div>
+              </AnimatedSection>
             ))}
           </div>
         </div>
@@ -130,32 +110,24 @@ export default function AboutContent() {
       <section className="py-32">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-32">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-6xl md:text-7xl font-normal"
-            >
+            <AnimatedSection className="text-6xl md:text-7xl font-normal">
               Our Journey
-            </motion.h2>
+            </AnimatedSection>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+            <AnimatedSection
+              delay={0.2}
               className="text-3xl md:text-4xl font-normal leading-tight opacity-80"
             >
               From inception to industry leadership, charting our path in cloud excellence.
-            </motion.p>
+            </AnimatedSection>
           </div>
 
           <div className="space-y-16">
             {milestones.map((milestone, index) => (
-              <motion.div
+              <AnimatedSection
                 key={milestone.id}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
+                delay={index * 0.2}
+                direction="left"
                 className="grid grid-cols-12 gap-8 items-start"
               >
                 <div className="col-span-2 md:col-span-1">
@@ -165,7 +137,7 @@ export default function AboutContent() {
                   <h3 className="text-2xl font-normal mb-2">{milestone.title}</h3>
                   <p className="text-lg opacity-60">{milestone.description}</p>
                 </div>
-              </motion.div>
+              </AnimatedSection>
             ))}
           </div>
         </div>

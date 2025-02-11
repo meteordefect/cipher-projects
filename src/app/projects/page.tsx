@@ -1,7 +1,5 @@
-'use client'
-
-import Image from 'next/image'
-import { motion } from 'framer-motion'
+import AnimatedSection from '../about/components/AnimatedSection'
+import ProjectCard from './components/ProjectCard'
 
 interface DetailedProject {
   title: string;
@@ -16,89 +14,6 @@ interface DetailedProject {
   technologies: string[];
   year: string;
   client: string;
-}
-
-function Project({ project }: { project: DetailedProject }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
-      className="grid grid-cols-1 lg:grid-cols-2 gap-16"
-    >
-      {/* Project Image */}
-      <div className="relative aspect-[4/3] overflow-hidden rounded-sm">
-        <Image
-          src={project.image}
-          alt={project.title}
-          fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover"
-        />
-      </div>
-
-      {/* Project Details */}
-      <div className="space-y-8">
-        <div>
-          <span
-            className="text-sm font-normal opacity-60"
-            style={{ color: project.accentColor }}
-          >
-            {project.category}
-          </span>
-          <h2 className="text-4xl font-normal mt-2">{project.title}</h2>
-          <p className="text-xl opacity-80 mt-4">{project.subtitle}</p>
-          <p className="mt-4 opacity-80">{project.description}</p>
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="text-xl font-normal">Challenge</h3>
-          <p className="opacity-80">{project.challenge}</p>
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="text-xl font-normal">Solution</h3>
-          <p className="opacity-80">{project.solution}</p>
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="text-xl font-normal">Results</h3>
-          <ul className="list-disc list-inside space-y-2 opacity-80">
-            {project.results.map((result, idx) => (
-              <li key={idx}>{result}</li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Technologies */}
-        <div className="space-y-4">
-          <h3 className="text-xl font-normal">Technologies</h3>
-          <div className="flex flex-wrap gap-2">
-            {project.technologies.map((tech, index) => (
-              <span
-                key={index}
-                className="px-3 py-1 border border-current/20 rounded-sm text-sm opacity-60"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Project Info */}
-        <div className="grid grid-cols-2 gap-8 pt-8 border-t border-current/20">
-          <div>
-            <span className="text-sm opacity-60">Year</span>
-            <p className="mt-1">{project.year}</p>
-          </div>
-          <div>
-            <span className="text-sm opacity-60">Client</span>
-            <p className="mt-1">{project.client}</p>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  )
 }
 
 const projects: DetailedProject[] = [
@@ -201,29 +116,22 @@ export default function ProjectsPage() {
       <section className="pt-48 pb-32">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-5xl md:text-[4vw] leading-[1.2] font-normal"
-            >
+            <AnimatedSection className="text-5xl md:text-[4vw] leading-[1.2] font-normal">
               Our Projects
-            </motion.h1>
+            </AnimatedSection>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+            <AnimatedSection
+              delay={0.2}
               className="text-3xl md:text-4xl font-normal leading-tight opacity-80 mt-8 lg:mt-16"
             >
               Detailed overview of our featured work in cloud infrastructure,
               blockchain, and enterprise solutions.
-            </motion.p>
+            </AnimatedSection>
           </div>
 
           <div className="space-y-32 mt-32">
-            {projects.map((project) => (
-              <Project key={project.title} project={project} />
+            {projects.map((project, index) => (
+              <ProjectCard key={project.title} project={project} isFirst={index === 0} />
             ))}
           </div>
         </div>

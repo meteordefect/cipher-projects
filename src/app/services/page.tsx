@@ -1,7 +1,6 @@
-'use client'
-
-import { motion } from 'framer-motion'
 import Image from 'next/image'
+import AnimatedSection from '../about/components/AnimatedSection'
+import ServiceItem from './components/ServiceItem'
 
 const services = [
   {
@@ -47,31 +46,22 @@ export default function ServicesPage() {
       <section className="pt-48 pb-32">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-5xl md:text-[4vw] leading-[1.2] font-normal"
-            >
+            <AnimatedSection className="text-5xl md:text-[4vw] leading-[1.2] font-normal">
               Engineering
               <br />
               Digital Excellence
-            </motion.h1>
+            </AnimatedSection>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+            <AnimatedSection
+              delay={0.2}
               className="text-3xl md:text-4xl font-normal leading-tight opacity-80 mt-8 lg:mt-16"
             >
               We transform complex business challenges into elegant digital solutions, partnering with you to create software that drives real growth and lasting success.
-            </motion.p>
+            </AnimatedSection>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+          <AnimatedSection
+            delay={0.3}
             className="mt-32 relative aspect-[21/9] w-full overflow-hidden rounded-lg"
           >
             <Image
@@ -81,55 +71,20 @@ export default function ServicesPage() {
               sizes="100vw"
               className="object-cover"
             />
-          </motion.div>
+          </AnimatedSection>
         </div>
       </section>
 
       {/* Services List Section */}
       <section className="py-32">
         <div className="container">
-          {services.map((service, index) => (
-            <div key={service.title}>
-              {/* Divider line */}
-              <div className="h-[1px] bg-current opacity-20" />
-
-              <div className="py-24 md:py-32">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                  className="grid grid-cols-12 gap-8 items-start"
-                >
-                  {/* Title */}
-                  <div className="col-span-12 md:col-span-3">
-                    <h2 className="text-5xl md:text-6xl font-normal">{service.title}</h2>
-                  </div>
-
-                  {/* Items List */}
-                  <div className="col-span-12 md:col-span-4">
-                    <ul className="space-y-4 text-xl md:text-2xl">
-                      {service.items.map((item, itemIndex) => (
-                        <motion.li
-                          key={itemIndex}
-                          initial={{ opacity: 0, x: -20 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.4, delay: itemIndex * 0.1 }}
-                        >
-                          {item}
-                        </motion.li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Description */}
-                  <div className="col-span-12 md:col-span-5">
-                    <p className="text-xl md:text-2xl opacity-60 leading-relaxed">
-                      {service.description}
-                    </p>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
+          {services.map((service) => (
+            <ServiceItem
+              key={service.title}
+              title={service.title}
+              items={service.items}
+              description={service.description}
+            />
           ))}
           {/* Final divider line */}
           <div className="h-[1px] bg-current opacity-20" />
@@ -138,4 +93,3 @@ export default function ServicesPage() {
     </main>
   )
 }
-

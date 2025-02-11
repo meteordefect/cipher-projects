@@ -1,66 +1,42 @@
-'use client'
-import { Suspense, lazy } from 'react' // Remove useState and useEffect
-import { motion } from 'framer-motion' // Remove AnimatePresence since PageTransition handles it
+import { Metadata } from 'next'
+import HomeContent from './components/HomeContent'
 
-
-// Loading States Components
-const SectionLoader = () => (
-  <div className="w-full py-24">
-    <div className="animate-pulse space-y-8">
-      <div className="h-12 bg-gray-200 rounded w-2/3" />
-      <div className="space-y-3">
-        <div className="h-4 bg-gray-200 rounded w-full" />
-        <div className="h-4 bg-gray-200 rounded w-5/6" />
-        <div className="h-4 bg-gray-200 rounded w-4/6" />
-      </div>
-    </div>
-  </div>
-)
-
-// Dynamically import components with loading states
-const Hero = lazy(() => import('@/components/Hero'))
-const ClientMarquee = lazy(() => import('@/components/Marquee'))
-const Services = lazy(() => import('@/components/Services'))
-const Experts = lazy(() => import('@/components/Experts'))
-const SelectedWork = lazy(() => import('@/components/Work'))
-
-// Section wrapper component for consistent loading behavior
-const Section = ({ children, fullWidth = false }: { children: React.ReactNode, fullWidth?: boolean }) => (
-  <Suspense fallback={<SectionLoader />}>
-    {fullWidth ? children : <div className="container">{children}</div>}
-  </Suspense>
-)
+export const metadata: Metadata = {
+  title: 'Cipher Projects | Leading Software Development & Cloud Engineering in Australia',
+  description: 'Expert software development, cloud engineering, and cybersecurity solutions. Delivering innovative digital solutions across Australia, Europe, and Asia.',
+  keywords: 'Cipher Projects, software development Australia, cloud engineering, cybersecurity solutions, AWS partners, custom software development Canberra',
+  openGraph: {
+    title: 'Cipher Projects | Software Development & Cloud Engineering',
+    description: 'Expert software development and cloud engineering solutions. Delivering excellence across Australia, Europe, and Asia.',
+    url: 'https://cipherprojects.com',
+    siteName: 'Cipher Projects',
+    images: [{
+      url: 'https://cipherprojects.com/og-image.jpg',
+      width: 1200,
+      height: 630,
+      alt: 'Cipher Projects'
+    }],
+    locale: 'en_AU',
+    type: 'website'
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Cipher Projects | Software Development & Cloud Engineering',
+    description: 'Expert software development and cloud engineering solutions. Delivering excellence across Australia, Europe, and Asia.',
+    images: 'https://cipherprojects.com/og-image.jpg'
+  },
+  alternates: {
+    canonical: 'https://cipherprojects.com'
+  },
+  robots: {
+    index: true,
+    follow: true,
+    'max-image-preview': 'large',
+    'max-snippet': -1,
+    'max-video-preview': -1
+  }
+}
 
 export default function Home() {
-
-  return (
-    <motion.main
-      className="min-h-screen"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {/* Hero Section - Full Width */}
-      <Section fullWidth>
-        <Hero />
-      </Section>
-
-      {/* Other Sections - With Container */}
-      <Section>
-        <ClientMarquee />
-      </Section>
-
-      <Section>
-        <Services />
-      </Section>
-
-      <Section>
-        <SelectedWork />
-      </Section>
-      
-      <Section>
-        <Experts />
-      </Section>
-    </motion.main>
-  )
+  return <HomeContent />
 }

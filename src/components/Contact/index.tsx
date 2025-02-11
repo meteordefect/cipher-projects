@@ -1,103 +1,9 @@
-'use client'
-
-// Test:
-//      curl -X POST -H "Content-Type: application/json" \
-//      -d '{"name": "Test", "email": "test@example.com", "message": "Hello"}' \
-//      https://mkz66v3npa.execute-api.ap-southeast-2.amazonaws.com/prod/contact
-//
-//
-//   set the api key in a file called .env.production
-
-import { useState } from 'react'
-import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Mail, Phone, MapPin } from 'lucide-react'
-import { Metadata } from 'next'
+import AnimatedSection from '../../app/about/components/AnimatedSection'
+import ContactForm from './ContactForm'
 
-export const metadata: Metadata = {
-  title: 'Contact Cipher Projects | Expert Software Development Services',
-  description: 'Get in touch with Cipher Projects for custom software development, cloud engineering, cybersecurity, and AI solutions. Serving clients across Australia, Europe, and Asia.',
-  keywords: 'contact Cipher Projects, software development services, cloud engineering, cybersecurity solutions, AI development, custom software Australia',
-  openGraph: {
-    title: 'Contact Cipher Projects | Software Development Experts',
-    description: 'Connect with Cipher Projects for your next software development project. Specializing in cloud engineering, cybersecurity, and AI solutions.',
-    url: 'https://cipherprojects.com/contact',
-    siteName: 'Cipher Projects',
-    images: [{
-      url: 'https://cipherprojects.com/og-image.jpg',
-      width: 1200,
-      height: 630,
-      alt: 'Contact Cipher Projects'
-    }],
-    locale: 'en_AU',
-    type: 'website'
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Contact Cipher Projects | Software Development Services',
-    description: 'Ready to start your next software project? Contact Cipher Projects for expert development services across Australia, Europe, and Asia.',
-    images: 'https://cipherprojects.com/og-image.jpg'
-  },
-  alternates: {
-    canonical: 'https://cipherprojects.com/contact'
-  },
-  robots: {
-    index: true,
-    follow: true,
-    'max-image-preview': 'large',
-    'max-snippet': -1,
-    'max-video-preview': -1
-  }
-}
-
-export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    budget: '',
-    message: ''
-  })
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
-  const [errorMessage, setErrorMessage] = useState('')
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitStatus('loading')
-    console.log('Form submitted with data:', formData)
-
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      })
-
-      const data = await response.json()
-      console.log('Response:', data)
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to send message')
-      }
-
-      setSubmitStatus('success')
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        budget: '',
-        message: ''
-      })
-
-    } catch (error) {
-      console.error('Error:', error)
-      setSubmitStatus('error')
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to send message')
-    }
-  }
-
+export default function Contact() {
   return (
     <main className="min-h-screen pt-48 pb-32">
       <div className="container">
@@ -105,19 +11,14 @@ export default function ContactPage() {
           {/* Left Column - Header & Contact Info */}
           <div>
             {/* Hero Text */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="mb-16"
-            >
+            <AnimatedSection className="mb-16">
               <h1 className="text-6xl md:text-[5vw] font-normal leading-[1.1] mb-8">
                 Let's talk about your next project.
               </h1>
               <p className="text-xl opacity-60">
                 The more details you include, the better we can understand your needs and provide the right solution.
               </p>
-            </motion.div>
+            </AnimatedSection>
 
             {/* Contact Info */}
             <div className="space-y-8">
@@ -151,101 +52,7 @@ export default function ContactPage() {
 
           {/* Right Column - Contact Form */}
           <div>
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <div>
-                <label className="text-lg mb-2 block">Your Name</label>
-                <input
-                  type="text"
-                  className="w-full bg-transparent border-b border-current py-4 focus:outline-none text-lg"
-                  placeholder="First and Last Name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="text-lg mb-2 block">Email</label>
-                <input
-                  type="email"
-                  className="w-full bg-transparent border-b border-current py-4 focus:outline-none text-lg"
-                  placeholder="name@example.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="text-lg mb-2 block">Phone</label>
-                <input
-                  type="tel"
-                  className="w-full bg-transparent border-b border-current py-4 focus:outline-none text-lg"
-                  placeholder="Your phone number"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                />
-              </div>
-
-              <div>
-                <label className="text-lg mb-2 block">Budget</label>
-                <select
-                  className="w-full bg-transparent border-b border-current py-4 focus:outline-none text-lg appearance-none cursor-pointer"
-                  value={formData.budget}
-                  onChange={(e) => setFormData({...formData, budget: e.target.value})}
-                >
-                  <option value="">Select a budget range</option>
-                  <option value="under-25k">Under $25,000</option>
-                  <option value="25-50k">$25,000 - $50,000</option>
-                  <option value="50-100k">$50,000 - $100,000</option>
-                  <option value="100k+">$100,000+</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="text-lg mb-2 block">Message</label>
-                <textarea
-                  className="w-full bg-transparent border-b border-current py-4 focus:outline-none text-lg min-h-[120px]"
-                  placeholder="Tell us about your project"
-                  value={formData.message}
-                  onChange={(e) => setFormData({...formData, message: e.target.value})}
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={submitStatus === 'loading'}
-                className={`w-full mt-8 px-8 py-4 border border-current
-                  ${submitStatus === 'loading'
-                    ? 'opacity-50 cursor-not-allowed'
-                    : 'hover:bg-black hover:text-white transition-all duration-300'}
-                  text-lg`}
-              >
-                {submitStatus === 'loading' ? 'Sending...' : 'Send Message'}
-              </button>
-
-              {/* Status Messages */}
-              {submitStatus === 'success' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-green-600 mt-4 p-4 bg-green-50 rounded-md"
-                >
-                  Message sent successfully! We'll get back to you soon.
-                </motion.div>
-              )}
-
-              {submitStatus === 'error' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-red-600 mt-4 p-4 bg-red-50 rounded-md"
-                >
-                  {errorMessage || 'Failed to send message. Please try again.'}
-                </motion.div>
-              )}
-            </form>
+            <ContactForm />
           </div>
         </div>
       </div>
