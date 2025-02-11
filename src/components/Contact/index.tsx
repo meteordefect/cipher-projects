@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Mail, Phone, MapPin } from 'lucide-react'
+import { Mail, Phone, MapPin, ArrowUpRight } from 'lucide-react'
 import AnimatedSection from '../../app/about/components/AnimatedSection'
 import ContactForm from './ContactForm'
 
@@ -21,31 +21,45 @@ export default function Contact() {
             </AnimatedSection>
 
             {/* Contact Info */}
-            <div className="space-y-8">
-              <h2 className="text-2xl font-normal">Get in Touch</h2>
-              <div className="space-y-6">
-                <Link
-                  href="tel:+61261761580"
-                  className="flex items-center gap-4 text-lg hover:opacity-60 transition-opacity duration-300"
-                >
-                  <Phone size={24} className="opacity-60" />
-                  <span>+61 2 6176 1580</span>
-                </Link>
-                <Link
-                  href="mailto:hello@cipherprojects.com"
-                  className="flex items-center gap-4 text-lg hover:opacity-60 transition-opacity duration-300"
-                >
-                  <Mail size={24} className="opacity-60" />
-                  <span>hello@cipherprojects.com</span>
-                </Link>
-                <div className="flex items-center gap-4 text-lg">
-                  <MapPin size={24} className="opacity-60" />
-                  <span>
-                    Mawson 2607
-                    <br />
-                    Canberra, Australia
-                  </span>
+            <div className="space-y-12">
+              <div className="space-y-8">
+                <h2 className="text-2xl font-normal">Get in Touch</h2>
+                <div className="space-y-6">
+                  <Link
+                    href="tel:+61261761580"
+                    className="flex items-center gap-4 text-lg hover:opacity-60 transition-opacity duration-300"
+                  >
+                    <Phone size={24} className="opacity-60" />
+                    <span>+61 2 6176 1580</span>
+                  </Link>
+                  <Link
+                    href="mailto:hello@cipherprojects.com"
+                    className="flex items-center gap-4 text-lg hover:opacity-60 transition-opacity duration-300"
+                  >
+                    <Mail size={24} className="opacity-60" />
+                    <span>hello@cipherprojects.com</span>
+                  </Link>
+                  <div className="flex items-center gap-4 text-lg">
+                    <MapPin size={24} className="opacity-60" />
+                    <span>
+                      Mawson 2607
+                      <br />
+                      Canberra, Australia
+                    </span>
+                  </div>
                 </div>
+              </div>
+
+              <div className="pt-4">
+                <Link
+                  href="https://cal.com/cipher-projects/30min"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-[#007AFF] text-white rounded-sm hover:bg-[#0056B3] transition-colors duration-300"
+                >
+                  <span className="text-lg">Schedule a Call</span>
+                  <ArrowUpRight className="w-5 h-5" />
+                </Link>
               </div>
             </div>
           </div>
