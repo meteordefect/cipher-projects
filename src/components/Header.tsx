@@ -1,12 +1,51 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useBackground } from '@/context/BackgroundContext'
 import { Menu, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ScrambleButton from '@/components/ScrambleButton'
+
+const menuItems = [
+  { name: 'Projects', href: '/projects' },
+  { name: 'Services', href: '/services' },
+  { name: 'About', href: '/about' },
+  { name: 'Blog', href: '/research' }
+]
+
+const MobileMenuItem = memo(({ 
+  item, 
+  isDark, 
+  pathname, 
+  index, 
+  onClick 
+}: { 
+  item: typeof menuItems[0]
+  isDark: boolean
+  pathname: string
+  index: number
+  onClick: () => void
+}) => (
+  <motion.div
+    initial={{ opacity: 0, x: -20 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.3, delay: index * 0.1 }}
+  >
+    <Link
+      href={item.href}
+      onClick={onClick}
+      className={`text-4xl font-medium block text-black transition-colors duration-300 ${
+        pathname === item.href ? 'opacity-100' : 'opacity-60 hover:opacity-100'
+      }`}
+    >
+      {item.name}
+    </Link>
+  </motion.div>
+))
+MobileMenuItem.displayName = 'MobileMenuItem'
 
 export default function Header() {
   const { isDark } = useBackground()
@@ -36,12 +75,6 @@ export default function Header() {
     }
   }, [isMenuOpen])
 
-  const menuItems = [
-    { name: 'Projects', href: '/projects' },
-    { name: 'Services', href: '/services' },
-    { name: 'About', href: '/about' },
-    { name: 'Blog', href: '/research' }
-  ]
 
   return (
     <>
@@ -55,11 +88,13 @@ export default function Header() {
             {/* Logo */}
             <Link href="/" className="relative z-50">
               <div className="relative w-40 h-14">
-                <img 
-                  src={isDark ? "/white-logo.png" : "/black-logo.png"} 
-                  alt="Cipher Projects" 
-                  className="h-14 w-auto object-contain transition-opacity duration-700"
-                  loading="eager"
+                <Image
+                  src={isDark ? "/white-logo.png" : "/black-logo.png"}
+                  alt="Cipher Projects"
+                  width={160}
+                  height={56}
+                  priority
+                  className="w-auto h-14 object-contain transition-opacity duration-700"
                 />
               </div>
             </Link>
@@ -90,7 +125,7 @@ export default function Header() {
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className={`md:hidden z-50 p-2 transition-opacity ${
-                isDark ? 'text-white' : 'text-black'
+                isMenuOpen ? 'text-black' : isDark ? 'text-white' : 'text-black'
               } hover:opacity-70`}
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMenuOpen}
@@ -123,36 +158,19 @@ export default function Header() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className={`fixed inset-0 z-40 ${
-              isDark ? 'bg-ciphernavy' : 'bg-white'
-            }`}
+        className="fixed inset-0 z-40 backdrop-blur-sm bg-white/95"
           >
             <div className="container h-full flex flex-col justify-center">
               <nav className="space-y-8">
                 {menuItems.map((item, index) => (
-                  <motion.div
+                  <MobileMenuItem
                     key={item.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ 
-                      duration: 0.3,
-                      delay: index * 0.1 
-                    }}
-                  >
-                    <Link
-                      href={item.href}
-                      onClick={() => setIsMenuOpen(false)}
-                      className={`text-4xl font-medium block transition-colors duration-300 ${
-                        isDark ? 'text-white' : 'text-black'
-                      } ${
-                        pathname === item.href 
-                          ? 'opacity-100' 
-                          : 'opacity-60 hover:opacity-100'
-                      }`}
-                    >
-                      {item.name}
-                    </Link>
-                  </motion.div>
+                    item={item}
+                    isDark={isDark}
+                    pathname={pathname}
+                    index={index}
+                    onClick={() => setIsMenuOpen(false)}
+                  />
                 ))}
 
                 {/* Mobile Let's Talk Button */}
@@ -168,9 +186,7 @@ export default function Header() {
                   <Link href="/contact">
                     <button
                       onClick={() => setIsMenuOpen(false)}
-                      className={`py-3 px-6 text-2xl font-normal transition-colors duration-300 ${
-                        isDark ? 'bg-white text-black' : 'bg-black text-white'
-                      } hover:opacity-80`}
+                      className="py-3 px-6 text-2xl font-normal bg-black text-white transition-colors duration-300 hover:opacity-80"
                     >
                       Let's Talk
                     </button>
