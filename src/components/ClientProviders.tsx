@@ -13,7 +13,7 @@ const ColorTransition = dynamic(() => import('@/components/ColorTransition'), {
   ssr: false
 })
 
-const CipherLoading = dynamic(() => import('@/components/CipherLoading'), {
+const LoadingTransition = dynamic(() => import('@/components/LoadingTransition'), {
   ssr: false
 })
 
@@ -27,7 +27,7 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <BackgroundProvider>
-        <CipherLoading />
+        <LoadingTransition />
         <LoadingWrapper>
           <SmoothScroll>
             <ColorTransition />
