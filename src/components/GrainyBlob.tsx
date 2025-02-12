@@ -3,33 +3,28 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 
-export default function DarkMoodImage() {
+export default function IntroAnimation() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [imageLoaded, setImageLoaded] = useState(false)
-  const [imageError, setImageError] = useState(false)
   const frameRef = useRef<number>(0)
   const startTimeRef = useRef<number>(0)
   const hasFlickeredRef = useRef(false)
   const imageRef = useRef<HTMLImageElement | null>(null)
-  const maxLoadTimeRef = useRef<NodeJS.Timeout | null>(null)
 
   // Preload image
   useEffect(() => {
     const img = new window.Image()
     
     img.onload = () => {
-      console.log('Image loaded successfully') // Debug log
       setImageLoaded(true)
       startTimeRef.current = Date.now()
       imageRef.current = img
     }
 
     img.onerror = (e) => {
-      console.error('Failed to load image:', e) // Enhanced error logging
-      setImageError(true)
+      console.error('Failed to load image:', e)
     }
 
-    // Try loading without crossOrigin first
     img.src = '/mood-office-optimized.jpg'
     
     return () => {
@@ -42,10 +37,7 @@ export default function DarkMoodImage() {
     const canvas = canvasRef.current
     if (!canvas || !imageLoaded) return
 
-    const ctx = canvas.getContext('2d', { 
-      willReadFrequently: true,
-      alpha: false // Optimize for non-transparent canvas
-    })
+    const ctx = canvas.getContext('2d')
     if (!ctx) return
 
     // Set canvas size with performance optimizations
@@ -54,15 +46,12 @@ export default function DarkMoodImage() {
       const displayWidth = window.innerWidth
       const displayHeight = window.innerHeight
       
-      // Set logical size
       canvas.style.width = `${displayWidth}px`
       canvas.style.height = `${displayHeight}px`
       
-      // Set actual size with DPR
       canvas.width = Math.round(displayWidth * dpr)
       canvas.height = Math.round(displayHeight * dpr)
       
-      // Scale context
       ctx.scale(dpr, dpr)
     }
     resize()
@@ -81,111 +70,59 @@ export default function DarkMoodImage() {
       const image = imageRef.current
       const elapsed = (Date.now() - startTimeRef.current) / 1000
 
-      const INITIAL_DELAY = 0.8
-      const FADE_DURATION = 2.5
-      const ZOOM_DURATION = 3.0 // Longer zoom duration for subtlety
-      
+      // Animation timing
+      const INITIAL_DELAY = 0.5  // Shorter initial delay
+      const FADE_DURATION = 2.0  // Faster fade in
       const fadeStart = elapsed - INITIAL_DELAY
       
       // Clear canvas
       ctx.fillStyle = 'black'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      // Base dimensions
+      // Calculate dimensions to maintain aspect ratio and full height
       const windowWidth = window.innerWidth
       const windowHeight = window.innerHeight
       const imageAspect = image.width / image.height
 
-      // Calculate base render dimensions to cover the screen
-      let renderWidth, renderHeight
-      if (windowWidth / windowHeight > imageAspect) {
-        renderWidth = windowWidth
-        renderHeight = windowWidth / imageAspect
-      } else {
-        renderHeight = windowHeight
-        renderWidth = windowHeight * imageAspect
-      }
+      // Always fit height, adjust width accordingly
+      const renderHeight = windowHeight
+      const renderWidth = windowHeight * imageAspect
+      const offsetX = (windowWidth - renderWidth) / 2
+      const offsetY = 0
 
-      // Enhanced zoom effect
-      const ZOOM_START = 1.0
-      const ZOOM_END = 1.08 // Subtle zoom amount
-      
-      // Calculate zoom progress with easing
-      const zoomProgress = Math.min(Math.max(0, fadeStart / ZOOM_DURATION), 1)
+      // Calculate opacity with smooth fade
       const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
-      const currentZoom = ZOOM_START + (easeOutCubic(zoomProgress) * (ZOOM_END - ZOOM_START))
-      
-      // Apply zoom from center
-      const scaledWidth = renderWidth * currentZoom
-      const scaledHeight = renderHeight * currentZoom
-      
-      // Center the scaled image
-      const offsetX = (windowWidth - scaledWidth) / 2
-      const offsetY = (windowHeight - scaledHeight) / 2
-
-      // Calculate base opacity with dramatic reveal
-      let opacity = fadeStart < 0 ? 0 : Math.min(fadeStart / FADE_DURATION, 0.68)
+      let opacity = fadeStart < 0 ? 0 : Math.min(fadeStart / FADE_DURATION, 1)
       opacity = easeOutCubic(opacity)
 
-      // Enhanced flicker effect
-      if (fadeStart > 0.1 && fadeStart < 0.15) {
-        opacity = 1.2 // First bright flash
-      } else if (fadeStart > 0.2 && fadeStart < 0.23) {
-        opacity = 0.2 // Quick dim
-      } else if (fadeStart > 0.23 && fadeStart < 0.3 && !hasFlickeredRef.current) {
+      // Flicker effect
+      if (fadeStart > 0.2 && fadeStart < 0.25) {
+        opacity = 1.2 // Bright flash
+      } else if (fadeStart > 0.3 && fadeStart < 0.32) {
+        opacity = 0.4 // Quick dim
+      } else if (fadeStart > 0.32 && fadeStart < 0.4 && !hasFlickeredRef.current) {
         opacity = 1.0 // Final reveal
         hasFlickeredRef.current = true
       }
 
-      // Subtle pulse after reveal
-      const pulse = Math.sin(elapsed * 1.2) * (hasFlickeredRef.current ? 0.02 : 0)
-      opacity = Math.max(0, Math.min(1, opacity + pulse))
-
-      // Draw image with current opacity
+      // Draw image
       ctx.globalAlpha = opacity
       ctx.drawImage(
         image,
         offsetX, offsetY,
-        scaledWidth, scaledHeight
+        renderWidth, renderHeight
       )
       
-      // Overlay
-      const overlayOpacity = 0.45 + Math.sin(elapsed * 1.5) * 0.05
-      ctx.fillStyle = `rgba(2, 4, 8, ${overlayOpacity})`
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-      
-      // Grain effect
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-      const data = imageData.data
-      const step = 2
-      
-      // Dynamic grain intensity
-      const MAX_NOISE = 35
-      const MIN_NOISE = 15
-      const grainProgress = Math.min(fadeStart / (FADE_DURATION * 1.5), 1)
-      const noiseRange = MAX_NOISE - (grainProgress * (MAX_NOISE - MIN_NOISE))
-      
-      for (let i = 0; i < data.length; i += (4 * step)) {
-        const baseNoise = (Math.random() - 0.5) * noiseRange
-        const noiseIntensity = 1 + Math.sin(elapsed * 1.5) * 0.1
-        const noise = baseNoise * noiseIntensity
-        
-        data[i] = Math.min(255, Math.max(0, data[i] + noise))
-        data[i + 1] = data[i]
-        data[i + 2] = data[i]
-      }
-      
-      ctx.putImageData(imageData, 0, 0)
-      
+      // Request next frame
       frameRef.current = requestAnimationFrame(draw)
     }
 
-    // Start animation only when image is loaded
+    // Start animation when image is loaded
     if (imageLoaded) {
       frameRef.current = requestAnimationFrame(draw)
     }
 
-    // Enhanced cleanup
+    // Cleanup
     return () => {
       if (frameRef.current) {
         cancelAnimationFrame(frameRef.current)
@@ -194,46 +131,22 @@ export default function DarkMoodImage() {
         clearTimeout(resizeTimeout)
       }
       window.removeEventListener('resize', handleResize)
-      if (imageRef.current) {
-        imageRef.current.src = ''
-      }
     }
-  }, [imageLoaded]) // Only re-run effect when image loads
+  }, [imageLoaded])
 
   return (
     <>
-      {/* Fallback for errors */}
-      {imageError && (
-        <Image 
-          src="/mood-office-optimized.jpg"
-          alt=""
-          width={1920}
-          height={1080}
-          priority
-          className="fixed inset-0 w-screen h-screen object-cover"
-          style={{ zIndex: -1 }}
-        />
-      )}
-      {/* Loading indicator */}
-      {!imageLoaded && !imageError && (
+      {/* Loading state */}
+      {!imageLoaded && (
         <div className="fixed inset-0 bg-black z-[-1]" />
       )}
-      {/* Hidden preload image */}
-      <Image 
-        src="/mood-office-optimized.jpg"
-        alt=""
-        width={1920}
-        height={1080}
-        priority
-        className="hidden"
-      />
       {/* Canvas for animation */}
       <canvas
         ref={canvasRef}
         className="fixed inset-0 w-screen h-screen object-cover pointer-events-none"
         style={{ 
           zIndex: -1,
-          transform: 'translate3d(0, 0, 0)',
+          transform: 'translate3d(0, 0, 0)', // Force GPU acceleration
           backfaceVisibility: 'hidden',
           perspective: 1000,
         }}
