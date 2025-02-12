@@ -13,50 +13,30 @@ export default function DarkMoodImage() {
   const imageRef = useRef<HTMLImageElement | null>(null)
   const maxLoadTimeRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Preload image with error handling and timeout
+  // Preload image
   useEffect(() => {
     const img = new window.Image()
     
-    const handleLoad = () => {
-      if (maxLoadTimeRef.current) {
-        clearTimeout(maxLoadTimeRef.current)
-      }
+    img.onload = () => {
+      console.log('Image loaded successfully') // Debug log
       setImageLoaded(true)
-      // Small delay to ensure browser has fully processed the image
-      setTimeout(() => {
-        startTimeRef.current = Date.now()
-        imageRef.current = img
-      }, 50)
+      startTimeRef.current = Date.now()
+      imageRef.current = img
     }
 
-    const handleError = () => {
-      console.error('Failed to load image')
+    img.onerror = (e) => {
+      console.error('Failed to load image:', e) // Enhanced error logging
       setImageError(true)
     }
 
-    // Set a maximum load time for Safari
-    maxLoadTimeRef.current = setTimeout(() => {
-      if (!imageLoaded) {
-        handleLoad() // Force start if taking too long
-      }
-    }, 2000)
-
-    img.onload = handleLoad
-    img.onerror = handleError
-    
-    // Force CORS mode and cache control
-    img.crossOrigin = 'anonymous'
-    const cacheBuster = `?v=${Date.now()}`
-    img.src = `/mood-office-optimized.jpg${cacheBuster}`
+    // Try loading without crossOrigin first
+    img.src = '/mood-office-optimized.jpg'
     
     return () => {
-      if (maxLoadTimeRef.current) {
-        clearTimeout(maxLoadTimeRef.current)
-      }
       img.onload = null
       img.onerror = null
     }
-  }, [imageLoaded])
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -143,21 +123,25 @@ export default function DarkMoodImage() {
       const offsetX = (windowWidth - scaledWidth) / 2
       const offsetY = (windowHeight - scaledHeight) / 2
 
-      // Calculate opacity
+      // Calculate base opacity with dramatic reveal
       let opacity = fadeStart < 0 ? 0 : Math.min(fadeStart / FADE_DURATION, 0.68)
       opacity = easeOutCubic(opacity)
-      
-      // Flicker effect
-      if (fadeStart > 0.2 && fadeStart < 0.3 && !hasFlickeredRef.current) {
-        opacity = 1.2
+
+      // Enhanced flicker effect
+      if (fadeStart > 0.1 && fadeStart < 0.15) {
+        opacity = 1.2 // First bright flash
+      } else if (fadeStart > 0.2 && fadeStart < 0.23) {
+        opacity = 0.2 // Quick dim
+      } else if (fadeStart > 0.23 && fadeStart < 0.3 && !hasFlickeredRef.current) {
+        opacity = 1.0 // Final reveal
         hasFlickeredRef.current = true
       }
 
-      // Slower pulse
-      const pulse = Math.sin(elapsed * 1.2) * 0.02
+      // Subtle pulse after reveal
+      const pulse = Math.sin(elapsed * 1.2) * (hasFlickeredRef.current ? 0.02 : 0)
       opacity = Math.max(0, Math.min(1, opacity + pulse))
 
-      // Draw image
+      // Draw image with current opacity
       ctx.globalAlpha = opacity
       ctx.drawImage(
         image,
