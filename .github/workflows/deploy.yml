@@ -69,7 +69,6 @@ jobs:
           echo "Deploying S3 Stack..."
           cdk deploy S3Stack --require-approval never --outputs-file s3-outputs.json
 
-
       # 9. Upload Deployment Package to S3
       - name: Upload Deployment Package
         run: |
@@ -83,7 +82,32 @@ jobs:
         run: |
           cdk deploy EC2Stack --require-approval never --outputs-file ec2-outputs.json
 
-# 11. Invalidate CloudFront Cache
+      # 11. Trigger EC2 Deployment
+      - name: Trigger EC2 Deployment
+        run: |
+          echo "Getting EC2 instance details..."
+          EC2_DNS=$(jq -r '.EC2Stack.EC2PublicDNS' cipher-infra/ec2-outputs.json)
+          BUCKET_NAME=$(jq -r '.S3Stack.DeploymentBucketName' cipher-infra/s3-outputs.json)
+          
+          # Create SSH key file
+          echo "${{ secrets.EC2_SSH_KEY }}" > deploy_key.pem
+          chmod 600 deploy_key.pem
+          
+          # Run deployment commands
+          ssh -o StrictHostKeyChecking=no -i deploy_key.pem ubuntu@$EC2_DNS "
+            cd /var/www/nextjs && \
+            sudo aws s3 cp s3://${BUCKET_NAME}/deploy.zip . && \
+            sudo unzip -o deploy.zip && \
+            sudo chown -R ubuntu:ubuntu . && \
+            sudo npm ci && \
+            sudo systemctl restart nextjs && \
+            sudo systemctl restart nginx
+          "
+          
+          # Cleanup
+          rm -f deploy_key.pem
+
+      # 12. Invalidate CloudFront Cache
       - name: Invalidate CloudFront Cache
         run: |
           echo "Checking EC2Stack outputs..."
@@ -108,4 +132,3 @@ jobs:
           npm ci
           echo "Deploying ContactFormStack..."
           cdk deploy ContactFormStack --require-approval never
-
