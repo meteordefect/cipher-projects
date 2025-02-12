@@ -86,14 +86,21 @@ export default function LoadingTransition() {
       const offsetX = (windowWidth - renderWidth) / 2
       const offsetY = 0
 
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      // Fill with black background
       ctx.fillStyle = 'black'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
+      // Draw image with slightly higher opacity
+      ctx.globalAlpha = 0.75
       ctx.drawImage(
         image,
         offsetX, offsetY,
         renderWidth, renderHeight
       )
+      ctx.globalAlpha = 1.0
 
       frameRef.current = requestAnimationFrame(draw)
     }
@@ -123,7 +130,7 @@ export default function LoadingTransition() {
             }
           }}
         >
-          {/* Background Image */}
+          {/* Background Image with Mood Overlay */}
           <motion.div 
             className="absolute inset-0"
             initial={{ opacity: 0 }}
@@ -134,6 +141,7 @@ export default function LoadingTransition() {
               ease: [0.43, 0.13, 0.23, 0.96]
             }}
           >
+            {/* Canvas */}
             <canvas
               ref={canvasRef}
               className="fixed inset-0 w-screen h-screen object-cover pointer-events-none"
@@ -143,6 +151,9 @@ export default function LoadingTransition() {
                 perspective: 1000,
               }}
             />
+            {/* Simple cross-browser overlays */}
+            <div className="absolute inset-0 bg-black/40" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/25" />
           </motion.div>
 
           {/* Logo */}
@@ -168,17 +179,17 @@ export default function LoadingTransition() {
             </div>
           </motion.div>
 
-          {/* Flash Effect */}
+          {/* Very Subtle Dark Flash Effect */}
           <motion.div
-            className="absolute inset-0 bg-white mix-blend-overlay"
+            className="absolute inset-0 bg-black mix-blend-multiply"
             initial={{ opacity: 0 }}
             animate={{
-              opacity: [0, 0.8, 0],
+              opacity: [0, 0.6, 0],
             }}
             transition={{
-              duration: 0.3,
+              duration: 1.8,
               delay: 1.2,
-              ease: "easeOut",
+              ease: "easeInOut",
               times: [0, 0.5, 1]
             }}
           />
