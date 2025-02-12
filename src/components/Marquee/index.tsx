@@ -6,35 +6,51 @@ import { motion } from 'framer-motion'
 const clients = [
   {
     name: 'AWS',
-    logo: '/logos/Amazon_Web_Services_Logo.svg'
+    logo: '/logos/Amazon_Web_Services_Logo.svg',
+    width: 100,
+    height: 48
   },
   {
     name: 'Azure',
-    logo: '/logos/Microsoft_Azure.svg'
+    logo: '/logos/Microsoft_Azure.svg',
+    width: 100,
+    height: 48
   },
   {
     name: 'MS',
-    logo: '/logos/ms.png'
+    logo: '/logos/ms.png',
+    width: 100,
+    height: 48
   },
   {
     name: 'NodeJS',
-    logo: '/logos/Nodejs_logo.svg'
+    logo: '/logos/Nodejs_logo.svg',
+    width: 100,
+    height: 48
   },
   {
     name: 'Terraform',
-    logo: '/logos/Terraform.svg'
+    logo: '/logos/Terraform.svg',
+    width: 100,
+    height: 48
   },
   {
     name: 'ServiceNow',
-    logo: '/logos/ServiceNow.svg'
+    logo: '/logos/ServiceNow.svg',
+    width: 100,
+    height: 48
   },
   {
     name: 'SAP',
-    logo: '/logos/SAP_2011_logo.svg'
+    logo: '/logos/SAP_2011_logo.svg',
+    width: 100,
+    height: 48
   },
   {
     name: 'React',
-    logo: '/logos/React-icon.svg'
+    logo: '/logos/React-icon.svg',
+    width: 100,
+    height: 48
   }
 ]
 
@@ -86,6 +102,9 @@ export default function ClientMarquee() {
                 <img
                   src={client.logo}
                   alt={client.name}
+                  width={client.width}
+                  height={client.height}
+                  loading="lazy"
                   className={`w-full h-full object-contain transition-opacity duration-300 ${isDark ? 'invert' : ''}`}
                 />
               </div>

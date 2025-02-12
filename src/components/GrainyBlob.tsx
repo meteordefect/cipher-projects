@@ -50,24 +50,31 @@ export default function DarkMoodImage() {
 
       const elapsed = (Date.now() - startTime) / 1000
 
-      // Improved scaling calculation
+      // Prioritize height-based scaling on mobile, width-based on desktop
       const windowWidth = window.innerWidth
       const windowHeight = window.innerHeight
-      const windowAspect = windowWidth / windowHeight
       const imageAspect = image.width / image.height
+      const isMobile = windowWidth <= 768
 
       let renderWidth = windowWidth
       let renderHeight = windowHeight
       let offsetX = 0
       let offsetY = 0
 
-      // Ensure image covers the entire viewport
-      if (windowAspect > imageAspect) {
-        renderWidth = windowHeight * (image.width / image.height)
+      if (isMobile) {
+        // On mobile, always scale based on height to ensure 100% height
+        renderWidth = windowHeight * imageAspect
         offsetX = (windowWidth - renderWidth) / 2
       } else {
-        renderHeight = windowWidth * (image.height / image.width)
-        offsetY = (windowHeight - renderHeight) / 2
+        // On desktop, use the original cover behavior
+        const windowAspect = windowWidth / windowHeight
+        if (windowAspect > imageAspect) {
+          renderWidth = windowHeight * imageAspect
+          offsetX = (windowWidth - renderWidth) / 2
+        } else {
+          renderHeight = windowWidth / imageAspect
+          offsetY = (windowHeight - renderHeight) / 2
+        }
       }
 
       // Add extra scale for safety
