@@ -14,17 +14,12 @@ export default function LoadingWrapper({ children }: { children: React.ReactNode
       />
       
       {/* Content layer */}
-      <AnimatePresence mode="wait">
-        {!isInitialLoading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-          >
-            {children}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Temporarily disabled fade-in animation */}
+      {!isInitialLoading && (
+        <div>
+          {children}
+        </div>
+      )}
     </>
   )
 }
