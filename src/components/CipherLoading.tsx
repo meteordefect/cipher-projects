@@ -54,7 +54,7 @@ export default function CipherLoading() {
             
             {/* Logo container */}
             <motion.div
-              className="relative z-[103] h-full w-full flex items-center justify-center"
+              className="relative z-[103] w-48 md:w-72"
               initial={{ scale: 1.2, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{
@@ -63,17 +63,15 @@ export default function CipherLoading() {
                 ease: [0.43, 0.13, 0.23, 0.96]
               }}
             >
-              <div className="relative w-48 md:w-72 h-full max-h-screen flex items-center justify-center">
-                <div className="relative w-full aspect-[3/1]">
-                  <Image
-                    src="/white-logo.png"
-                    alt="Cipher Projects"
-                    fill
-                    sizes="(max-width: 768px) 192px, 288px"
-                    priority
-                    className="object-contain"
-                  />
-                </div>
+              <div className="relative w-full aspect-[3/1]">
+                <Image
+                  src="/white-logo.png"
+                  alt="Cipher Projects"
+                  fill
+                  sizes="(max-width: 768px) 192px, 288px"
+                  priority
+                  className="object-contain"
+                />
               </div>
             </motion.div>
           </motion.div>
