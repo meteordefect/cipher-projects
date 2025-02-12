@@ -50,25 +50,18 @@ export default function DarkMoodImage() {
 
       const elapsed = (Date.now() - startTime) / 1000
 
-      // Improved scaling calculation
+      // Height-first scaling calculation for all devices
       const windowWidth = window.innerWidth
       const windowHeight = window.innerHeight
-      const windowAspect = windowWidth / windowHeight
       const imageAspect = image.width / image.height
 
-      let renderWidth = windowWidth
+      // Always set height to 100% viewport height
       let renderHeight = windowHeight
-      let offsetX = 0
+      // Calculate width to maintain aspect ratio
+      let renderWidth = windowHeight * imageAspect
+      // Center horizontally
+      let offsetX = (windowWidth - renderWidth) / 2
       let offsetY = 0
-
-      // Ensure image covers the entire viewport
-      if (windowAspect > imageAspect) {
-        renderWidth = windowHeight * (image.width / image.height)
-        offsetX = (windowWidth - renderWidth) / 2
-      } else {
-        renderHeight = windowWidth * (image.height / image.width)
-        offsetY = (windowHeight - renderHeight) / 2
-      }
 
       // Add extra scale for safety
       const safetyScale = 1.1
@@ -136,9 +129,9 @@ export default function DarkMoodImage() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-screen h-screen object-cover pointer-events-none bg-black"
+      className="fixed inset-0 w-screen h-screen object-cover pointer-events-none"
       style={{ 
-        zIndex: 1,
+        zIndex: -1,
         transform: 'translate3d(0, 0, 0)', // Force GPU acceleration
       }}
     />
