@@ -99,15 +99,15 @@ jobs:
           aws ssm send-command \
             --instance-ids "$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
-            --parameters commands=[\
-              "cd /var/www/nextjs",\
-              "aws s3 cp s3://${BUCKET_NAME}/deploy.zip .",\
-              "unzip -o deploy.zip",\
-              "chown -R ubuntu:ubuntu .",\
-              "npm ci",\
-              "systemctl restart nextjs",\
-              "systemctl restart nginx"\
-            ] \
+            --parameters '{"commands":[
+              "cd /var/www/nextjs",
+              "aws s3 cp s3://'${BUCKET_NAME}'/deploy.zip .",
+              "unzip -o deploy.zip",
+              "chown -R ubuntu:ubuntu .",
+              "npm ci",
+              "systemctl restart nextjs",
+              "systemctl restart nginx"
+            ]}' \
             --output text
           
           echo "Waiting for command completion..."
