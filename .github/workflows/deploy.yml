@@ -82,38 +82,7 @@ jobs:
         run: |
           cdk deploy EC2Stack --require-approval never --outputs-file ec2-outputs.json
 
-      # 11. Trigger EC2 Deployment via SSM
-      - name: Trigger EC2 Deployment
-        run: |
-          echo "Getting deployment details..."
-          INSTANCE_ID=$(aws ec2 describe-instances \
-            --filters "Name=instance-state-name,Values=running" "Name=tag:aws:cloudformation:stack-name,Values=EC2Stack" \
-            --query "Reservations[].Instances[?State.Name=='running'][].InstanceId" \
-            --output text)
-          BUCKET_NAME=$(jq -r '.S3Stack.DeploymentBucketName' cipher-infra/s3-outputs.json)
-          
-          echo "Instance ID: $INSTANCE_ID"
-          echo "Bucket Name: $BUCKET_NAME"
-          
-          echo "Running deployment commands via SSM..."
-          aws ssm send-command \
-            --instance-ids "$INSTANCE_ID" \
-            --document-name "AWS-RunShellScript" \
-            --parameters '{"commands":[
-              "cd /var/www/nextjs",
-              "aws s3 cp s3://'${BUCKET_NAME}'/deploy.zip .",
-              "unzip -o deploy.zip",
-              "chown -R ubuntu:ubuntu .",
-              "npm ci",
-              "systemctl restart nextjs",
-              "systemctl restart nginx"
-            ]}' \
-            --output text
-          
-          echo "Waiting for command completion..."
-          sleep 30
-
-      # 12. Invalidate CloudFront Cache
+      # 11. Invalidate CloudFront Cache
       - name: Invalidate CloudFront Cache
         run: |
           echo "Checking EC2Stack outputs..."
