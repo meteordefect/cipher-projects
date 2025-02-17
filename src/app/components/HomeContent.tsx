@@ -5,15 +5,9 @@ import { Suspense, lazy } from 'react'
 
 // Loading States Components
 const SectionLoader = () => (
-  <div className="w-full py-24">
-    <div className="animate-pulse space-y-8">
-      <div className="h-12 bg-gray-200 rounded w-2/3" />
-      <div className="space-y-3">
-        <div className="h-4 bg-gray-200 rounded w-full" />
-        <div className="h-4 bg-gray-200 rounded w-5/6" />
-        <div className="h-4 bg-gray-200 rounded w-4/6" />
-      </div>
-    </div>
+  <div className="w-full opacity-0">
+    {/* Invisible placeholder that maintains layout structure */}
+    <div className="h-24" />
   </div>
 )
 
