@@ -11,6 +11,16 @@ export interface ResearchPost {
 
 export const researchPosts: ResearchPost[] = [
   {
+    id: 'aws-cloud-101',
+    title: "AWS Cloud 101: A Beginner's Guide to Cloud Computing",
+    subtitle: "Understanding the fundamentals of AWS",
+    date: "January 15, 2025",
+    author: "Cipher Projects Team",
+    category: "Cloud Computing",
+    image: "/research/aws-security.jpg",
+    excerpt: "A comprehensive introduction to AWS cloud computing, covering fundamental concepts, key services, and best practices for businesses starting their cloud journey."
+  },
+  {
     id: 'offshore-development-team',
     title: "Managing Offshore Development Teams: A Comprehensive Guide",
     subtitle: "Strategies for successful offshore collaboration",

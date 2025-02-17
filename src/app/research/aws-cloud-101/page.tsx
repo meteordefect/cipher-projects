@@ -30,7 +30,7 @@ export default function AWSCloudPage() {
         {/* Hero Image */}
         <div className="relative aspect-[21/9] mb-16 overflow-hidden rounded-sm">
           <Image
-            src="/research/aws-cloud.jpg"
+            src="/research/aws-security.jpg"
             alt="AWS Cloud Infrastructure"
             fill
             className="object-cover"
